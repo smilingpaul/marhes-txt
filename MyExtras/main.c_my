@@ -1,0 +1,140 @@
+// Simple blinking led program for the LPC-P2148 board
+
+/*************************************************************************
+ *             Header Files
+ *************************************************************************/
+#include "app_types.h"
+#include "LPC23xx.h"
+#include "armVIC.h"
+
+/*************************************************************************
+ *             Function declarations
+ *************************************************************************/
+void InitMAM(void);
+void InitClock(void);
+
+/*************************************************************************
+ *             MAIN
+ *************************************************************************/
+
+int	main (void) {
+
+	int		j;			// loop counter (stack variable)
+	//const char *MSG = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+	InitMAM();			// Initialize memory accelerator
+	InitClock();		// Clock is initialized in the debug commands
+						// PLL: 288MHz, CLK: 72MHz
+
+	SCS |= 0x01;		// Enable High Speed GPIO
+	PCONP = 0;			// Turn off all peripherals on start. The Watchdog
+						// timer, GPIO, the Pin Connect block, and the System
+						// Control block can't be turned off
+
+//	PWMInit();
+//	WheelInit();
+//	Uart0Init();
+//	LcdInit();
+
+//	enableIRQ();
+
+	FIO0DIR |= (1<<21);
+	FIO0CLR |= (1<<21);
+
+	// endless loop to toggle the two leds
+	while (1) {
+		for (j = 0; j < 1000000; j++ );		// wait 500 msec
+		FIO0SET |= (1<<21);
+		//LcdBacklight(1);
+
+		for (j = 0; j < 1000000; j++ );		// wait 500 msec
+		FIO0CLR |= (1<<21);
+		//LcdBacklight(0);
+	}
+}
+
+/*************************************************************************
+ *             Initialize
+ *************************************************************************/
+
+void InitMAM(void)
+{
+
+	MAMCR = 0;				// disable MAM
+	MAMTIM = 4;    			// FCLK > 60 MHz
+	MAMCR = 1;   			// MAM functions fully enabled
+}
+
+/*************************************************************************
+ * Function Name: InitClock
+ * Parameters: void
+ * Return: void
+ *
+ * Description: Initialize PLL and clocks' dividers. Pclk - 288MHz,
+ * Cclk- 72MHz, Usbclk - 48MHz
+ *
+ *************************************************************************/
+void InitClock(void)
+{
+	// 1. If PLL is connected, disconnect it.
+	if (PLLSTAT & (1<<25))
+	{
+		PLLCON = 1;		// Enable and disconnect PLL then write feed sequence
+		PLLFEED = 0xAA;
+		PLLFEED = 0x55;
+	}
+
+	// 2. Disable the PLL by clearing the PLL enable bit and then writing a
+	//    feed sequence to load the bit
+	PLLCON = 0;
+	PLLFEED = 0xAA;
+	PLLFEED = 0x55;
+
+	// 3. Init OSC enabling the main oscillator
+	SCS |= (1<<5);					// OSCEN = 1
+	while (!(SCS & (1<<6)));		// Wait for OSC to be ready
+
+	// 4. Select source clock for PLL.  Selects the main oscillator as the PLL
+	//    clock source.
+	CLKSRCSEL = 1;
+
+	// 5. Set PLL settings 288 MHz, M=12, N=1
+	//    M is bits 14:0, N is bits 23:16
+	PLLCFG = ((12-1)<<0) | ((1-1)<<16);
+	PLLFEED = 0xAA;
+	PLLFEED = 0x55;
+
+	// 6. Enable PLL
+	PLLCON = 1;
+	PLLFEED = 0xAA;
+	PLLFEED = 0x55;
+
+	// 7. Set clk divider settings - Fpll - 288 MHz
+	CCLKCFG   = 4-1;        		// 1/4 Fpll - 72 MHz
+	USBCLKCFG = 6-1;            	// 1/6 Fpll - 48 MHz
+
+	// 8. Wait for the PLL to achieve lock
+	while ((PLLSTAT & (1<<26)) == 0);
+
+	// 9. Check if the readback of PLLSTAT is correct
+	unsigned int readback = (PLLSTAT & 0x00FF7FFF);
+	while (readback != (((12-1)<<0) | ((1-1)<<16)));
+
+	// 10. Connect the PLL
+	PLLCON = 3;						// Use equals because PLLCON isn't the real register
+	PLLFEED = 0xAA;
+	PLLFEED = 0x55;
+
+	// 11. Wait for connect
+	while ((PLLSTAT & (1<<1)) == 0);
+}
+
+
+
+
+
+
+
+
+
+
