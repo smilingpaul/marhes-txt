@@ -10,9 +10,9 @@ void DisplayInit(void)
 	DisplayIMU();
 }
 
-void DisplaySwitch(char dispNum)
+void DisplaySwitch(signed char dispNum)
 {
-    char temp = dispNum;
+    signed char temp = dispNum;
     
     if (temp < DISPLAY_MIN)
         temp = DISPLAY_MAX;
@@ -20,10 +20,12 @@ void DisplaySwitch(char dispNum)
     if (temp > DISPLAY_MAX)
         temp = DISPLAY_MIN;
     
+    LcdClearScreen();
+    
     switch(temp)
     {
 	    case DISPLAY_IMAGE:
-
+            DisplayState = DISPLAY_IMAGE;
 		    break;
 	    case DISPLAY_VEL:
 		    DisplayVelocity();
@@ -53,9 +55,9 @@ void DisplayVelocity(void)
     DisplayState = DISPLAY_VEL;
 	LcdPutStr("VELOCITY CMD", 0, 0, LARGE, FCOLOR, BCOLOR);
 	LcdSetLine(18, 0, 18, 131, FCOLOR);
-	LcdPutStr("Lin Vel:", 24, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("Ang Vel:", 36, 0, SMALL, FCOLOR, BCOLOR);
-	LcdSetRect(42, 0, 42, 131, NOFILL, BCOLOR);
+	LcdPutStr("LIN VEL:", 24, 0, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr("ANG VEL:", 36, 0, SMALL, FCOLOR, BCOLOR);
+/*	LcdSetRect(42, 0, 42, 131, FILL, BCOLOR);*/
 }
 
 void DisplayIMU(void)
@@ -70,7 +72,7 @@ void DisplayIMU(void)
 	LcdPutStr("LINX:", 72, 0, SMALL, FCOLOR, BCOLOR);
 	LcdPutStr("LINY:", 84, 0, SMALL, FCOLOR, BCOLOR);
     LcdPutStr("LINZ:", 96, 0, SMALL, FCOLOR, BCOLOR);    
-	LcdSetRect(104, 0, 104, 131, NOFILL, BCOLOR);
+/*	LcdSetRect(104, 0, 104, 131, FILL, BCOLOR);*/
 }
 
 void DisplayGPS(void)
@@ -85,7 +87,7 @@ void DisplayGPS(void)
 	LcdPutStr("STAT:", 72, 0, SMALL, FCOLOR, BCOLOR);
 	LcdPutStr("VIS :", 84, 0, SMALL, FCOLOR, BCOLOR);
     LcdPutStr("USED:", 96, 0, SMALL, FCOLOR, BCOLOR);    
-	LcdSetRect(104, 0, 104, 131, NOFILL, BCOLOR);
+/*	LcdSetRect(104, 0, 104, 131, FILL, BCOLOR);*/
 }
 
 void DisplayEncoder(void)
@@ -99,5 +101,5 @@ void DisplayEncoder(void)
 	LcdPutStr("RL  :", 60, 0, SMALL, FCOLOR, BCOLOR);
 	LcdPutStr("LINV:", 72, 0, SMALL, FCOLOR, BCOLOR);
 	LcdPutStr("ANGV:", 84, 0, SMALL, FCOLOR, BCOLOR);
-    LcdSetRect(92, 0, 92, 131, NOFILL, BCOLOR);
+/*    LcdSetRect(92, 0, 92, 131, FILL, BCOLOR);*/
 }

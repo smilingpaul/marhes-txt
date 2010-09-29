@@ -27,7 +27,7 @@
  *************************************************************************/
 
 void DisplayInit(void);
-void DisplaySwitch(char dispNum);
+void DisplaySwitch(signed char dispNum);
 unsigned char DisplayGetState(void);
 void DisplayVelocity(void);
 void DisplayIMU(void);

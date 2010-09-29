@@ -127,19 +127,14 @@ int main(void)
 	// Enter infinite while loop
 	while(1)
 	{
-        ButtonUpdate();
-        buttonState = ButtonGetMask();
-        
-        if (~FIO1PIN & (1<<18))
-            FIO0SET = (1<<21);
-        else
-            FIO0CLR = (1<<21);
-        
-   /*     if (buttonState & BUT_RIGHT_BIT)
+	    for(i = 0; i < 20000; i++);
+	
+        buttonState = ButtonGetMask();       
+	    if (buttonState & BUT_RIGHT_BIT)
             DisplaySwitch(DisplayGetState() + 1);
         if (buttonState & BUT_LEFT_BIT)
             DisplaySwitch(DisplayGetState() - 1);
-*/
+
 		// Control the motors of the robot with WASD game style control
 		// If we have received a character
 		if(Uart0RxDataReady())
