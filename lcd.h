@@ -122,7 +122,7 @@ void LcdSendCommand(unsigned char command);
 void LcdSendData(unsigned char data);
 void LcdBacklight(unsigned char state);
 void LcdReset(unsigned char state);
-void LcdClearScreen(void);
+void LcdClearScreen(uint16_t color);
 void LcdSetXY(int x, int y);
 void LcdSetPixel(int  x, int  y, int  color);
 void LcdSetLine(int x1, int y1, int x2, int y2, int color);

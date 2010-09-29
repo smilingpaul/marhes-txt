@@ -4,7 +4,7 @@ static unsigned char DisplayState = DISPLAY_IMAGE;
 
 void DisplayInit(void)
 {
-    LcdClearScreen();
+    LcdClearScreen(BCOLOR);
 	// First start displaying the TXT picture
 	//LcdImage();
 	DisplayIMU();
@@ -20,7 +20,7 @@ void DisplaySwitch(signed char dispNum)
     if (temp > DISPLAY_MAX)
         temp = DISPLAY_MIN;
     
-    LcdClearScreen();
+    LcdClearScreen(BCOLOR);
     
     switch(temp)
     {

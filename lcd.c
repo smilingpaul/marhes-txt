@@ -152,7 +152,7 @@ void LcdReset(unsigned char state)
 //    Author:  James P Lynch     July 7, 2007
 //  *****************************************************************************
 
-void LcdClearScreen(void) {
+void LcdClearScreen(uint16_t color) {
 
 	long  i;    // loop counter
 
@@ -170,9 +170,9 @@ void LcdClearScreen(void) {
 	LcdSendCommand(RAMWR);
 	for (i = 0; i < ((131 * 131) / 2); i++)
 	{
-		LcdSendData((BLACK >> 4) & 0xFF);
-		LcdSendData(((BLACK & 0xF) << 4) | ((BLACK >> 8) & 0xF));
-		LcdSendData(BLACK & 0xFF);
+		LcdSendData((color >> 4) & 0xFF);
+		LcdSendData(((color & 0xF) << 4) | ((color >> 8) & 0xF));
+		LcdSendData(color & 0xFF);
 	}
 //	for (i = 0; i < ((131 * 131) / 2); i++)
 //	{

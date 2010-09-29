@@ -16,7 +16,7 @@
 #define DISPLAY_GPS		    3
 #define DISPLAY_ENCODER		4
 
-#define FCOLOR			    WHITE
+#define FCOLOR			    YELLOW
 #define BCOLOR			    BLACK
 
 #define DISPLAY_MIN         0
