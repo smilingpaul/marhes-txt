@@ -78,6 +78,8 @@ SRC += lcd.c
 SRC += pwm.c 
 SRC += encoder.c 
 #SRC += controller.c
+SRC += display.c
+SRC += button.c
 
 # List C source files here which must be compiled in ARM-Mode.
 # use file-extension c for "c-only"-files

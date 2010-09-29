@@ -60,6 +60,8 @@
 #include "encoder.h"
 #include "controller.h"
 #include "lcd.h"
+#include "display.h"
+#include "button.h"
 #include "helperFuncs.h"
 
 /*************************************************************************
@@ -99,6 +101,7 @@ int main(void)
 //	uint32_t frontRight, frontLeft;
 //	char frStr[33] = {'\0'};
 //	char flStr[33] = {'\0'};
+    unsigned char buttonState;
 	int i;
 
 	// Wait a little
@@ -116,16 +119,7 @@ int main(void)
 	// Test Steering Servos
 	Uart0TxString("\r\nTesting the steering servos...");
 /*	ControllerTestMotors();*/
-	Uart0TxString("Done.\r\n");//one.\r\n");
-
-	LcdClearScreen();
-	LcdSetPixel(70,70,PINK);
-	LcdSetLine(75, 100, 100, 100, GREEN);
-	LcdSetLine(25, 25, 80, 80, CYAN);
-	LcdSetRect(100, 50, 125, 75, 1, RED);
-	LcdSetCircle(100, 50, 50, BLUE);
-	LcdPutChar('A', 50, 50, MEDIUM, WHITE, BLACK);
-	LcdPutStr("Hello", 25, 50, LARGE, WHITE, BLACK);
+	Uart0TxString("Done.\r\n");
 
 //	sprintf(frStr,"%d",123);
 //	Uart0TxString(frStr);
@@ -133,10 +127,19 @@ int main(void)
 	// Enter infinite while loop
 	while(1)
 	{
-/*		for (i = 0; i < 500000; i++);*/
-
-/*		FIO0PIN ^= (1<<21);*/
-
+        ButtonUpdate();
+        buttonState = ButtonGetMask();
+        
+        if (~FIO1PIN & (1<<18))
+            FIO0SET = (1<<21);
+        else
+            FIO0CLR = (1<<21);
+        
+   /*     if (buttonState & BUT_RIGHT_BIT)
+            DisplaySwitch(DisplayGetState() + 1);
+        if (buttonState & BUT_LEFT_BIT)
+            DisplaySwitch(DisplayGetState() - 1);
+*/
 		// Control the motors of the robot with WASD game style control
 		// If we have received a character
 		if(Uart0RxDataReady())
@@ -233,10 +236,8 @@ void sysInit(void)
 	LcdInit();
 	EncoderInit();
 //	ControllerInit();
-/*	DisplayInit();*/
-
-
-
+	DisplayInit();
+	ButtonInit();
 }
 
 /*************************************************************************

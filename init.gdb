@@ -14,5 +14,5 @@ monitor reset init
 monitor sleep 500
 monitor soft_reset_halt
 symbol-file main.out
-break main.c:108
+break main
 continue
