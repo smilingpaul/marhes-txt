@@ -5,6 +5,7 @@
 #include "armVIC.h"
 #include "LPC23xx.h"
 #include "lcd.h"
+#include "ROSIFace.h"
 
 /*************************************************************************
  *             Definitions
@@ -19,6 +20,8 @@
 #define FCOLOR			    YELLOW
 #define BCOLOR			    BLACK
 
+#define SCREEN_MAX          131
+
 #define DISPLAY_MIN         0
 #define DISPLAY_MAX         4
 
@@ -27,8 +30,11 @@
  *************************************************************************/
 
 void DisplayInit(void);
-void DisplaySwitch(signed char dispNum);
+void DisplaySetState(signed char dispNum);
 unsigned char DisplayGetState(void);
+short DisplayChangeValueS(short prevValue, short currentValue, uint8_t xLoc, uint8_t yLoc);
+float DisplayChangeValueF(float prevValue, float currentValue, uint8_t xLoc, uint8_t yLoc);
+void DisplayUpdate(void);
 void DisplayVelocity(void);
 void DisplayIMU(void);
 void DisplayGPS(void);

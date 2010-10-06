@@ -53,7 +53,7 @@
 #define SSP0SR_RFF		(1<<3)
 #define SSP0SR_BSY		(1<<4)
 
-#define SSP0CPSR_CPSDVSR (72)
+#define SSP0CPSR_CPSDVSR (12)
 
 #define LCD_BACKLIGHT	(1<<26)
 #define LCD_RESET		(1<<25)

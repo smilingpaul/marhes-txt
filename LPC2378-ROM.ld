@@ -12,16 +12,13 @@
    20070429 - mthomas - special version lpc2378 example
 */
 
-/* 
-ENTRY(_boot)
-STACK_SIZE = 0x800; -> see startup-file and .stack-section 
-*/
-
 /* Memory Definitions */
 MEMORY
 {
   ROM (rx) : ORIGIN = 0x00000000, LENGTH = (512k-4k)
   RAM (rw) : ORIGIN = 0x40000000, LENGTH = (32k-32)
+  usbram   : ORIGIN = 0x7FD00000, LENGTH = 8K   /* */
+  ethram   : ORIGIN = 0x7FE00000, LENGTH = 16K  /* */
 }
 
 /* Section Definitions */
@@ -42,44 +39,7 @@ SECTIONS
 	. = ALIGN(4);
   } > ROM
   
-  /***** old: 
-  .text :
-  {
-    *crt0.o (.text)            
-    *(.text)                   
-    *(.rodata)                 
-    *(.rodata*)
-    *(.glue_7)
-    *(.glue_7t)
-  } > ROM 
-  *****/
-
   . = ALIGN(4);
-  
-	/* .ctors .dtors are used for c++ constructors/destructors */
-	/* added by Martin Thomas 4/2005 based on Anglia Design example */
-	.ctors :
-	{
-		PROVIDE(__ctors_start__ = .);
-		KEEP(*(SORT(.ctors.*)))
-		KEEP(*(.ctors))
-		. = ALIGN(4);
-		PROVIDE(__ctors_end__ = .);
-		. = ALIGN(4);
-	} >ROM
-	
-	.dtors :
-	{
-		PROVIDE(__dtors_start__ = .); 
-		KEEP(*(SORT(.dtors.*)))
-		KEEP(*(.dtors))
-		. = ALIGN(4);
-		PROVIDE(__dtors_end__ = .);
-		. = ALIGN(4);
-	} >ROM
-  
-    . = ALIGN(4);
-	/* mthomas - end */
    
   _etext = . ;
   PROVIDE (etext = .);
@@ -128,16 +88,15 @@ SECTIONS
     . = ALIGN(4);
   } > RAM
 
-  _end = . ;
-  PROVIDE (end = .);
-  
   .heap :
   {
 	*(.HEAP)
     . = ALIGN(4);
   } > RAM
 
-
+  _end = . ;
+  PROVIDE (end = .);
+  
   /* Stabs debugging sections.  */
   .stab          0 : { *(.stab) }
   .stabstr       0 : { *(.stabstr) }

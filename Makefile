@@ -73,6 +73,7 @@ TARGET = main
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 SRC = $(TARGET).c 
+SRC += syscalls.c
 SRC += uart0.c 
 SRC += lcd.c 
 SRC += pwm.c 
@@ -80,6 +81,7 @@ SRC += encoder.c
 #SRC += controller.c
 SRC += display.c
 SRC += button.c
+SRC += ROSIFace.c
 
 # List C source files here which must be compiled in ARM-Mode.
 # use file-extension c for "c-only"-files
@@ -132,12 +134,12 @@ DEBUG = gdb#dwarf-2
 
 # List any extra directories to look for include files here.
 #     Each directory must be seperated by a space.
-EXTRAINCDIRS = #C:\yagarto\lib\gcc\arm-none-eabi\4.5.0\include C:\yagarto\arm-none-eabi\include
+EXTRAINCDIRS = 
 
 # List any extra directories to look for library files here.
 #     Each directory must be seperated by a space.
 #EXTRA_LIBDIRS = ../arm7_efsl_0_2_4
-EXTRA_LIBDIRS = #C:\yagarto\lib\gcc\arm-none-eabi\4.5.0 C:\yagarto\arm-none-eabi\lib
+EXTRA_LIBDIRS = 
 
 
 # Compiler flag to set the C Standard level.
@@ -265,6 +267,7 @@ MSG_SIZE_BEFORE = Size before:
 MSG_SIZE_AFTER = Size after:
 MSG_FLASH = Creating load file for Flash:
 MSG_EXTENDED_LISTING = Creating Extended Listing:
+
 MSG_SYMBOL_TABLE = Creating Symbol Table:
 MSG_LINKING = Linking:
 MSG_COMPILING = Compiling C:

@@ -95,7 +95,7 @@ Stack_Mem:
 @@                AREA    HEAP, NOINIT, READWRITE, ALIGN=3
 @@Heap_Mem        SPACE   Heap_Size
 
-.equ Heap_Size,   0x00000000
+.equ Heap_Size,   0x00000400
 .section .HEAP, "w"
 .align 4
 HeapMem:

@@ -1,16 +1,26 @@
 #include "display.h"
 
-static unsigned char DisplayState = DISPLAY_IMAGE;
+static unsigned char DisplayState;
+static char Switched;
+static uint16_t currentVC[SIZE_VEL_ARR];
+static float currentImuData[SIZE_IMU_ARR];
+static uint16_t currentGpsStat[SIZE_GPS_STAT_ARR];
+static float currentGpsData[SIZE_GPS_DATA_ARR];
 
 void DisplayInit(void)
 {
+    DisplayState = DISPLAY_IMU;
+    Switched = 1;
+    
+    ROSGetVelocityCmd(currentVC);
+    ROSGetImuData(currentImuData);
+    ROSGetGpsStatus(currentGpsStat);
+    ROSGetGpsData(currentGpsData);
+    
     LcdClearScreen(BCOLOR);
-	// First start displaying the TXT picture
-	//LcdImage();
-	DisplayIMU();
 }
 
-void DisplaySwitch(signed char dispNum)
+void DisplaySetState(signed char dispNum)
 {
     signed char temp = dispNum;
     
@@ -20,12 +30,21 @@ void DisplaySwitch(signed char dispNum)
     if (temp > DISPLAY_MAX)
         temp = DISPLAY_MIN;
     
-    LcdClearScreen(BCOLOR);
-    
-    switch(temp)
+    DisplayState = temp;
+    Switched = 1;
+}
+
+unsigned char DisplayGetState(void)
+{
+    return DisplayState;
+}
+
+void DisplayUpdate(void)
+{  
+    switch(DisplayState)
     {
 	    case DISPLAY_IMAGE:
-            DisplayState = DISPLAY_IMAGE;
+            
 		    break;
 	    case DISPLAY_VEL:
 		    DisplayVelocity();
@@ -45,61 +64,121 @@ void DisplaySwitch(signed char dispNum)
     }
 }
 
-unsigned char DisplayGetState(void)
+short DisplayChangeValueS(short prevValue, short currentValue, uint8_t xLoc, uint8_t yLoc)
 {
-    return DisplayState;
+    char strTemp[15];
+    if(prevValue != currentValue)
+	{	
+	    snprintf(strTemp, 15, "%u", currentValue);
+	    LcdSetRect(xLoc, yLoc, xLoc + 8, SCREEN_MAX, FILL, BCOLOR);
+	    LcdPutStr(strTemp, xLoc, yLoc, SMALL, FCOLOR, BCOLOR);
+	}
+	return currentValue;
+}
+
+float DisplayChangeValueF(float prevValue, float currentValue, uint8_t xLoc, uint8_t yLoc)
+{
+    char strTemp[15];
+    if(prevValue != currentValue)
+	{	
+	    snprintf(strTemp, 15, "%f", currentValue);
+	    LcdSetRect(xLoc, yLoc, xLoc + 8, SCREEN_MAX, FILL, BCOLOR);
+	    LcdPutStr(strTemp, xLoc, yLoc, SMALL, FCOLOR, BCOLOR);
+	}
+	return currentValue; 
+
 }
 
 void DisplayVelocity(void)
 {
-    DisplayState = DISPLAY_VEL;
-	LcdPutStr("VELOCITY CMD", 0, 0, LARGE, FCOLOR, BCOLOR);
-	LcdSetLine(18, 0, 18, 131, FCOLOR);
-	LcdPutStr("LIN VEL:", 24, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("ANG VEL:", 36, 0, SMALL, FCOLOR, BCOLOR);
-/*	LcdSetRect(42, 0, 42, 131, FILL, BCOLOR);*/
+    uint16_t vc[SIZE_VEL_ARR];
+    ROSGetVelocityCmd(vc);    
+
+    if(Switched)
+    {
+        LcdClearScreen(BCOLOR);
+        LcdPutStr("VELOCITY CMD", 0, 0, LARGE, FCOLOR, BCOLOR);
+	    LcdSetLine(18, 0, 18, 131, FCOLOR);
+	    LcdPutStr("LIN VEL:", 24, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("ANG VEL:", 36, 0, SMALL, FCOLOR, BCOLOR);
+	    Switched = 0;
+	}
+	
+    currentVC[0] = DisplayChangeValueS(currentVC[0], vc[0], 24, 52);
+    currentVC[1] = DisplayChangeValueS(currentVC[1], vc[1], 36, 52);
 }
 
 void DisplayIMU(void)
 {
-    DisplayState = DISPLAY_IMU;
-	LcdPutStr("IMU DATA", 0, 0, LARGE, FCOLOR, BCOLOR);
-	LcdSetLine(18, 0, 18, 131, FCOLOR);
-	LcdPutStr("ROTX:", 24, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("ROTY:", 36, 0, SMALL, FCOLOR, BCOLOR);
-    LcdPutStr("ROTZ:", 48, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("ROTW:", 60, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("LINX:", 72, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("LINY:", 84, 0, SMALL, FCOLOR, BCOLOR);
-    LcdPutStr("LINZ:", 96, 0, SMALL, FCOLOR, BCOLOR);    
-/*	LcdSetRect(104, 0, 104, 131, FILL, BCOLOR);*/
+    uint8_t i = 0;
+    float imuD[SIZE_IMU_ARR];
+    ROSGetImuData(imuD);
+
+    if(Switched)
+    {
+        LcdClearScreen(BCOLOR);
+	    LcdPutStr("IMU DATA", 0, 0, LARGE, FCOLOR, BCOLOR);
+	    LcdSetLine(18, 0, 18, 131, FCOLOR);
+	    LcdPutStr("ROTX:", 24, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("ROTY:", 36, 0, SMALL, FCOLOR, BCOLOR);
+        LcdPutStr("ROTZ:", 48, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("ROTW:", 60, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("LINX:", 72, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("LINY:", 84, 0, SMALL, FCOLOR, BCOLOR);
+        LcdPutStr("LINZ:", 96, 0, SMALL, FCOLOR, BCOLOR); 
+        Switched = 0;   
+    }
+    
+    for(i = 0; i < SIZE_IMU_ARR; i++)
+        currentImuData[i] = DisplayChangeValueF(currentImuData[i], imuD[i], \
+            24 + 12 * i, 36);
 }
 
 void DisplayGPS(void)
 {
-    DisplayState = DISPLAY_GPS;
-	LcdPutStr("GPS DATA", 0, 0, LARGE, FCOLOR, BCOLOR);
-	LcdSetLine(18, 0, 18, 131, FCOLOR);
-	LcdPutStr("LAT :", 24, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("LONG:", 36, 0, SMALL, FCOLOR, BCOLOR);
-    LcdPutStr("ALT :", 48, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("HEAD:", 60, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("STAT:", 72, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("VIS :", 84, 0, SMALL, FCOLOR, BCOLOR);
-    LcdPutStr("USED:", 96, 0, SMALL, FCOLOR, BCOLOR);    
-/*	LcdSetRect(104, 0, 104, 131, FILL, BCOLOR);*/
+    uint8_t i = 0;
+    float gpsD[SIZE_GPS_DATA_ARR];
+    ROSGetGpsData(gpsD);
+    uint8_t gpsS[SIZE_GPS_STAT_ARR];
+    ROSGetGpsStatus(gpsS);
+    
+    if(Switched)
+    {
+        LcdClearScreen(BCOLOR);
+	    LcdPutStr("GPS DATA", 0, 0, LARGE, FCOLOR, BCOLOR);
+	    LcdSetLine(18, 0, 18, 131, FCOLOR);
+	    LcdPutStr("LAT :", 24, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("LONG:", 36, 0, SMALL, FCOLOR, BCOLOR);
+        LcdPutStr("ALT :", 48, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("HEAD:", 60, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("STAT:", 72, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("VIS :", 84, 0, SMALL, FCOLOR, BCOLOR);
+        LcdPutStr("USED:", 96, 0, SMALL, FCOLOR, BCOLOR);    
+        Switched = 0;
+    }
+    
+/*    for(i = 0; i < SIZE_GPS_DATA_ARR; i++)*/
+/*        currentGpsData[i] = DisplayChangeValueF(currentGpsData[i], gpsD[i], \*/
+/*            24 + 12 * i, 36);*/
+/*            */
+/*    for(i = 0; i < SIZE_GPS_STAT_ARR; i++)*/
+/*        currentGpsData[i] = DisplayChangeValueS(currentGpsStat[i], gpsS[i], \*/
+/*            72 + 12 * i, 36);*/
 }
 
 void DisplayEncoder(void)
 {
-    DisplayState = DISPLAY_ENCODER;
-	LcdPutStr("ENCODER DATA", 0, 0, LARGE, FCOLOR, BCOLOR);
-	LcdSetLine(18, 0, 18, 131, FCOLOR);
-	LcdPutStr("FR  :", 24, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("FL  :", 36, 0, SMALL, FCOLOR, BCOLOR);
-    LcdPutStr("RR  :", 48, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("RL  :", 60, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("LINV:", 72, 0, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr("ANGV:", 84, 0, SMALL, FCOLOR, BCOLOR);
-/*    LcdSetRect(92, 0, 92, 131, FILL, BCOLOR);*/
+    if(Switched)
+    {    
+        LcdClearScreen(BCOLOR);
+        LcdPutStr("ENCODER DATA", 0, 0, LARGE, FCOLOR, BCOLOR);
+	    LcdSetLine(18, 0, 18, 131, FCOLOR);
+	    LcdPutStr("FR  :", 24, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("FL  :", 36, 0, SMALL, FCOLOR, BCOLOR);
+        LcdPutStr("RR  :", 48, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("RL  :", 60, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("LINV:", 72, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("ANGV:", 84, 0, SMALL, FCOLOR, BCOLOR);
+        Switched = 0;
+    }
 }

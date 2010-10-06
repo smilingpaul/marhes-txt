@@ -62,6 +62,7 @@
 #include "lcd.h"
 #include "display.h"
 #include "button.h"
+#include "ROSIFace.h"
 #include "helperFuncs.h"
 
 /*************************************************************************
@@ -129,55 +130,60 @@ int main(void)
 	{
 	    for(i = 0; i < 20000; i++);
 	
+	    ROSProcessPacket();
+	    
         buttonState = ButtonGetMask();       
 	    if (buttonState & BUT_RIGHT_BIT)
-            DisplaySwitch(DisplayGetState() + 1);
+            DisplaySetState(DisplayGetState() + 1);
         if (buttonState & BUT_LEFT_BIT)
-            DisplaySwitch(DisplayGetState() - 1);
+            DisplaySetState(DisplayGetState() - 1);
+        DisplayUpdate();
+        
+        
 
-		// Control the motors of the robot with WASD game style control
-		// If we have received a character
-		if(Uart0RxDataReady())
-		{
-			char ch = Uart0RxChar();		// Get the next character in queue
-			switch(ch)
-			{
-				case 'w':
-					// Change the motor channel to increase the PWM a little
-					PWMSetDuty(MOTOR_CHANNEL, PWMGetDuty(MOTOR_CHANNEL) + 1000);
-					break;
-				case 's':
-					// Change the motor channel to decrease the PWM a little
-					PWMSetDuty(MOTOR_CHANNEL, PWMGetDuty(MOTOR_CHANNEL) - 1000);
-					break;
-				case 'd':
-					// Change the servo channel to increase the PWM a little
-					PWMSetDuty(FRONT_SERVO_CHANNEL, PWMGetDuty(FRONT_SERVO_CHANNEL) + 1000);
-					break;
-				case 'a':
-					// Change the servo channel to decrease the PWM a little
-					PWMSetDuty(FRONT_SERVO_CHANNEL, PWMGetDuty(FRONT_SERVO_CHANNEL) - 1000);
-					break;
-//				case 'r':
-//					frontRight = EncoderCount(FRONT_RIGHT);
-//					uintToString(frontRight,frStr);
-//					Uart0TxString("\r\nFront Right Encoder Ticks: ");
-//					Uart0TxString(frStr);
-//					Uart0TxString("\r\n");
-//					break;
-//				case 'l':
-//					frontLeft = EncoderCount(FRONT_LEFT);
-//					uintToString(frontLeft,flStr);
-//					Uart0TxString("Front Left Encoder Ticks: ");
-//					Uart0TxString(flStr);
-//					Uart0TxString("\r\n");
-//					break;
-				default:
-					// If an invalid character is received let the user know
-					Uart0TxString("Invalid Character\r\n");
-					break;
-			}
-		}
+/*		// Control the motors of the robot with WASD game style control*/
+/*		// If we have received a character*/
+/*		if(Uart0RxDataReady())*/
+/*		{*/
+/*			char ch = Uart0RxChar();		// Get the next character in queue*/
+/*			switch(ch)*/
+/*			{*/
+/*				case 'w':*/
+/*					// Change the motor channel to increase the PWM a little*/
+/*					PWMSetDuty(MOTOR_CHANNEL, PWMGetDuty(MOTOR_CHANNEL) + 1000);*/
+/*					break;*/
+/*				case 's':*/
+/*					// Change the motor channel to decrease the PWM a little*/
+/*					PWMSetDuty(MOTOR_CHANNEL, PWMGetDuty(MOTOR_CHANNEL) - 1000);*/
+/*					break;*/
+/*				case 'd':*/
+/*					// Change the servo channel to increase the PWM a little*/
+/*					PWMSetDuty(FRONT_SERVO_CHANNEL, PWMGetDuty(FRONT_SERVO_CHANNEL) + 1000);*/
+/*					break;*/
+/*				case 'a':*/
+/*					// Change the servo channel to decrease the PWM a little*/
+/*					PWMSetDuty(FRONT_SERVO_CHANNEL, PWMGetDuty(FRONT_SERVO_CHANNEL) - 1000);*/
+/*					break;*/
+/*//				case 'r':*/
+/*//					frontRight = EncoderCount(FRONT_RIGHT);*/
+/*//					uintToString(frontRight,frStr);*/
+/*//					Uart0TxString("\r\nFront Right Encoder Ticks: ");*/
+/*//					Uart0TxString(frStr);*/
+/*//					Uart0TxString("\r\n");*/
+/*//					break;*/
+/*//				case 'l':*/
+/*//					frontLeft = EncoderCount(FRONT_LEFT);*/
+/*//					uintToString(frontLeft,flStr);*/
+/*//					Uart0TxString("Front Left Encoder Ticks: ");*/
+/*//					Uart0TxString(flStr);*/
+/*//					Uart0TxString("\r\n");*/
+/*//					break;*/
+/*				default:*/
+/*					// If an invalid character is received let the user know*/
+/*					Uart0TxString("Invalid Character\r\n");*/
+/*					break;*/
+/*			}*/
+/*		}*/
 	}
 }
 

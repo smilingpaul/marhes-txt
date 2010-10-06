@@ -30,46 +30,17 @@
 
 #define USE_STRINGS
 
-typedef struct
-{
-    unsigned short linVel;
-    unsigned short angVel;
+#define SIZE_VEL_ARR        2
+#define SIZE_IMU_ARR        7
+#define SIZE_GPS_DATA_ARR   4
+#define SIZE_GPS_STAT_ARR   3
 
-}velocityCmd_t;
-
-typedef struct
-{
-    float rotX;
-    float rotY;
-    float rotZ;
-    float rotW;
-    float linX;
-    float linY;
-    float linZ;
-}imuData_t;
-
-typedef struct
-{
-    unsigned short stat;
-    unsigned short satsUsed;
-    unsigned short satsVis;
-}gpsStatus_t;
-
-typedef struct
-{
-    float latitude;
-    float longitude;
-    float altitude;
-    float heading
-}gpsData_t;
-
-
-void ROSProcessPacket(void)
+void ROSProcessPacket(void);
 uint8_t ROSChecksum(void);
 void ROSProcessData(void);
-velocityCmd_t ROSGetVelocityCmd(void);
-imuData_t ROSGetImuData(void);
-gpsStatus_t ROSGetGpsStatus(void);
-gpsData_t ROSGetGpsData(void);
+void ROSGetVelocityCmd(uint16_t *array);
+void ROSGetImuData(float *array);
+void ROSGetGpsStatus(uint16_t *array);
+void ROSGetGpsData(float *array);
 
 #endif /* ROSIFACE_H_ */
