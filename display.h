@@ -7,6 +7,8 @@
 #include "lcd.h"
 #include "ROSIFace.h"
 
+#include <stdio.h>
+
 /*************************************************************************
  *             Definitions
  *************************************************************************/
@@ -34,6 +36,7 @@ void DisplaySetState(signed char dispNum);
 unsigned char DisplayGetState(void);
 short DisplayChangeValueS(short prevValue, short currentValue, uint8_t xLoc, uint8_t yLoc);
 float DisplayChangeValueF(float prevValue, float currentValue, uint8_t xLoc, uint8_t yLoc);
+char* ftostr(char* buffer, float value, int places);
 void DisplayUpdate(void);
 void DisplayVelocity(void);
 void DisplayIMU(void);

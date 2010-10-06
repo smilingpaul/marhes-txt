@@ -68,7 +68,7 @@
 .equ SVC_Stack_Size,     0x00000100
 .equ ABT_Stack_Size,     0x00000000
 .equ FIQ_Stack_Size,     0x00000000
-.equ IRQ_Stack_Size,     0x00000300
+.equ IRQ_Stack_Size,     0x00000200
 .equ USR_Stack_Size,     0x00000400
 
 .equ Stack_Size,        (UND_Stack_Size + SVC_Stack_Size + ABT_Stack_Size + \
