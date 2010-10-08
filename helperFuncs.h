@@ -14,11 +14,12 @@
 #include "armVIC.h"
 #include <string.h>
 
+#define INT_STR_LENGTH          12
+
 /*************************************************************************
  *             Function declarations
  *************************************************************************/
-char* uintToString(uint32_t num, char* buffer);
-char* rev(char* str);
-int strsize(const char* str);
+char *itoa(int i);
+char* ftostr( char* buffer, float value, int size );
 
 #endif /* HELPERFUNCS_H_ */

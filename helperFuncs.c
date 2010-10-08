@@ -13,70 +13,60 @@
 
 #include "helperFuncs.h"
 
-/*************************************************************************
- * Function Name: uintToString
- * Parameters: uint32_t num: the number to convert to a string
- * 			   char* buffer: the location to return the string
- * Return: char*: the location of the return string
- *
- * Description: Converts a uint to a string
- *
- *************************************************************************/
-char* uintToString(uint32_t num, char* buffer)
+/*
+** itoa() - will convert integers to char array
+**
+** expects: an integer
+**
+** returns: pointer to it's buffer
+*/
+
+/* 10 digits + 1 sign + 1 trailing nul */
+static char itoa_buf[INT_STR_LENGTH];
+
+char *itoa(int i)
 {
-	const char SHIFT = 48;
-	char* temp = buffer;
-	uint32_t quotient = num;
-	uint32_t remainder = 0;
+    char *pos = itoa_buf + sizeof(itoa_buf) - 1;
+    unsigned int u;
+    int negative = 0;
 
-	while(quotient > 0)
-	{
-		remainder = quotient % 10;
+    if (i < 0)
+    {
+        negative = 1;
+        u = ((unsigned int)(-(1+i))) + 1;
+    }
+    else
+    {
+        u = i;
+    }
 
-		*buffer = (char)remainder + SHIFT;
-		buffer++;
+    *pos = 0;
 
-		quotient /= 10;
-	}
+    do
+    {
+        *--pos = '0' + (u % 10);
+        u /= 10;
+    } while (u);
 
-	*buffer = '\0';
-	rev(temp);
+    if (negative)
+    {
+        *--pos = '-';
+    }
 
-	return temp;
+    return pos;
 }
 
-/*************************************************************************
- * Function Name: rev
- * Parameters: char* str: the string to reverse
- * Return: char*: the location of the returned string
- *
- * Description: Reverses the order of a string
- *
- *************************************************************************/
-char* rev(char* str)
+char* ftostr( char* buffer, float value, int size )
 {
-  int end = strsize(str)-1;
-  int start = 0;
+    int whole ;
+    int fraction ;
+    char sign[2] = "" ;
 
-  while( start<end )
-  {
-    str[start] ^= str[end];
-    str[end] ^=   str[start];
-    str[start]^= str[end];
-
-    ++start;
-    --end;
-  }
-
-  return str;
-}
-
-int strsize(const char* str)
-{
-	const char *s;
-
-	s = str;
-	while (*s)
-		s++;
-	return s - str;
+    whole = (int)value ;
+    fraction = (int)((value - whole) * powf(10.0f,places) + 0.5f) ;
+    buffer = itoa(whole);
+    
+    //sprintf( buffer, "%s%d.%*.*d", sign, whole, places, places, fraction);
+    
+    return buffer;
 }

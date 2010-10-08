@@ -89,26 +89,6 @@ float DisplayChangeValueF(float prevValue, float currentValue, uint8_t xLoc, uin
 
 }
 
-char* ftostr( char* buffer, float value, int places )
-{
-    int whole ;
-    int fraction ;
-    char sign[2] = "" ;
-
-    if( value < 0 )
-    {
-        value = -value ;
-        sign[0] = '-' ;
-        sign[1] = '\0' ;
-    }
-
-    whole = (int)value ;
-    fraction = (int)((value - whole) * powf(10.0f,places) + 0.5f) ;
-    sprintf( buffer, "%s%d.%*.*d", sign, whole, places, places, fraction);
-
-    return buffer;
-}
-
 void DisplayVelocity(void)
 {
     uint16_t vc[SIZE_VEL_ARR];
