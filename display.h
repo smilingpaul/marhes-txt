@@ -6,8 +6,7 @@
 #include "LPC23xx.h"
 #include "lcd.h"
 #include "ROSIFace.h"
-
-#include <stdio.h>
+#include "helperFuncs.h"
 
 /*************************************************************************
  *             Definitions
@@ -34,9 +33,10 @@
 void DisplayInit(void);
 void DisplaySetState(signed char dispNum);
 unsigned char DisplayGetState(void);
-short DisplayChangeValueS(short prevValue, short currentValue, uint8_t xLoc, uint8_t yLoc);
-float DisplayChangeValueF(float prevValue, float currentValue, uint8_t xLoc, uint8_t yLoc);
-char* ftostr(char* buffer, float value, int places);
+uint16_t DisplayChangeValueS(uint16_t prevValue, uint16_t currentValue, \
+    uint8_t xLoc, uint8_t yLoc);
+float DisplayChangeValueF(float prevValue, float currentValue, char* str, \
+    uint8_t xLoc, uint8_t yLoc);
 void DisplayUpdate(void);
 void DisplayVelocity(void);
 void DisplayIMU(void);

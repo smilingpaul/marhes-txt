@@ -9,6 +9,7 @@
 #define ROSIFACE_H_
 
 #include "uart0.h"
+#include "app_types.h"
 
 #define MAX_PACKET_SIZE		255
 
@@ -35,12 +36,16 @@
 #define SIZE_GPS_DATA_ARR   4
 #define SIZE_GPS_STAT_ARR   3
 
+#define SIZE_MAX_RX_STR     20
+
 void ROSProcessPacket(void);
 uint8_t ROSChecksum(void);
 void ROSProcessData(void);
-void ROSGetVelocityCmd(uint16_t *array);
-void ROSGetImuData(float *array);
-void ROSGetGpsStatus(uint16_t *array);
-void ROSGetGpsData(float *array);
+uint16_t ROSGetVelocityCmd(uint8_t value);
+float ROSGetImuData(uint8_t value);
+char* ROSGetImuDataString(uint8_t value);
+uint16_t ROSGetGpsStatus(uint8_t value);
+float ROSGetGpsData(uint8_t value);
+char* ROSGetGpsDataString(uint8_t value);
 
 #endif /* ROSIFACE_H_ */

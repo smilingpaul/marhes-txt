@@ -53,7 +53,6 @@
 #include "app_types.h"
 #include "LPC23xx.h"
 #include "armVIC.h"
-#include <stdio.h>
 
 #include "pwm.h"
 #include "uart0.h"
@@ -64,6 +63,7 @@
 #include "button.h"
 #include "ROSIFace.h"
 #include "helperFuncs.h"
+//#include "includes.h"
 
 /*************************************************************************
  *             Definitions
@@ -102,6 +102,11 @@ int main(void)
 //	uint32_t frontRight, frontLeft;
 //	char frStr[33] = {'\0'};
 //	char flStr[33] = {'\0'};
+/*    uint8_t Buffer[100];*/
+/*    uint8_t* pBuffer;*/
+/*    uint32_t Size,TranSize;*/
+/*    boolean CdcConfigureStateHold; */
+    unsigned char UpdateDisplay = 0;
     unsigned char buttonState;
 	int i;
 
@@ -111,35 +116,71 @@ int main(void)
 	// Initialize the system and turn on interrupts
 	sysInit();
 	enableIRQ();
+	
+/*	// Soft connection enable*/
+/*    USB_ConnectRes(TRUE);*/
+/*    CdcConfigureStateHold = !IsUsbCdcConfigure();*/
 
 	// Do some initialization/testing giving feedback over UART0
 	Uart0TxString("\r\nTXT-1 Robot LPC2378 Software 0.1\r\n");
 	Uart0TxString("Written by: Marhes TXT-1 Development Team\r\n");
 	Uart0TxString("Date: August 21, 2010\r\n");
 
-	// Test Steering Servos
+	// Test SteeriHwInitng Servos
 	Uart0TxString("\r\nTesting the steering servos...");
 /*	ControllerTestMotors();*/
 	Uart0TxString("Done.\r\n");
 
-//	sprintf(frStr,"%d",123);
-//	Uart0TxString(frStr);
-
 	// Enter infinite while loop
 	while(1)
-	{
-	    for(i = 0; i < 20000; i++);
-	
+	{    
 	    ROSProcessPacket();
 	    
-        buttonState = ButtonGetMask();       
-	    if (buttonState & BUT_RIGHT_BIT)
-            DisplaySetState(DisplayGetState() + 1);
-        if (buttonState & BUT_LEFT_BIT)
-            DisplaySetState(DisplayGetState() - 1);
-        DisplayUpdate();
-        
-        
+	    buttonState = ButtonGetChangedHigh();       
+	    if(buttonState & BUT_CENTER_BIT)
+	        UpdateDisplay ^= 1;
+	    
+	    if(UpdateDisplay)
+	    {
+	        if (buttonState & BUT_RIGHT_BIT)
+                DisplaySetState(DisplayGetState() + 1);
+            if (buttonState & BUT_LEFT_BIT)
+                DisplaySetState(DisplayGetState() - 1);
+            if (i > 500000)
+            { 
+                DisplayUpdate();
+                i = 0;
+            }
+            else
+            {
+                i++;
+            }
+        }
+           
+/*        if (IsUsbCdcConfigure())*/
+/*        {*/
+/*          // Data from USB*/
+/*          Size = UsbCdcRead(Buffer,sizeof(Buffer)-1);*/
+/*          if(Size)*/
+/*          {*/
+/*    #ifdef DATA_LOGGING*/
+/*            Buffer[Size] = 0;*/
+/*            printf("> %s\n",Buffer);*/
+/*    #endif // DATA_LOGGING*/
+/*            TranSize = 0;*/
+/*            pBuffer = Buffer;*/
+/*            do*/
+/*            {*/
+/*              Size -= TranSize;*/
+/*              pBuffer += TranSize;*/
+/*              //TranSize = UartWrite(UART_1,pBuffer,Size);*/
+/*            }*/
+/*            while(Size != TranSize);*/
+/*          }*/
+/*          */
+/*          while(!UsbCdcWrite(Buffer,Size));*/
+/*          //while(!UsbCdcWrite("Hello",6));*/
+/*      }*/
 
 /*		// Control the motors of the robot with WASD game style control*/
 /*		// If we have received a character*/
@@ -239,6 +280,8 @@ void sysInit(void)
 //	ControllerInit();
 	DisplayInit();
 	ButtonInit();
+	// Init USB
+    //UsbCdcInit();
 }
 
 /*************************************************************************

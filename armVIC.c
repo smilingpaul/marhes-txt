@@ -18,14 +18,14 @@
 #define FIQ_MASK 0x00000040
 #define INT_MASK (IRQ_MASK | FIQ_MASK)
 
-static inline unsigned __get_cpsr(void)
+inline unsigned __get_cpsr(void)
 {
   unsigned long retval;
   asm volatile (" mrs  %0, cpsr" : "=r" (retval) : /* no inputs */  );
   return retval;
 }
 
-static inline void __set_cpsr(unsigned val)
+inline void __set_cpsr(unsigned val)
 {
   asm volatile (" msr  cpsr, %0" : /* no outputs */ : "r" (val)  );
 }

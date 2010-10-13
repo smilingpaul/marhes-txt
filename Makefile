@@ -82,13 +82,21 @@ SRC += encoder.c
 SRC += display.c
 SRC += button.c
 SRC += ROSIFace.c
+SRC += helperFuncs.c
+#SRC += usb_t9.c
+#SRC += usb_hw.c
+#SRC += cd_class.c
+#SRC += usb_hooks.c
+#SRC += usb_buffer.c
+#SRC += usb_dev_desc.c
+
 
 # List C source files here which must be compiled in ARM-Mode.
 # use file-extension c for "c-only"-files
 SRCARM = armVIC.c
 SRCARM += uart0ISR.c
 SRCARM += encoderISR.c
-#SRCARM += helperFuncs.c
+#SRCARM += sys.c
 
 # List C++ source files here.
 # use file-extension cpp for C++-files (use extension .cpp)

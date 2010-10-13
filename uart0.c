@@ -28,7 +28,7 @@ void Uart0Init(void)
 
 	// 3. Set the DLAB bit to write to the baud registers
 	U0LCR = UART_DLAB;
-	U0DLL = 78;
+	U0DLL = 26;//78;//26;
 	U0DLM = 0;
 	U0FDR = 0x21;
 	U0LCR = UART_8BIT;

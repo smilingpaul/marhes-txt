@@ -10,13 +10,7 @@ static float currentGpsData[SIZE_GPS_DATA_ARR];
 void DisplayInit(void)
 {
     DisplayState = DISPLAY_VEL;
-    Switched = 1;
-    
-    ROSGetVelocityCmd(currentVC);
-    ROSGetImuData(currentImuData);
-    ROSGetGpsStatus(currentGpsStat);
-    ROSGetGpsData(currentGpsData);
-    
+    Switched = 1;    
     LcdClearScreen(BCOLOR);
 }
 
@@ -64,26 +58,25 @@ void DisplayUpdate(void)
     }
 }
 
-short DisplayChangeValueS(short prevValue, short currentValue, uint8_t xLoc, uint8_t yLoc)
+uint16_t DisplayChangeValueS(uint16_t prevValue, uint16_t currentValue, uint8_t xLoc, uint8_t yLoc)
 {
-    static char strTemp[15];
+    char* strTemp;
     if(prevValue != currentValue)
     {
-        snprintf(strTemp, 15, "%u", currentValue);
+        strTemp = itoa((int)currentValue);
         LcdSetRect(xLoc, yLoc, xLoc + 8, SCREEN_MAX, FILL, BCOLOR);
         LcdPutStr(strTemp, xLoc, yLoc, SMALL, FCOLOR, BCOLOR);
     }
     return currentValue;
 }
 
-float DisplayChangeValueF(float prevValue, float currentValue, uint8_t xLoc, uint8_t yLoc)
+float DisplayChangeValueF(float prevValue, float currentValue, char* str, \
+    uint8_t xLoc, uint8_t yLoc)
 {
-    static char strTemp[15];
     if(prevValue != currentValue)
     {
-        ftostr(strTemp, currentValue, 6);
         LcdSetRect(xLoc, yLoc, xLoc + 8, SCREEN_MAX, FILL, BCOLOR);
-        LcdPutStr(strTemp, xLoc, yLoc, SMALL, FCOLOR, BCOLOR);
+        LcdPutStr(str, xLoc, yLoc, SMALL, FCOLOR, BCOLOR);
     }
     return currentValue; 
 
@@ -91,9 +84,6 @@ float DisplayChangeValueF(float prevValue, float currentValue, uint8_t xLoc, uin
 
 void DisplayVelocity(void)
 {
-    uint16_t vc[SIZE_VEL_ARR];
-    ROSGetVelocityCmd(vc);    
-
     if(Switched)
     {
         LcdClearScreen(BCOLOR);
@@ -104,15 +94,13 @@ void DisplayVelocity(void)
         Switched = 0;
     }
     
-    currentVC[0] = DisplayChangeValueS(currentVC[0], vc[0], 24, 52);
-    currentVC[1] = DisplayChangeValueS(currentVC[1], vc[1], 36, 52);
+    currentVC[0] = DisplayChangeValueS(currentVC[0], ROSGetVelocityCmd(0), 24, 52);
+    currentVC[1] = DisplayChangeValueS(currentVC[1], ROSGetVelocityCmd(1), 36, 52);
 }
 
 void DisplayIMU(void)
 {
     uint8_t i = 0;
-    float imuD[SIZE_IMU_ARR];
-    ROSGetImuData(imuD);
 
     if(Switched)
     {
@@ -130,17 +118,13 @@ void DisplayIMU(void)
     }
 
     for(i = 0; i < SIZE_IMU_ARR; i++)
-        currentImuData[i] = DisplayChangeValueF(currentImuData[i], imuD[i], \
-            24 + 12 * i, 36);
+        currentImuData[i] = DisplayChangeValueF(currentImuData[i], \
+            ROSGetImuData(i), ROSGetImuDataString(i), 24 + 12 * i, 36);
 }
 
 void DisplayGPS(void)
 {
     uint8_t i = 0;
-    float gpsD[SIZE_GPS_DATA_ARR];
-    ROSGetGpsData(gpsD);
-    uint8_t gpsS[SIZE_GPS_STAT_ARR];
-    ROSGetGpsStatus(gpsS);
     
     if(Switched)
     {
@@ -157,13 +141,13 @@ void DisplayGPS(void)
         Switched = 0;
     }
     
-/*    for(i = 0; i < SIZE_GPS_DATA_ARR; i++)*/
-/*        currentGpsData[i] = DisplayChangeValueF(currentGpsData[i], gpsD[i], \*/
-/*            24 + 12 * i, 36);*/
-/*            */
-/*    for(i = 0; i < SIZE_GPS_STAT_ARR; i++)*/
-/*        currentGpsData[i] = DisplayChangeValueS(currentGpsStat[i], gpsS[i], \*/
-/*            72 + 12 * i, 36);*/
+    for(i = 0; i < SIZE_GPS_DATA_ARR; i++)
+        currentGpsData[i] = DisplayChangeValueF(currentGpsData[i], \
+            ROSGetGpsData(i), ROSGetGpsDataString(i), 24 + 12 * i, 36);
+            
+    for(i = 0; i < SIZE_GPS_STAT_ARR; i++)
+        currentGpsStat[i] = DisplayChangeValueS(currentGpsStat[i], \
+            ROSGetGpsStatus(i), 72 + 12 * i, 36);
 }
 
 void DisplayEncoder(void)

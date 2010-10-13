@@ -157,6 +157,23 @@ int _isatty_r(struct _reent *r, int fd)
   return 1;
 }
 
+// below found from: http://align2.com/hos/syscalls.c.html
+_exit (n)
+{
+  return -1;
+}
+
+_kill (n, m)
+{
+  return -1;
+}
+
+_getpid (n)
+{
+  return 1;
+}
+
+
 /*** EOF ***/
 
 

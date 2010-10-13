@@ -10,8 +10,10 @@
 // Storage for current data from ros
 static uint16_t velocityCmd[SIZE_VEL_ARR] = {0};
 static float imuData[SIZE_IMU_ARR] = {0};
+static char imuDataStrings[SIZE_IMU_ARR][SIZE_MAX_RX_STR] = {{0}};
 static uint16_t gpsStatus[SIZE_GPS_STAT_ARR] = {0};
 static float gpsData[SIZE_GPS_DATA_ARR] = {0}; 
+static char gpsDataStrings[SIZE_GPS_DATA_ARR][SIZE_MAX_RX_STR] = {{0}};
 
 // Storage for leftover data
 static uint8_t data[MAX_PACKET_SIZE];
@@ -117,9 +119,10 @@ void ROSProcessData(void)
                 }
                 tempStr[strPtr + 1] = 0;
                 imuData[valueLoop] = atof(tempStr);
+                strcpy(imuDataStrings[valueLoop], tempStr);
                 dataLoop++;
             }
-            FIO0PIN ^= (1<<21);
+            //FIO0PIN ^= (1<<21);
             break;
         case CMD_VEL:
             // Check size of packet
@@ -135,43 +138,32 @@ void ROSProcessData(void)
     }
 }
 
-void ROSGetVelocityCmd(uint16_t *array)
+uint16_t ROSGetVelocityCmd(uint8_t value)
 {
-    uint8_t i = 0;
-    while(i < SIZE_VEL_ARR)
-    {
-        *array++ = velocityCmd[i];
-        i++;
-    }
+    return velocityCmd[value];
 }
 
-void ROSGetImuData(float *array)
+float ROSGetImuData(uint8_t value)
 {
-    uint8_t i = 0;
-    while(i < SIZE_IMU_ARR)
-    {
-        *array++ = imuData[i];
-        i++;
-    }
+    return imuData[value];
 }
 
-void ROSGetGpsStatus(uint16_t *array)
+char* ROSGetImuDataString(uint8_t value)
 {
-    uint8_t i = 0;
-    while(i < SIZE_GPS_STAT_ARR)
-    {
-        *array++ = gpsStatus[i];
-        i++;
-    }
+    return imuDataStrings[value];
 }
 
-void ROSGetGpsData(float *array)
+uint16_t ROSGetGpsStatus(uint8_t value)
 {
-    uint8_t i = 0;
-    while(i < SIZE_GPS_DATA_ARR)
-    {
-        *array++ = gpsData[i];
-        i++;
-    }
+    return gpsStatus[value];
 }
 
+float ROSGetGpsData(uint8_t value)
+{
+    return gpsData[value];
+}
+
+char* ROSGetGpsDataString(uint8_t value)
+{
+    return gpsDataStrings[value];
+}

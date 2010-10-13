@@ -1,5 +1,7 @@
 #include "button.h"
 
+static uint8_t prevButtonState = 0;
+
 void ButtonInit(void)
 {
     // Set direction for buttons to inputs (clear the bit)
@@ -7,10 +9,12 @@ void ButtonInit(void)
     FIO1DIR &= ~(BUT_CENTER | BUT_UP | BUT_DOWN | BUT_RIGHT | BUT_LEFT);
 }
 
-unsigned char ButtonGetMask(void)
+uint8_t ButtonGetChangedHigh(void)
 {
-	unsigned char buttonState;
-
+    uint8_t buttonState;
+    uint8_t temp;
+    
+    // Get the state of the buttons first
     buttonState = (~FIO0PIN>>BUT_BUT1_SHFT) & 0x01;
     buttonState |= (~FIO0PIN>>BUT_BUT2_SHFT) & 0x02;
     buttonState |= (~FIO1PIN>>BUT_CENTER_SHFT) & 0x04;
@@ -19,5 +23,12 @@ unsigned char ButtonGetMask(void)
     buttonState |= (~FIO1PIN>>BUT_RIGHT_SHFT) & 0x20;
     buttonState |= (~FIO1PIN>>BUT_LEFT_SHFT) & 0x40;
 
-	return buttonState;
+    // XOR previous state with current state to get changes, then and with 
+    // current state to get buttons that went higher
+    temp = (prevButtonState ^ buttonState) & buttonState;
+    
+    // Store the current button state
+    prevButtonState = buttonState;
+    
+    return temp;
 }

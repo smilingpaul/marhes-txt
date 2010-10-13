@@ -38,6 +38,6 @@
  *************************************************************************/
 
 void ButtonInit(void);
-unsigned char ButtonGetMask(void);
+uint8_t ButtonGetChangedHigh(void);
 
 #endif

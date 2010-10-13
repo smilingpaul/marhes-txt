@@ -56,17 +56,22 @@ char *itoa(int i)
     return pos;
 }
 
-char* ftostr( char* buffer, float value, int size )
+char* ftostr( char* buffer, float value, int places )
 {
-    int whole ;
-    int fraction ;
-    char sign[2] = "" ;
-
-    whole = (int)value ;
-    fraction = (int)((value - whole) * powf(10.0f,places) + 0.5f) ;
-    buffer = itoa(whole);
+    int whole;
+    int fraction;
+    float fractionFloat;
     
-    //sprintf( buffer, "%s%d.%*.*d", sign, whole, places, places, fraction);
+    whole = (int)value;
+    if(value < 0)
+        fractionFloat = -value - whole;
+    else
+        fractionFloat = value - whole;
+    fraction = (int)(fractionFloat * powf(10.0f,places) + 0.5f);
+    
+    strcpy(buffer, itoa(whole));
+    strcat(buffer, ".");
+    strcat(buffer, itoa(fraction));
     
     return buffer;
 }

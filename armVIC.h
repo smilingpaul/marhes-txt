@@ -55,7 +55,10 @@
 #define ISR_EXIT()  asm volatile(" ldmfd sp!,{r1}\n" \
                                  " msr   spsr_c,r1\n" \
                                  " ldmfd sp!,{r0-r12,pc}^")
-
+                                 
+unsigned __get_cpsr(void);                                 
+void __set_cpsr(unsigned val);
+                                 
 /******************************************************************************
  *
  * Function Name: disableIRQ()

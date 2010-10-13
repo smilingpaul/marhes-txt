@@ -13,6 +13,9 @@
 /*  typedefs are here  */
 #include <stdint.h>
 #include <stdlib.h> /* NULL */
+#include <string.h>
+#include <stdio.h>
+#include <math.h>
 
 typedef enum {false, true}  boolean;
 
