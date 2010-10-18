@@ -43,9 +43,8 @@ void LcdInit(void)
 	}
 
 	// 5. Setup the LCD Controller
-	FIO1DIR |= LCD_BACKLIGHT;				// Set direction of backlight
+	FIO1DIR |= LCD_BACKLIGHT;
 	FIO3DIR |= LCD_RESET;					// and reset to output
-	LcdBacklight(1);						// Turn  the backlight on
 	LcdReset(0);							// Reset the LCD Controller
 	for(j = 0; j < 1000000; j++);
 	LcdReset(1);

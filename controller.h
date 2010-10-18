@@ -11,6 +11,7 @@
 #include "app_types.h"
 #include "LPC23xx.h"
 #include "pwm.h"
+#include "ROSIFace.h"
 
 /*************************************************************************
  *             Definitions
@@ -22,10 +23,10 @@
 #define REAR_SERVO_CHANNEL			3
 
 // The maximum and minimum velocities accepted from ROS
-#define VELOCITY_MAX 				1.6f
-#define VELOCITY_MIN 				-1.6f
-#define THETA_MAX 					2.1f
-#define THETA_MIN  					-2.1f
+#define VELOCITY_MAX 				1600
+#define VELOCITY_MIN 				-1600
+#define THETA_MAX 					1600
+#define THETA_MIN  					-1600
 
 // The maximum and minimum PWM values for the servos/motor controller
 #define VELOCITY_PWM_MAX			144000	// PWM - Freq = 0x15F900 (1440000)
@@ -40,10 +41,9 @@
 void ControllerInit(void);
 void ControllerCalcPID(void);
 uint32_t ControllerCalcPWM(uint16_t channel);
-void ControllerSetTheta(float value);
-float ControllerGetTheta(void);
-void ControllerSetVelocity(float value);
-float ControllerGetVelocity(void);
-void ControllerTestMotors(void);
+void ControllerSetTheta(int16_t value);
+int16_t ControllerGetTheta(void);
+void ControllerSetVelocity(int16_t value);
+int16_t ControllerGetVelocity(void);
 
 #endif /* CONTROLLER_H_ */

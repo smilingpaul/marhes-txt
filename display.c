@@ -2,9 +2,9 @@
 
 static unsigned char DisplayState;
 static char Switched;
-static uint16_t currentVC[SIZE_VEL_ARR];
+static int16_t currentVC[SIZE_VEL_ARR];
 static float currentImuData[SIZE_IMU_ARR];
-static uint16_t currentGpsStat[SIZE_GPS_STAT_ARR];
+static int16_t currentGpsStat[SIZE_GPS_STAT_ARR];
 static float currentGpsData[SIZE_GPS_DATA_ARR];
 
 void DisplayInit(void)
@@ -16,7 +16,7 @@ void DisplayInit(void)
 
 void DisplaySetState(signed char dispNum)
 {
-    signed char temp = dispNum;
+    char temp = dispNum;
     
     if (temp < DISPLAY_MIN)
         temp = DISPLAY_MAX;
@@ -58,7 +58,7 @@ void DisplayUpdate(void)
     }
 }
 
-uint16_t DisplayChangeValueS(uint16_t prevValue, uint16_t currentValue, uint8_t xLoc, uint8_t yLoc)
+int16_t DisplayChangeValueS(int16_t prevValue, int16_t currentValue, uint8_t xLoc, uint8_t yLoc)
 {
     char* strTemp;
     if(prevValue != currentValue)

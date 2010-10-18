@@ -7,9 +7,9 @@
 
 #include "controller.h"
 
-float theta = 0;
-float velocity = 0;
-float velocitySlope, velocityInt, thetaSlope, thetaInt;
+static int16_t theta = 0;
+static int16_t velocity = 0;
+static float velocitySlope, velocityInt, thetaSlope, thetaInt;
 
 void ControllerInit(void)
 {
@@ -22,6 +22,9 @@ void ControllerInit(void)
 void ControllerCalcPID(void)
 {
 	// Just test code
+	ControllerSetVelocity(ROSGetVelocityCmd(ROS_LINEAR_VEL));
+	ControllerSetTheta(ROSGetVelocityCmd(ROS_ANGULAR_VEL));
+
 	PWMSetDuty(MOTOR_CHANNEL, ControllerCalcPWM(MOTOR_CHANNEL));
 	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
 	//PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
@@ -34,13 +37,13 @@ uint32_t ControllerCalcPWM(uint16_t channel)
 	switch(channel)
 	{
 		case MOTOR_CHANNEL:
-			temp = velocitySlope * velocity + velocityInt;
+			temp = (uint32_t)(velocitySlope * velocity + velocityInt);
 			break;
 		case FRONT_SERVO_CHANNEL:
-			temp = thetaSlope * theta + thetaInt;
+			temp = (uint32_t)(thetaSlope * theta + thetaInt);
 			break;
 		case REAR_SERVO_CHANNEL:
-			temp = thetaSlope * theta + thetaInt;
+			temp = (uint32_t)(thetaSlope * theta + thetaInt);
 			break;
 		default:
 			temp = DUTY_1_5;
@@ -50,7 +53,7 @@ uint32_t ControllerCalcPWM(uint16_t channel)
 	return temp;
 }
 
-void ControllerSetTheta(float value)
+void ControllerSetTheta(int16_t value)
 {
 	if (value > THETA_MAX)
 		theta = THETA_MAX;
@@ -60,12 +63,12 @@ void ControllerSetTheta(float value)
 		theta = value;
 }
 
-float ControllerGetTheta(void)
+int16_t ControllerGetTheta(void)
 {
 	return theta;
 }
 
-void ControllerSetVelocity(float value)
+void ControllerSetVelocity(int16_t value)
 {
 	if (value > VELOCITY_MAX)
 		velocity = VELOCITY_MAX;
@@ -75,22 +78,7 @@ void ControllerSetVelocity(float value)
 		velocity = value;
 }
 
-float ControllerGetVelocity(void)
+int16_t ControllerGetVelocity(void)
 {
 	return velocity;
-}
-
-void ControllerTestMotors(void)
-{
-	unsigned long counter;
-	unsigned long duty = THETA_PWM_MIN;
-	while(duty <= THETA_PWM_MAX)
-	{
-		//PWMSetDuty(MOTOR_CHANNEL, duty);
-		PWMSetDuty(FRONT_SERVO_CHANNEL, duty);
-		duty += 50;
-		for ( counter=0; counter<0x00005000; counter++ );
-	}
-	PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5);
-	PWMSetDuty(FRONT_SERVO_CHANNEL, DUTY_1_5);
 }

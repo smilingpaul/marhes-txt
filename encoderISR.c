@@ -18,7 +18,7 @@ void EncoderISR(void)
 	// Check for MR0 Interrupt
 	if(T1IR | IR_MR0)
 	{
-		FIO0PIN ^= (1<<21);
+		//FIO0PIN ^= (1<<21);
 		// Stop Counters
 		T0TCR = 0;
 		T3TCR = 0;

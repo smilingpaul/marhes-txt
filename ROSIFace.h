@@ -38,13 +38,17 @@
 
 #define SIZE_MAX_RX_STR     20
 
+// Command Vel Array Indexes
+#define ROS_LINEAR_VEL		0
+#define ROS_ANGULAR_VEL		1
+
 void ROSProcessPacket(void);
-uint8_t ROSChecksum(void);
+int8_t ROSChecksum(void);
 void ROSProcessData(void);
-uint16_t ROSGetVelocityCmd(uint8_t value);
+int16_t ROSGetVelocityCmd(uint8_t value);
 float ROSGetImuData(uint8_t value);
 char* ROSGetImuDataString(uint8_t value);
-uint16_t ROSGetGpsStatus(uint8_t value);
+int16_t ROSGetGpsStatus(uint8_t value);
 float ROSGetGpsData(uint8_t value);
 char* ROSGetGpsDataString(uint8_t value);
 

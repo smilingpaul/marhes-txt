@@ -8,10 +8,10 @@
 #include "ROSIFace.h"
  
 // Storage for current data from ros
-static uint16_t velocityCmd[SIZE_VEL_ARR] = {0};
+static int16_t velocityCmd[SIZE_VEL_ARR] = {0};
 static float imuData[SIZE_IMU_ARR] = {0};
 static char imuDataStrings[SIZE_IMU_ARR][SIZE_MAX_RX_STR] = {{0}};
-static uint16_t gpsStatus[SIZE_GPS_STAT_ARR] = {0};
+static int16_t gpsStatus[SIZE_GPS_STAT_ARR] = {0};
 static float gpsData[SIZE_GPS_DATA_ARR] = {0}; 
 static char gpsDataStrings[SIZE_GPS_DATA_ARR][SIZE_MAX_RX_STR] = {{0}};
 
@@ -27,6 +27,7 @@ void ROSProcessPacket(void)
     {                
         if(dataNum == 0)                        // Look for 0xFA
         {
+            
             data[dataNum] = Uart0RxChar();      // Get next byte
             if(data[dataNum] == 0xFA)           // If 1st byte of header, get
                 dataNum++;                      // second
@@ -61,9 +62,9 @@ void ROSProcessPacket(void)
     }   
 }
 
-uint8_t ROSChecksum(void)
+int8_t ROSChecksum(void)
 {
-    unsigned char *buffer = &data[3];
+    uint8_t *buffer = &data[3];
   	int checksum = 0;
   	int n;
 
@@ -84,8 +85,8 @@ uint8_t ROSChecksum(void)
 	// low-order byte of the checksum.
   	if (n>0) checksum = checksum ^ (int)*(buffer++);
 
-    if ((unsigned char)(checksum>>8) == *(buffer++))
-        if ((unsigned char)(checksum & 0xFF) == *(buffer++))
+    if ((uint8_t)(checksum>>8) == *(buffer++))
+        if ((uint8_t)(checksum & 0xFF) == *(buffer++))
             return 1;
     
     return 0;
@@ -122,15 +123,15 @@ void ROSProcessData(void)
                 strcpy(imuDataStrings[valueLoop], tempStr);
                 dataLoop++;
             }
-            //FIO0PIN ^= (1<<21);
             break;
         case CMD_VEL:
             // Check size of packet
             if (data[2] != SIZE_VEL + 2)
                 break;
             // Store velocity command values
-            velocityCmd[0] = data[4] << 8 | data[5];
-            velocityCmd[1] = data[6] << 8 | data[7]; 
+            velocityCmd[0] = (int16_t)(data[4] << 8 | data[5]);
+            velocityCmd[1] = (int16_t)(data[6] << 8 | data[7]);
+            FIO0PIN ^= (1<<21);
             break;
         default:
         
@@ -138,7 +139,7 @@ void ROSProcessData(void)
     }
 }
 
-uint16_t ROSGetVelocityCmd(uint8_t value)
+int16_t ROSGetVelocityCmd(uint8_t value)
 {
     return velocityCmd[value];
 }
@@ -153,7 +154,7 @@ char* ROSGetImuDataString(uint8_t value)
     return imuDataStrings[value];
 }
 
-uint16_t ROSGetGpsStatus(uint8_t value)
+int16_t ROSGetGpsStatus(uint8_t value)
 {
     return gpsStatus[value];
 }
