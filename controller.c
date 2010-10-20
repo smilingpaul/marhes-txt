@@ -27,7 +27,7 @@ void ControllerCalcPID(void)
 
 	PWMSetDuty(MOTOR_CHANNEL, ControllerCalcPWM(MOTOR_CHANNEL));
 	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
-	//PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
+	PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
 }
 
 uint32_t ControllerCalcPWM(uint16_t channel)
@@ -40,7 +40,7 @@ uint32_t ControllerCalcPWM(uint16_t channel)
 			temp = (uint32_t)(velocitySlope * velocity + velocityInt);
 			break;
 		case FRONT_SERVO_CHANNEL:
-			temp = (uint32_t)(thetaSlope * theta + thetaInt);
+			temp = (uint32_t)(-thetaSlope * theta + thetaInt);
 			break;
 		case REAR_SERVO_CHANNEL:
 			temp = (uint32_t)(thetaSlope * theta + thetaInt);
