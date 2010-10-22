@@ -1,0 +1,383 @@
+/******************************************************************************
+ *
+ * A program which sends a greeting to UART1, then echos
+ * characters on UART1 and blinks an LED
+ *
+ * base code from: Bill Knight, R O SoftWare <BillK@rosw.com>
+ *
+ * Extended and adapted to NXP LPC23xx/24xx by Martin Thomas
+ * <eversmith(at)heizung-thomas(dot)de>
+ * - Interrupt-Init and handling (UARTs and TIMER0)
+ * - extended "systime" with callbacks
+ * - adapted register-definitions to LPC23xx.h (included)
+ * - clock-setups for LPC23xx/24xx (PLL, Core, PCLK etc.)
+ * - removed GPIO init, use FIO
+ *
+ * ----------------------------------------------------------------------------
+ *
+ * Toolchain: GNU arm-elf (WinARM 6/06)
+ * Target   : NXP LPC2378 on Olimex LPC-2378-STK
+ *
+ * $RCSfile: $
+ * $Revision: $
+ *
+ * Copyright 2004, R O SoftWare
+ * Copyright 2007, Martin Thomas
+ * No guarantees, warrantees, or promises, implied or otherwise.
+ * May be used for hobby or commercial purposes provided copyright
+ * notice remains intact.
+ *
+ *****************************************************************************/
+
+#define VERSION "0.8 mthomas 5/2007"
+ 
+#include "app_types.h"
+#include "LPC_REGS.h"
+#include "sys_config.h"
+
+#include "armVIC.h"
+#include "sysTime.h"
+#include "sysTimeISR.h"
+#include "uart.h"
+
+volatile uint32_t hit_cnt; // for timer-callback
+
+/******************************************************************************
+ *
+ * Function Name: lowInit()
+ *
+ * Description:
+ *    This function starts up the PLL then sets up the GPIO pins before
+ *    waiting for the PLL to lock.  It finally engages the PLL and
+ *    returns
+ *
+ * Calling Sequence: 
+ *    void
+ *
+ * Returns:
+ *    void
+ * partily based on code for NXP example collection
+ *****************************************************************************/
+
+static void configPLL(void)
+{
+	uint32_t readback;
+
+	// check if PLL connected, disconnect if yes
+	if ( PLLSTAT & PLLSTAT_PLLC ) {
+		PLLCON = PLLCON_PLLE;       /* Enable PLL, disconnected ( PLLC = 0 )*/
+		PLLFEED = 0xaa;
+		PLLFEED = 0x55;
+	}
+
+	PLLCON  = 0;        /* Disable PLL, disconnected */
+	PLLFEED = 0xaa;
+	PLLFEED = 0x55;
+
+	SCS |= SCS_OSCEN;   /* Enable main OSC, SCS Man p.28 */
+	while( !( SCS & SCS_OSCSTAT ) ) {
+		;	/* Wait until main OSC is usable */
+	}
+
+	CLKSRCSEL = CLKSRC_MAIN_OSC;   /* select main OSC as the PLL clock source */
+
+	PLLCFG = PLLCFG_MSEL | PLLCFG_NSEL;
+	PLLFEED = 0xaa;
+	PLLFEED = 0x55;
+	
+	PLLCON = PLLCON_PLLE;       /* Enable PLL, disconnected ( PLLC = 0 ) */
+	PLLFEED = 0xaa;
+	PLLFEED = 0x55;
+	
+	CCLKCFG = CCLKCFG_CCLKSEL_VAL;     /* Set clock divider, Manual p.45 */
+
+//#if USE_USB
+//	USBCLKCFG = USBCLKDivValue; /* usbclk = 288 MHz/6 = 48 MHz */
+//#endif
+	
+	while ( ( PLLSTAT & PLLSTAT_PLOCK ) == 0 )  {
+		; /* Check lock bit status */
+	}
+	
+	readback = PLLSTAT & 0x00FF7FFF;
+	while ( readback != (PLLCFG_MSEL | PLLCFG_NSEL) )
+	{
+		; // stall - invalid readback
+	}
+	
+	PLLCON = ( PLLCON_PLLE | PLLCON_PLLC );  /* enable and connect */
+	PLLFEED = 0xaa;
+	PLLFEED = 0x55;
+	while ( ((PLLSTAT & PLLSTAT_PLLC) == 0) ) {
+		;  /* Check connect bit status, wait for connect */
+	}
+}
+
+static void lowInit(void)
+{
+	configPLL();
+	
+	// setup & enable the MAM
+	MAMCR = MAMCR_OFF;
+#if CCLK < 20000000
+	MAMTIM = 1;
+#elif CCLK < 40000000
+	MAMTIM = 2;
+#else
+	MAMTIM = 3;
+#endif
+	MAMCR = MAMCR_FULL;
+	
+	// set the peripheral bus speed
+	// value computed from config.h
+	
+#if PBSD == 4
+	PCLKSEL0 = 0x00000000;	/* PCLK is 1/4 CCLK */
+	PCLKSEL1 = 0x00000000;
+#elif PBSD == 2
+	PCLKSEL0 = 0xAAAAAAAA;	/* PCLK is 1/2 CCLK */
+	PCLKSEL1 = 0xAAAAAAAA;
+#elif PBSD == 1
+	PCLKSEL0 = 0x55555555;	/* PCLK is the same as CCLK */
+	PCLKSEL1 = 0x55555555;
+#else
+#error invalid p-clock divider
+#endif
+
+	return;
+}
+
+/******************************************************************************
+ *
+ * Function Name: sysInit()
+ *
+ * Description:
+ *    This function is responsible for initializing the program
+ *    specific hardware
+ *
+ * Calling Sequence: 
+ *    void
+ *
+ * Returns:
+ *    void
+ *
+ *****************************************************************************/
+static void sysInit(void)
+{
+	uint32_t i = 0;
+	volatile uint32_t *vect_addr, *vect_prio;
+
+	lowInit();                            // setup clocks and processor port pins
+
+	// set the interrupt controller defaults
+#if defined(RAM_RUN)
+	MEMMAP = MEMMAP_SRAM;                 // map interrupt vectors space into SRAM
+#elif defined(ROM_RUN)
+	MEMMAP = MEMMAP_FLASH;                // map interrupt vectors space into FLASH
+#else
+#error RUN_MODE not defined!
+#endif
+	
+	/* initialize VIC */
+	VICIntEnClr  = 0xffffffff;
+	VICVectAddr  = 0x00000000;
+	VICIntSelect = 0x00000000; /* all IRQ */
+	
+	/* set all the vector and vector control register to 0 */
+	for ( i = 0; i < 32; i++ ) {
+		vect_addr = (uint32_t *)(VIC_BASE_ADDR + VECT_ADDR_INDEX + i*4);
+		vect_prio = (uint32_t *)(VIC_BASE_ADDR + VECT_PRIO_INDEX + i*4);
+		*vect_addr = 0x00000000;
+		*vect_prio = 0x0000000F;
+	}
+
+	// non-existing on LPC23xx/24xx:  VICDefVectAddr = (uint32_t)reset;     // point unvectored IRQs to reset()
+	
+	//  wdtInit();                         // initialize the watchdog timer
+	initSysTime();                        // initialize the system timer
+
+#if (UART0_SUPPORT)
+	uart0Init(UART_BAUD(HOST_BAUD_U0), UART_8N1, UART_FIFO_8); // setup the UART
+#endif
+#if (UART1_SUPPORT)
+	uart1Init(UART_BAUD(HOST_BAUD_U1), UART_8N1, UART_FIFO_8); // setup the UART
+#endif
+
+	SCS |= (1UL<<0); // set GPIOM in SCS for fast IO
+}
+
+/******************************************************************************
+ *
+ * Function Name: button_state()
+ *
+ * Description:
+ *    This function checks if a key has been pressed. Assumes
+ *    keys to be "active low" (PIN-Bit==0 -> pressed). Does
+ *    debouncing for given debounce time-difference
+ *
+ * Calling Sequence: 
+ *    GPIO-Initialisation for Inputs
+ *
+ * Returns:
+ *    -1 : keys changed or bouncing
+ *     0 : keys released
+ *     1 : key1 pressed, 2: key2 pressed, 3: both pressed
+ *
+ *****************************************************************************/
+#define KEY_DEBOUNCE FIFTY_MS
+static int button_state(void)
+{
+	static uint32_t lastchangetime;
+	static uint32_t laststate;
+	int retval = 0;
+	int actstate;
+	
+	actstate = (SW1_PIN & (SW1_BIT | SW2_BIT));
+	
+	if (laststate != actstate) {
+		lastchangetime = getSysTICs();
+		laststate = actstate;
+	}
+	else {
+		if (getElapsedSysTICs(lastchangetime) > KEY_DEBOUNCE) {
+			retval = 0;
+			if ( !(SW1_PIN & SW1_BIT) ) retval |= 0x01;
+			if ( !(SW1_PIN & SW2_BIT) ) retval |= 0x02;
+			return retval;
+		}
+	}
+	return -1; // changed or bouncing
+}
+
+/******************************************************************************
+  Timer Callback
+ ******************************************************************************/
+static void led_callback(void)
+{
+	static int flip = 0;
+	
+	if ( flip ) {
+		LED1_CLR = LED1_BIT;
+	}
+	else {
+		LED1_SET = LED1_BIT; 
+	}
+	flip = !flip;
+	
+	hit_cnt++;
+}
+
+/******************************************************************************
+ *
+ * Function Name: main()
+ *
+ * Description:
+ *    This function is the program entry point.  After initializing the
+ *    system, it sends a greeting out UART0 then enters an endless loop
+ *    echoing chracters on the UART and blinking an LED every half
+ *    second.
+ *
+ * Calling Sequence: 
+ *    void
+ *
+ * Returns:
+ *    void
+ *
+ *****************************************************************************/
+int main(void)
+{
+	uint32_t startTime;
+	int ch;
+	int bt;
+	int lock=FALSE;
+	uint32_t my_hitcnt;
+	
+	sysInit();
+	
+#if defined(UART0_TX_INT_MODE) || defined(UART0_RX_INT_MODE) || defined(SYSTIME_INT_MODE)
+	enableIRQ();
+#endif
+	
+	LED1_DIR |= LED1_BIT; // LED-Pin as output
+
+#if 1
+	// do some "alive" blinks
+	volatile uint32_t vi;
+	uint32_t j;
+	for ( j=0; j<10; j++ ) {
+		LED1_PIN ^= LED1_BIT;
+		for ( vi=0; vi<0x00090000; vi++ );
+	}
+#endif
+
+	uart1Puts("\r\nUART- and Timer-Interrupt demo for LPC23xx/24xx " VERSION "\r\n");
+	uart1Puts("(a WinARM Demo-Application based on code from R O Software)\r\n");
+#if ( UART0_SUPPORT )
+	uart0Puts("Hello from UART0\r\n");
+#if defined(UART0_TX_INT_MODE)
+	uart1Puts("UART0 Int Mode\r\n");
+#endif
+#endif
+#if defined(UART1_TX_INT_MODE)
+	uart1Puts("UART1 Int Mode\r\n");
+#endif
+	uart1Puts("\r\n");
+	
+	if ( systimeRegisterCallback( led_callback, 1000 ) ) {
+		uart1Puts("Callback registered\r\n");
+	}
+
+	startTime = getSysTICs();
+	my_hitcnt = hit_cnt;
+	
+	for (;;) {
+	
+		do {
+		
+			if ( my_hitcnt != hit_cnt ) {
+				uart1Puts(" callback hit ");
+				my_hitcnt = hit_cnt;
+			}
+
+			if ((ch = uart1Getch()) >= 0) {
+				uart1Puts("the <");
+				uart1Putch(ch);
+				uart1Puts("> key has been pressed\r\n");
+			}
+	
+			// send button-pressed string only once if hit
+			if (button_state()==0) lock=FALSE; // release lock if button is released
+
+			if ( ((bt=button_state()) > 0 ) && !lock ) {
+				if ( bt & 0x01 ) {
+					uart1Puts("\r\nButton 1 Pressed!\r\n");
+					if ( systimeRegisterCallback( led_callback, 1000 ) ) {
+						uart1Puts("Callback newly registered or already registered.\r\n");
+					}
+					else {
+						uart1Puts("Callback register failed.\r\n");
+					}
+					lock=TRUE;
+				}
+				if ( bt & 0x02 ) {
+					uart1Puts("\r\nButton 2 Pressed!\r\n");
+					if ( systimeRemoveCallback( led_callback ) ) {
+						uart1Puts("Callback removed.\r\n");
+					}
+					else {
+						uart1Puts("Callback not registered of remove failed.\r\n");
+					}
+					lock=TRUE;
+				}
+			}
+		} while (getElapsedSysTICs(startTime) < HALF_SEC);
+
+		startTime += HALF_SEC;
+		
+		uart1Puts(".");
+	
+	} // for
+
+	return 0;
+}
+
