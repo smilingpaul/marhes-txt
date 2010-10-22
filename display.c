@@ -6,6 +6,7 @@ static int16_t currentVC[SIZE_VEL_ARR];
 static float currentImuData[SIZE_IMU_ARR];
 static int16_t currentGpsStat[SIZE_GPS_STAT_ARR];
 static float currentGpsData[SIZE_GPS_DATA_ARR];
+static uint32_t currentEncoderCounts[SIZE_ENCODER_ARR];
 
 void DisplayInit(void)
 {
@@ -152,6 +153,8 @@ void DisplayGPS(void)
 
 void DisplayEncoder(void)
 {
+    uint8_t i = 0;
+
     if(Switched)
     {    
         LcdClearScreen(BCOLOR);
@@ -159,10 +162,12 @@ void DisplayEncoder(void)
 	    LcdSetLine(18, 0, 18, 131, FCOLOR);
 	    LcdPutStr("FR  :", 24, 0, SMALL, FCOLOR, BCOLOR);
 	    LcdPutStr("FL  :", 36, 0, SMALL, FCOLOR, BCOLOR);
-        LcdPutStr("RR  :", 48, 0, SMALL, FCOLOR, BCOLOR);
-	    LcdPutStr("RL  :", 60, 0, SMALL, FCOLOR, BCOLOR);
-	    LcdPutStr("LINV:", 72, 0, SMALL, FCOLOR, BCOLOR);
-	    LcdPutStr("ANGV:", 84, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("LINV:", 48, 0, SMALL, FCOLOR, BCOLOR);
+	    LcdPutStr("ANGV:", 60, 0, SMALL, FCOLOR, BCOLOR);
         Switched = 0;
     }
+
+    for(i = 0; i < SIZE_ENCODER_ARR; i++)
+        currentEncoderCounts[i] = (uint32_t)DisplayChangeValueS((int16_t)currentEncoderCounts[i], \
+        		(int16_t)EncoderCount(i), 24 + 12 * i, 36);
 }

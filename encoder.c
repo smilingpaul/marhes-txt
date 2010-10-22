@@ -31,21 +31,13 @@
  *
  *  Pin definition:
  *  	P3.23 - CAP0.0 - Front Right Encoder A Signal
- *    	P3.24 - CAP0.1 - Front Left  Encoder A Signal
- *    	P0.23 - CAP3.0 - Rear  Right Encoder A Signal
- *    	P0.24 - CAP3.1 - Rear  Left  Encoder A Signal
- *  	P2.6  - FastIn - Front Right Encoder B Signal
- *    	P2.7  - FastIn - Front Left  Encoder B Signal
- *    	P2.8  - FastIn - Rear  Right Encoder B Signal
- *    	P2.9  - FastIn - Rear  Left  Encoder B Signal
+ *    	P0.23 - CAP3.0 - Front Left Encoder A Signal
  */
 
 #include "encoder.h"
 
 // Variable declaration
-uint32_t frontRightTicks, frontLeftTicks;
-//uint32_t rearRightTicks, rearLeftTicks;
-char inputChannel = 0;
+uint32_t ticks[SIZE_ENCODER_ARR];
 
 /*************************************************************************
  * Function Name: EncoderInit
@@ -62,16 +54,16 @@ char inputChannel = 0;
 void EncoderInit(void)
 {
 	// 1. Power up Timer 0 and 3 for capture mode and Timer 1 as a timer
-	PCONP |= PCONP_PCTIM0 | PCONP_PCTIM1; // | PCONP_PCTIM3;
+	PCONP |= PCONP_PCTIM0 | PCONP_PCTIM1 | PCONP_PCTIM3;
 
 	// 2. Make the peripheral clocks 72 MHz = divided by one
 	PCLKSEL0 |= PCLKSEL0_TIM0_DIV1 | PCLKSEL0_TIM1_DIV1;
-	//PCLKSEL1 |= PCLKSEL1_TIM3_DIV1;
+	PCLKSEL1 |= PCLKSEL1_TIM3_DIV1;
 
 	// 3. Select pin functions.  Make P3.23 be CAP0.0 and P3.24 be CAP0.1.
 	//    Make P0.23 be CAP3.0 and P0.24 be CAP3.1.
-	PINSEL7 |= (PINSEL7_CAP00 | PINSEL7_CAP01);
-	//PINSEL1 |= (PINSEL1_CAP30 | PINSEL1_CAP31);
+	PINSEL7 |= (PINSEL7_CAP00);
+	PINSEL1 |= (PINSEL1_CAP30);
 
 	// 4. Setup timer counter
 	T0TCR = TCR_CR;							// Reset timer0 counter
@@ -79,23 +71,21 @@ void EncoderInit(void)
 											// Start the counting on channel 0
 	T0PR = 0;								// Increment TC after every rise/fall
 
-//	T3TCR = TCR_CR;							// Reset timer3 counter
-//	T3CTCR = CTCR_CM_RF | CTCR_CAP_SEL_0;	// Timer is counter mode on rise/fall
-//											// Start the counting on channel 0
-//	T3PR = 0;								// Increment TC after every rise/fall
+	T3TCR = TCR_CR;							// Reset timer3 counter
+	T3CTCR = CTCR_CM_RF | CTCR_CAP_SEL_0;	// Timer is counter mode on rise/fall
+											// Start the counting on channel 0
+	T3PR = 0;								// Increment TC after every rise/fall
 
-//	inputChannel = 0;						// Set the input channel
+//	// 5. Configure inputs to other signal of quadrature encoders to
+//	//    find out the direction of the wheels (input = 0)
+//	FIO2DIR &= ~(0x00000C0);				// Front B signals as inputs
+////	FIO2DIR &= ~(0x0000300);				// Rear B signals as inputs
 
-	// 5. Configure inputs to other signal of quadrature encoders to
-	//    find out the direction of the wheels (input = 0)
-	FIO2DIR &= ~(0x00000C0);				// Front B signals as inputs
-//	FIO2DIR &= ~(0x0000300);				// Rear B signals as inputs
-
-	// 6. Setup timer1 for a sample period of 10msec to switch between channels
+	// 6. Setup timer1 for a sample period of 20msec to switch between channels
 	//    for counting enabling the interrupt
 	T1TCR = TCR_CR;							// Reset timer1 counter
 	T1CTCR = CTCR_TM;						// Timer 1 is in timer mode
-	T1MR0 = 7200000;//MCR_10MS;						// Match at 10ms
+	T1MR0 = MCR_20MS;						// Match at 20ms
 	T1MCR = MCR_MR0I | MCR_MR0S | MCR_MR0R;	// On match, interrupt,reset,stop TC
 
 	// Setup T1 Interrupt
@@ -107,31 +97,13 @@ void EncoderInit(void)
 
 	// 7. Enable the Timer counters
 	T0TCR = TCR_CE;
-//	T3TCR = TCR_CE;
+	T3TCR = TCR_CE;
 	T1TCR = TCR_CE;
 }
 
-uint32_t EncoderCount(char channel)
+uint32_t EncoderCount(uint8_t channel)
 {
 	uint32_t count;
-
-	switch(channel)
-	{
-		case FRONT_RIGHT:
-			count = frontRightTicks;
-			break;
-		case FRONT_LEFT:
-			count = frontLeftTicks;
-			break;
-//		case REAR_RIGHT:
-//			count = rearRightTicks;
-//			break;
-//		case REAR_LEFT:
-//			count = rearLeftTicks;
-//			break;
-		default:
-			count = 0;
-			break;
-	}
+	count = ticks[channel];
 	return count;
 }

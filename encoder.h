@@ -71,19 +71,22 @@
 
 // MCR Times
 #define MCR_10MS				720000		// 720kHz / 72MHz = 10ms
+#define MCR_20MS				1440000		// 1.44MHz / 72MHz = 10ms
 
 // Encoder channels
-#define FRONT_RIGHT				1			// Front right encoder channel
-#define FRONT_LEFT				2			// Front left encoder channel
-//#define REAR_RIGHT				3			// Rear right encoder channel
-//#define REAR_LEFT				4			// Rear left encoder channel
+#define FRONT_RIGHT				0			// Front right encoder channel
+#define FRONT_LEFT				1			// Front left encoder channel
+//#define REAR_RIGHT			2			// Rear right encoder channel
+//#define REAR_LEFT				3			// Rear left encoder channel
+
+#define SIZE_ENCODER_ARR		2
 
 /*************************************************************************
  *             Function declarations
  *************************************************************************/
 
 void EncoderInit(void);
-uint32_t EncoderCount(char channel);
+uint32_t EncoderCount(uint8_t channel);
 void EncoderISR(void);
 
 #endif /* ENCODER_H_ */

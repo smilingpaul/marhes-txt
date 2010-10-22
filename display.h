@@ -6,6 +6,7 @@
 #include "LPC23xx.h"
 #include "lcd.h"
 #include "ROSIFace.h"
+#include "encoder.h"
 #include "helperFuncs.h"
 
 /*************************************************************************
