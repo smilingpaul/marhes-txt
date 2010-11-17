@@ -48,6 +48,9 @@
  *****************************************************************************/
 
 #define VERSION "0.8 mthomas 5/2007"
+
+// Comment out to use UART2
+//#define UART0
  
 // Includes
 #include "app_types.h"
@@ -56,6 +59,7 @@
 
 #include "pwm.h"
 #include "uart0.h"
+#include "uart2.h"
 #include "encoder.h"
 #include "controller.h"
 #include "lcd.h"
@@ -187,7 +191,11 @@ void sysInit(void)
 
 	// Call initialization functions of necessary peripherals
 	PWMInit();
+#ifdef UART0
 	Uart0Init();
+#else
+	Uart2Init();
+#endif
 	LcdInit();
 	EncoderInit();
 	ControllerInit();

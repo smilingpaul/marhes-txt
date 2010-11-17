@@ -22,6 +22,7 @@ static uint8_t dataNum = 0;
 // Processes data in the serial port buffer.
 void ROSProcessPacket(void)
 {
+#ifdef UART0
     // While there is more data available in uart0
     while (Uart0RxDataReady())
     {                
@@ -59,7 +60,47 @@ void ROSProcessPacket(void)
                                                 // restart the process
             }
         }      
-    }   
+    }
+#else
+    // While there is more data available in uart2
+    while (Uart2RxDataReady())
+    {
+        if(dataNum == 0)                        // Look for 0xFA
+        {
+
+            data[dataNum] = Uart2RxChar();      // Get next byte
+            if(data[dataNum] == 0xFA)           // If 1st byte of header, get
+                dataNum++;                      // second
+        }
+        else if (dataNum == 1)                  // Look for 0xFB if proceeded by
+        {                                       // 0xFA
+            data[dataNum] = Uart2RxChar();      // Get next byte
+            if(data[dataNum] == 0xFB)           // If 0xFB, get size from next
+                dataNum++;                      // byte, else start over looking
+            else                                // for 0xFA
+                dataNum = 0;
+        }
+        else if (dataNum == 2)                  // Get size of packet
+        {
+            data[dataNum] = Uart2RxChar();
+            dataNum++;
+        }
+        else                                    // Get the rest of the data
+        {
+            data[dataNum] = Uart2RxChar();      // Get next byte
+            dataNum++;
+
+            if(dataNum >= (data[2] + 3))        // If last byte, process cksum
+            {                                   // then data.
+                if(ROSChecksum())
+                    ROSProcessData();
+
+                dataNum = 0;                    // If cksum doesn't match,
+                                                // restart the process
+            }
+        }
+    }
+#endif
 }
 
 int8_t ROSChecksum(void)
