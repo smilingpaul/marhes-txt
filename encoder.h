@@ -80,6 +80,7 @@
 //#define REAR_LEFT				3			// Rear left encoder channel
 
 #define SIZE_ENCODER_ARR		2
+#define SIZE_ENCODER_VEL_ARR	2
 
 /*************************************************************************
  *             Function declarations
@@ -87,6 +88,7 @@
 
 void EncoderInit(void);
 uint32_t EncoderCount(uint8_t channel);
+float EncoderVel(uint8_t channel);
 void EncoderISR(void);
 
 #endif /* ENCODER_H_ */

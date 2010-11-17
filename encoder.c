@@ -38,6 +38,7 @@
 
 // Variable declaration
 uint32_t ticks[SIZE_ENCODER_ARR];
+float vels[SIZE_ENCODER_VEL_ARR];
 
 /*************************************************************************
  * Function Name: EncoderInit
@@ -106,4 +107,11 @@ uint32_t EncoderCount(uint8_t channel)
 	uint32_t count;
 	count = ticks[channel];
 	return count;
+}
+
+float EncoderVel(uint8_t channel)
+{
+	float vel;
+	vel = vels[channel];
+	return vel;
 }

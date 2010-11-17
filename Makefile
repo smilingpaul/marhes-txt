@@ -75,6 +75,7 @@ TARGET = main
 SRC = $(TARGET).c 
 SRC += syscalls.c
 SRC += uart0.c 
+SRC += uart2.c
 SRC += lcd.c 
 SRC += pwm.c 
 SRC += encoder.c 
@@ -88,6 +89,7 @@ SRC += helperFuncs.c
 # use file-extension c for "c-only"-files
 SRCARM = armVIC.c
 SRCARM += uart0ISR.c
+SRCARM += uart2ISR.c
 SRCARM += encoderISR.c
 
 # List C++ source files here.

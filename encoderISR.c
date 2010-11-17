@@ -8,6 +8,7 @@
 #include "encoder.h"
 
 extern uint32_t ticks[];
+extern float vels[SIZE_ENCODER_VEL_ARR];
 
 void EncoderISR(void)
 {
@@ -23,6 +24,9 @@ void EncoderISR(void)
 		// Store the right and left encoder counts and reset and enable the TC
 		ticks[FRONT_RIGHT] = T0TC;
 		ticks[FRONT_LEFT] = T3TC;
+
+		//vels[0] = (ticks[FRONT_RIGHT] + ticks[FRONT_LEFT]) * 0.3 / (2 * 0.020);
+		//vels[1] = (ticks[FRONT_RIGHT] - ticks[FRONT_LEFT]) * 0.3 / (275 * 0.020);
 
 		// Reset and enable the TC
 		T0TCR = TCR_CR;

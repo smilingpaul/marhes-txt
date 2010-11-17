@@ -7,6 +7,7 @@ static float currentImuData[SIZE_IMU_ARR];
 static int16_t currentGpsStat[SIZE_GPS_STAT_ARR];
 static float currentGpsData[SIZE_GPS_DATA_ARR];
 static uint32_t currentEncoderCounts[SIZE_ENCODER_ARR];
+static float currentEncoderVels[SIZE_ENCODER_VEL_ARR];
 
 void DisplayInit(void)
 {
@@ -170,4 +171,7 @@ void DisplayEncoder(void)
     for(i = 0; i < SIZE_ENCODER_ARR; i++)
         currentEncoderCounts[i] = (uint32_t)DisplayChangeValueS((int16_t)currentEncoderCounts[i], \
         		(int16_t)EncoderCount(i), 24 + 12 * i, 36);
+
+//    for(i = 0; i < SIZE_ENCODER_VEL_ARR; i++)
+//    	currentEncoderVels[i] = DisplayChangeValueF();
 }
