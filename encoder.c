@@ -55,7 +55,7 @@ int32_t pos[SIZE_ENCODER_POS_ARR] = {0};
  *************************************************************************/
 void EncoderInit(void)
 {
-	// 1. Power up Timer 0 and 3 for capture mode and Timer 1 as a timer
+	// 1. Power up r
 	PCONP |= PCONP_PCTIM0 | PCONP_PCTIM1 | PCONP_PCTIM3;
 
 	// 2. Make the peripheral clocks 72 MHz = divided by one
@@ -98,7 +98,9 @@ void EncoderInit(void)
 	VICVectPriority5 = 0xF;									// Set the priority
 	VICIntEnable |= VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1);	// Enable the interrupt
 
-
+	vels[0] = 100;
+	vels[1] = -100;
+	vels[2] = 100;
 
 	// 7. Enable the Timer counters
 	T0TCR = TCR_CE;

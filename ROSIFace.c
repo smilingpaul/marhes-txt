@@ -219,7 +219,8 @@ int ROSCalcChkSum(uint8_t dataSize)
   	return(c);
 }
 
-void ROSSendEncOdom(int32_t x_mm, int32_t y_mm, int16_t th_mrad, int16_t linVel, int16_t angVel)
+void ROSSendEncOdom(int32_t x_mm, int32_t y_mm, int16_t th_mrad, \
+		int16_t linVelX, int16_t linVelY, int16_t angVel)
 {
 	int checksum;
 
@@ -239,11 +240,14 @@ void ROSSendEncOdom(int32_t x_mm, int32_t y_mm, int16_t th_mrad, int16_t linVel,
 	packet[12] = (uint8_t)(th_mrad >> 8);	// Write orientation
 	packet[13] = (uint8_t)th_mrad;
 
-	packet[14] = (uint8_t)(linVel >> 8);	// Write linear velocity
-	packet[15] = (uint8_t)linVel;
+	packet[14] = (uint8_t)(linVelX >> 8);	// Write linear x velocity
+	packet[15] = (uint8_t)linVelX;
 
-	packet[16] = (uint8_t)(angVel >> 8);	// Write angular velocity
-	packet[17] = (uint8_t)angVel;
+	packet[16] = (uint8_t)(linVelY >> 8);	// Write linear y velocity
+	packet[17] = (uint8_t)linVelY;
+
+	packet[18] = (uint8_t)(angVel >> 8);	// Write angular velocity
+	packet[19] = (uint8_t)angVel;
 
 	// Calculate checksum
 	checksum = ROSCalcChkSum(SIZE_ENC_ODOM);    	// Calculate the checksum

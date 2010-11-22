@@ -91,6 +91,7 @@ SRCARM = armVIC.c
 SRCARM += uart0ISR.c
 SRCARM += uart2ISR.c
 SRCARM += encoderISR.c
+SRCARM += mysin.c
 
 # List C++ source files here.
 # use file-extension cpp for C++-files (use extension .cpp)

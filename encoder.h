@@ -81,7 +81,7 @@
 //#define REAR_LEFT				3			// Rear left encoder channel
 
 #define SIZE_ENCODER_ARR		2
-#define SIZE_ENCODER_VEL_ARR	2
+#define SIZE_ENCODER_VEL_ARR	3
 #define SIZE_ENCODER_POS_ARR	3
 
 /*************************************************************************
