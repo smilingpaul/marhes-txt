@@ -30,7 +30,7 @@
 #define SIZE_GPS_STATUS		7
 #define SIZE_IMU_DATA		31
 #define SIZE_VEL			5
-#define SIZE_ENC_ODOM		15
+#define SIZE_ENC_ODOM		17
 
 #define USE_STRINGS
 
@@ -50,7 +50,8 @@ int8_t ROSChecksum(void);
 void ROSProcessData(void);
 void ROSBuildHeader(uint8_t dataSize);
 int ROSCalcChkSum(uint8_t dataSize);
-void ROSSendEncOdom(int32_t x_mm, int32_t y_mm, int16_t th_mrad, int16_t linVel, int16_t angVel);
+void ROSSendEncOdom(int32_t x_mm, int32_t y_mm, int16_t th_mrad, \
+		int16_t linVelX, int16_t linVelY, int16_t angVel);
 int16_t ROSGetVelocityCmd(uint8_t value);
 float ROSGetImuData(uint8_t value);
 char* ROSGetImuDataString(uint8_t value);
