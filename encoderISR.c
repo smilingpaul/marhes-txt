@@ -7,8 +7,9 @@
 
 #include "encoder.h"
 
-extern uint32_t ticks[];
-extern float vels[SIZE_ENCODER_VEL_ARR];
+extern int32_t ticks[];
+extern int32_t vels[];
+extern int64_t pos[];
 
 void EncoderISR(void)
 {
@@ -25,15 +26,26 @@ void EncoderISR(void)
 		ticks[FRONT_RIGHT] = T0TC;
 		ticks[FRONT_LEFT] = T3TC;
 
-		//vels[0] = (ticks[FRONT_RIGHT] + ticks[FRONT_LEFT]) * 0.3 / (2 * 0.020);
-		//vels[1] = (ticks[FRONT_RIGHT] - ticks[FRONT_LEFT]) * 0.3 / (275 * 0.020);
-
 		// Reset and enable the TC
 		T0TCR = TCR_CR;
 		T3TCR = TCR_CR;
 		T0TCR = TCR_CE;
 		T3TCR = TCR_CE;
 		T1TCR = TCR_CE;
+
+//		vels[0] = (ticks[FRONT_RIGHT] + ticks[FRONT_LEFT]) * 30 / (2 * 2);  	// mult by 100/100
+//		vels[1] = (ticks[FRONT_RIGHT] - ticks[FRONT_LEFT]) * 30 / (275 * 2);
+//
+//		pos[0] = vels[0] * cos(pos[2]/1000) + pos[0];
+//		pos[1] = vels[0] * sin(pos[2]/1000) + pos[1];
+//		pos[2] = vels[1] + pos[2];
+
+		// Drive in circle
+
+		// Send encoder message
+		//ROSSendEncOdom(pos[0], pos[1], pos[2], vels[0], vels[1]);
+
+		FIO0PIN ^= (1<<21);
 
 		// Clear MR0 interrupt
 		T1IR |= IR_MR0;

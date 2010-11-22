@@ -11,6 +11,7 @@
 #include "app_types.h"
 #include "armVIC.h"
 #include "LPC23xx.h"
+#include "ROSIFace.h"
 
 /*************************************************************************
  *             Definitions
@@ -81,14 +82,15 @@
 
 #define SIZE_ENCODER_ARR		2
 #define SIZE_ENCODER_VEL_ARR	2
+#define SIZE_ENCODER_POS_ARR	3
 
 /*************************************************************************
  *             Function declarations
  *************************************************************************/
 
 void EncoderInit(void);
-uint32_t EncoderCount(uint8_t channel);
-float EncoderVel(uint8_t channel);
+int32_t EncoderCount(uint8_t channel);
+int32_t EncoderVel(uint8_t channel);
 void EncoderISR(void);
 
 #endif /* ENCODER_H_ */

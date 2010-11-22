@@ -37,8 +37,9 @@
 #include "encoder.h"
 
 // Variable declaration
-uint32_t ticks[SIZE_ENCODER_ARR];
-float vels[SIZE_ENCODER_VEL_ARR];
+uint32_t ticks[SIZE_ENCODER_ARR] = {0};
+int32_t vels[SIZE_ENCODER_VEL_ARR] = {0};
+int32_t pos[SIZE_ENCODER_POS_ARR] = {0};
 
 /*************************************************************************
  * Function Name: EncoderInit
@@ -67,14 +68,15 @@ void EncoderInit(void)
 	PINSEL1 |= (PINSEL1_CAP30);
 
 	// 4. Setup timer counter
-	T0TCR = TCR_CR;							// Reset timer0 counter
+
 	T0CTCR = CTCR_CM_RF | CTCR_CAP_SEL_0;	// Timer is counter mode on rise/fall
 											// Start the counting on channel 0
+	T0TCR = TCR_CR;							// Reset timer0 counter
 	T0PR = 0;								// Increment TC after every rise/fall
 
-	T3TCR = TCR_CR;							// Reset timer3 counter
 	T3CTCR = CTCR_CM_RF | CTCR_CAP_SEL_0;	// Timer is counter mode on rise/fall
 											// Start the counting on channel 0
+	T3TCR = TCR_CR;							// Reset timer3 counter
 	T3PR = 0;								// Increment TC after every rise/fall
 
 //	// 5. Configure inputs to other signal of quadrature encoders to
@@ -86,7 +88,7 @@ void EncoderInit(void)
 	//    for counting enabling the interrupt
 	T1TCR = TCR_CR;							// Reset timer1 counter
 	T1CTCR = CTCR_TM;						// Timer 1 is in timer mode
-	T1MR0 = MCR_20MS;						// Match at 20ms
+	T1MR0 = 3600000;//MCR_20MS;						// Match at 20ms
 	T1MCR = MCR_MR0I | MCR_MR0S | MCR_MR0R;	// On match, interrupt,reset,stop TC
 
 	// Setup T1 Interrupt
@@ -96,22 +98,24 @@ void EncoderInit(void)
 	VICVectPriority5 = 0xF;									// Set the priority
 	VICIntEnable |= VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1);	// Enable the interrupt
 
+
+
 	// 7. Enable the Timer counters
 	T0TCR = TCR_CE;
 	T3TCR = TCR_CE;
 	T1TCR = TCR_CE;
 }
 
-uint32_t EncoderCount(uint8_t channel)
+int32_t EncoderCount(uint8_t channel)
 {
-	uint32_t count;
+	int32_t count;
 	count = ticks[channel];
 	return count;
 }
 
-float EncoderVel(uint8_t channel)
+int32_t EncoderVel(uint8_t channel)
 {
-	float vel;
+	int32_t vel;
 	vel = vels[channel];
 	return vel;
 }

@@ -9,6 +9,7 @@
 #define ROSIFACE_H_
 
 #include "uart0.h"
+#include "uart2.h"
 #include "app_types.h"
 
 #define MAX_PACKET_SIZE		255
@@ -23,11 +24,13 @@
 #define CMD_GPS_STATUS    	101
 #define CMD_IMU_DATA		102
 #define CMD_VEL				103
+#define CMD_ENC_ODOM		104
 
 #define SIZE_GPS_FIX		19
 #define SIZE_GPS_STATUS		7
 #define SIZE_IMU_DATA		31
 #define SIZE_VEL			5
+#define SIZE_ENC_ODOM		15
 
 #define USE_STRINGS
 
@@ -45,6 +48,9 @@
 void ROSProcessPacket(void);
 int8_t ROSChecksum(void);
 void ROSProcessData(void);
+void ROSBuildHeader(uint8_t dataSize);
+int ROSCalcChkSum(uint8_t dataSize);
+void ROSSendEncOdom(int32_t x_mm, int32_t y_mm, int16_t th_mrad, int16_t linVel, int16_t angVel);
 int16_t ROSGetVelocityCmd(uint8_t value);
 float ROSGetImuData(uint8_t value);
 char* ROSGetImuDataString(uint8_t value);
