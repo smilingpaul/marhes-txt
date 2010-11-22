@@ -172,6 +172,7 @@ void DisplayEncoder(void)
         currentEncoderCounts[i] = (uint32_t)DisplayChangeValueS((int16_t)currentEncoderCounts[i], \
         		(int16_t)EncoderCount(i), 24 + 12 * i, 36);
 
-//    for(i = 0; i < SIZE_ENCODER_VEL_ARR; i++)
-//    	currentEncoderVels[i] = DisplayChangeValueF();
+    for(i = 0; i < SIZE_ENCODER_VEL_ARR; i++)
+    	currentEncoderVels[i] = DisplayChangeValueS((int16_t)currentEncoderVels[i], \
+    			(int16_t)EncoderVel(i), 48 + 12 * i, 36);
 }

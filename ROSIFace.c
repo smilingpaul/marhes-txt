@@ -19,6 +19,9 @@ static char gpsDataStrings[SIZE_GPS_DATA_ARR][SIZE_MAX_RX_STR] = {{0}};
 static uint8_t data[MAX_PACKET_SIZE];
 static uint8_t dataNum = 0;
 
+// Send data building array
+static uint8_t packet[MAX_PACKET_SIZE];
+
 // Processes data in the serial port buffer.
 void ROSProcessPacket(void)
 {
@@ -178,6 +181,76 @@ void ROSProcessData(void)
         
             break;   
     }
+}
+
+void ROSBuildHeader(uint8_t dataSize)
+{
+	packet[0] = 0xFA;				// Write 2 header bytes
+    packet[1] = 0xFB;
+
+	packet[2] = dataSize + 2;		// Write the length of packet, which is
+									// everything from the command byte to the
+                                    // checksum
+}
+
+int ROSCalcChkSum(uint8_t dataSize)
+{
+	uint8_t *buffer = &packet[3];
+  	int c = 0;
+  	int n;
+
+  	n = dataSize;							// Get the number of data bytes
+
+	// For the even number of bytes, successively adding data byte pairs (high
+	// byte first) to a running checksum (initially zero), disregarding sign and
+	// overflow.
+  	while (n > 1)
+	{
+    	c+= (*(buffer)<<8) | *(buffer+1);	// Add byte pair to checksum
+    	c = c & 0xffff;						// Disregard overflow
+    	n -= 2;								// Calc next pointer
+    	buffer += 2;
+  	}
+
+	// If there are an odd number of data bytes, the last byte is XORed to the
+	// low-order byte of the checksum.
+  	if (n>0) c = c ^ (int)*(buffer++);
+
+  	return(c);
+}
+
+void ROSSendEncOdom(int32_t x_mm, int32_t y_mm, int16_t th_mrad, int16_t linVel, int16_t angVel)
+{
+	int checksum;
+
+	ROSBuildHeader(SIZE_ENC_ODOM);			// Build header
+	packet[3] = CMD_ENC_ODOM;				// Write message type
+
+	packet[4] = (uint8_t)(x_mm >> 24);		// Write x position
+	packet[5] = (uint8_t)(x_mm >> 16);
+	packet[6] = (uint8_t)(x_mm >> 8);
+	packet[7] = (uint8_t)(x_mm >> 0);
+
+	packet[8] = (uint8_t)(y_mm >> 24);		// Write y position
+	packet[9] = (uint8_t)(y_mm >> 16);
+	packet[10] = (uint8_t)(y_mm >> 8);
+	packet[11] = (uint8_t)(y_mm >> 0);
+
+	packet[12] = (uint8_t)(th_mrad >> 8);	// Write orientation
+	packet[13] = (uint8_t)th_mrad;
+
+	packet[14] = (uint8_t)(linVel >> 8);	// Write linear velocity
+	packet[15] = (uint8_t)linVel;
+
+	packet[16] = (uint8_t)(angVel >> 8);	// Write angular velocity
+	packet[17] = (uint8_t)angVel;
+
+	// Calculate checksum
+	checksum = ROSCalcChkSum(SIZE_ENC_ODOM);    	// Calculate the checksum
+	packet[3+SIZE_ENC_ODOM] = checksum >> 8;		// Put the checksum bytes in
+	packet[3+SIZE_ENC_ODOM+1] = checksum & 0xFF;	// reverse order
+
+	Uart2TxArr(packet, SIZE_ENC_ODOM + 5);
 }
 
 int16_t ROSGetVelocityCmd(uint8_t value)

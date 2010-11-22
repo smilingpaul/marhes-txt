@@ -48,9 +48,6 @@
  *****************************************************************************/
 
 #define VERSION "0.8 mthomas 5/2007"
-
-// Comment out to use UART2
-//#define UART0
  
 // Includes
 #include "app_types.h"
@@ -101,8 +98,8 @@ void sysInit(void);
 int main(void)
 {
 	// Variable initialization
-    unsigned char UpdateDisplay = 0;
-    unsigned char buttonState;
+    uint8_t UpdateDisplay = 0;
+    uint8_t buttonState;
 	int i;
 
 	// Wait a little
@@ -111,13 +108,13 @@ int main(void)
 	// Initialize the system and turn on interrupts
 	sysInit();
 	enableIRQ();
-	
+
 	// Enter infinite while loop
 	while(1)
 	{    
 	    ROSProcessPacket();
 	    ControllerCalcPID();
-	    
+
 	    buttonState = ButtonGetChangedHigh();       
 	    if(buttonState & BUT_CENTER_BIT)
 	    {

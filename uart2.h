@@ -67,6 +67,7 @@
 
 void Uart2Init(void);
 void Uart2TxString(const char *data);
+void Uart2TxArr(uint8_t *data, uint8_t numBytes);
 int Uart2TxBufUsed(void);
 int Uart2TxBufSpace(void);
 char Uart2RxChar(void);
