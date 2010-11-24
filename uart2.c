@@ -101,8 +101,6 @@ void Uart2TxString(const char *data)
 
 void Uart2TxArr(uint8_t *data, uint8_t numBytes)
 {
-	register char ch;
-
 	U2IER &= ~UART_THREIE;					// Disable THR Interrupt
 
 	// If currently running add to the buffer, and if not, write to the
@@ -167,13 +165,13 @@ char Uart2RxChar(void)
 
 char* Uart2RxString(char* dest)
 {
-	int index = 0;
+	int i = 0;
 
-	while (Uart2RxDataReady() && index < UART2_RX_STR_SIZE - 1)
+	while (Uart2RxDataReady() && i < UART2_RX_STR_SIZE - 1)
 	{
 		*dest = Uart2RxChar();
 		dest++;
-		index++;
+		i++;
 	}
 	*dest = '\0';
 	return dest;

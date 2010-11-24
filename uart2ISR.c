@@ -62,4 +62,3 @@ void Uart2ISR(void)
 	VICVectAddr = 0x00000000;
 	ISR_EXIT();
 }
-

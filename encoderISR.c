@@ -14,7 +14,7 @@ extern int32_t pos[];
 void EncoderISR(void)
 {
 //	int32_t dx, dy, dt;
-	static double st, ct;
+	static double st;//, ct;
 
 	ISR_ENTRY();
 
@@ -46,7 +46,7 @@ void EncoderISR(void)
 //		// Drive in circle
 		//trads = vels[2]/1000;
 		st = myFastSin(.1);
-		ct = myFastCos(.1);
+		//ct = myFastCos(.1);
 //		dx = (int32_t)((vels[0] * ct - vels[1] * st) * 0.050);
 //		dy = (int32_t)((vels[0] * st + vels[1] * ct) * 0.050);
 //		dt = (int32_t)(vels[2] * 0.050);
@@ -57,6 +57,7 @@ void EncoderISR(void)
 
 		// Send encoder message
 		//ROSSendEncOdom(pos[0], pos[1], pos[2], vels[0], vels[1], vels[2]);
+		//ROSSendEncOdom(1,1,1,1,1,1);
 
 		FIO0PIN ^= (1<<21);
 

@@ -163,8 +163,8 @@ void ROSProcessData(void)
                     strPtr++;              
                 }
                 tempStr[strPtr + 1] = 0;
-                imuData[valueLoop] = atof(tempStr);
-                strcpy(imuDataStrings[valueLoop], tempStr);
+                //imuData[valueLoop] = atof(tempStr);
+                //strcpy(imuDataStrings[valueLoop], tempStr);
                 dataLoop++;
             }
             break;
