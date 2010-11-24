@@ -61,6 +61,10 @@ char* ftostr( char* buffer, float value, int places )
     int whole;
     int fraction;
     float fractionFloat;
+    char* cptr;
+    char* bufIterator;
+
+    bufIterator = buffer;
     
     whole = (int)value;
     if(value < 0)
@@ -69,9 +73,25 @@ char* ftostr( char* buffer, float value, int places )
         fractionFloat = value - whole;
     fraction = (int)(fractionFloat * powf(10.0f,places) + 0.5f);
     
-    strcpy(buffer, itoa(whole));
-    strcat(buffer, ".");
-    strcat(buffer, itoa(fraction));
+//    strcpy(buffer, itoa(whole));
+//    strcat(buffer, ".");
+//    strcat(buffer, itoa(fraction));
     
+    // Copy whole part of number to string
+    cptr = itoa(whole);
+    while(*cptr != 0)
+    {
+    	*bufIterator = *cptr;
+    	cptr++;
+    	bufIterator++;
+    }
+    *bufIterator = '.';
+    cptr = itoa(fraction);
+    while(*cptr != 0)
+    {
+    	*bufIterator = *cptr;
+    	cptr++;
+    	bufIterator++;
+    }
     return buffer;
 }

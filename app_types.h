@@ -13,7 +13,7 @@
 /*  typedefs are here  */
 #include <stdint.h>
 #include <stdlib.h> /* NULL */
-#include <string.h>
+//#include <string.h>
 #include <stdio.h>
 #include <math.h>
 

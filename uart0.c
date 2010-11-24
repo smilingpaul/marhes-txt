@@ -122,13 +122,13 @@ char Uart0RxChar(void)
 
 char* Uart0RxString(char* dest)
 {
-	int index = 0;
+	int i = 0;
 
-	while (Uart0RxDataReady() && index < UART0_RX_STR_SIZE - 1)
+	while (Uart0RxDataReady() && i < UART0_RX_STR_SIZE - 1)
 	{
 		*dest = Uart0RxChar();
 		dest++;
-		index++;
+		i++;
 	}
 	*dest = '\0';
 	return dest;

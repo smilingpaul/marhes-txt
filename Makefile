@@ -73,7 +73,7 @@ TARGET = main
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 SRC = $(TARGET).c 
-SRC += syscalls.c
+#SRC += syscalls.c
 SRC += uart0.c 
 SRC += uart2.c
 SRC += lcd.c 
