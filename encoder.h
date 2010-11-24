@@ -12,6 +12,7 @@
 #include "armVIC.h"
 #include "LPC23xx.h"
 #include "ROSIFace.h"
+#include "mySine.h"
 
 /*************************************************************************
  *             Definitions

@@ -14,7 +14,7 @@ extern int32_t pos[];
 void EncoderISR(void)
 {
 //	int32_t dx, dy, dt;
-	static double st, ct, trads;
+	static double st, ct;
 
 	ISR_ENTRY();
 
@@ -45,8 +45,8 @@ void EncoderISR(void)
 
 //		// Drive in circle
 		//trads = vels[2]/1000;
-		st = sin(.1);
-		ct = cos(.1);
+		st = myFastSin(.1);
+		ct = myFastCos(.1);
 //		dx = (int32_t)((vels[0] * ct - vels[1] * st) * 0.050);
 //		dy = (int32_t)((vels[0] * st + vels[1] * ct) * 0.050);
 //		dt = (int32_t)(vels[2] * 0.050);

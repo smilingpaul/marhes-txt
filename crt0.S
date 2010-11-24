@@ -11,7 +11,7 @@
 
 @ modified by Martin Thomas:
 @  - changed comment char to @ for GNU assembler (arm-elf-as)
-@    "The line comment character is [...] ‘@’ on the ARM [...]"
+@    "The line comment character is [...] ï¿½@ï¿½ on the ARM [...]"
 @    (GNU-as manual from binutils V 2.17)
 @  - ported RV-ASM to GNU-ASM (sections, import/export equ, 
 @    :OR:, Labels etc.)
