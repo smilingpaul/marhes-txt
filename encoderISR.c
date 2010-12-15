@@ -11,11 +11,10 @@ extern int32_t ticks[];
 extern int32_t vels[];
 extern int32_t pos[];
 
+static int32_t dx, dy, dt, ct, st;
+
 void EncoderISR(void)
 {
-//	int32_t dx, dy, dt;
-	static double st;//, ct;
-
 	ISR_ENTRY();
 
 	// Check for MR0 Interrupt
@@ -43,17 +42,18 @@ void EncoderISR(void)
 //		pos[1] = vels[0] * sin(pos[2]/1000) + pos[1];
 //		pos[2] = vels[1] + pos[2];
 
-//		// Drive in circle
-		//trads = vels[2]/1000;
-		st = myFastSin(.1);
-		//ct = myFastCos(.1);
-//		dx = (int32_t)((vels[0] * ct - vels[1] * st) * 0.050);
-//		dy = (int32_t)((vels[0] * st + vels[1] * ct) * 0.050);
-//		dt = (int32_t)(vels[2] * 0.050);
-//
-//		pos[0] += dx;
-//		pos[1] += dy;
-//		pos[2] += dt;
+//		Drive in circle
+		vels[0] = 1000;
+		vels[1] = 100;
+		ct = 1000;
+		st = pos[2];
+		dx = (int32_t)(vels[0] * 50 / 1000);
+		dy = (int32_t)(vels[0] * st * 50 / 1000000);
+		dt = (int32_t)(vels[2] * 50 / 1000);
+
+		pos[0] += dx;
+		pos[1] += dy;
+		pos[2] += dt;
 
 		// Send encoder message
 		//ROSSendEncOdom(pos[0], pos[1], pos[2], vels[0], vels[1], vels[2]);

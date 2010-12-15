@@ -112,32 +112,32 @@ int main(void)
 	// Enter infinite while loop
 	while(1)
 	{    
-	    ROSProcessPacket();
-	    ControllerCalcPID();
-
-	    buttonState = ButtonGetChangedHigh();       
-	    if(buttonState & BUT_CENTER_BIT)
-	    {
-	    	UpdateDisplay ^= 1;
-	    	LcdBacklight(UpdateDisplay);
-	    }
-	    
-	    if(UpdateDisplay)
-	    {
-	        if (buttonState & BUT_RIGHT_BIT)
-                DisplaySetState(DisplayGetState() + 1);
-            if (buttonState & BUT_LEFT_BIT)
-                DisplaySetState(DisplayGetState() - 1);
-            if (i > 50000)
-            { 
-                DisplayUpdate();
-                i = 0;
-            }
-            else
-            {
-                i++;
-            }
-        }
+//	    ROSProcessPacket();
+//	    ControllerCalcPID();
+//
+//	    buttonState = ButtonGetChangedHigh();
+//	    if(buttonState & BUT_CENTER_BIT)
+//	    {
+//	    	UpdateDisplay ^= 1;
+//	    	LcdBacklight(UpdateDisplay);
+//	    }
+//
+//	    if(UpdateDisplay)
+//	    {
+//	        if (buttonState & BUT_RIGHT_BIT)
+//                DisplaySetState(DisplayGetState() + 1);
+//            if (buttonState & BUT_LEFT_BIT)
+//                DisplaySetState(DisplayGetState() - 1);
+//            if (i > 50000)
+//            {
+//                DisplayUpdate();
+//                i = 0;
+//            }
+//            else
+//            {
+//                i++;
+//            }
+//        }
 	}
 	return 0;
 }
@@ -187,17 +187,17 @@ void sysInit(void)
 	FIO0DIR |= (1<<21); 					// LED-Pin as output for heartbeat
 
 	// Call initialization functions of necessary peripherals
-	PWMInit();
-#ifdef UART0
-	Uart0Init();
-#else
-	Uart2Init();
-#endif
-	LcdInit();
+//	PWMInit();
+//#ifdef UART0
+//	Uart0Init();
+//#else
+//	Uart2Init();
+//#endif
+//	LcdInit();
 	EncoderInit();
-	ControllerInit();
-	DisplayInit();
-	ButtonInit();
+//	ControllerInit();
+//	DisplayInit();
+//	ButtonInit();
 }
 
 /*************************************************************************
