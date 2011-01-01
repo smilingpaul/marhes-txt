@@ -1,9 +1,15 @@
-/*
- * ROSIFace.c
- *
- *  Created on: Aug 12, 2010
- *      Author: Titus
- */
+/*! \file ROSIFace.c
+    \brief An interface between the TXT ROS driver and the TXT controller board.
+
+	Created on: Aug 12, 2010
+	Author: Titus Appel
+	Institution: UNM-ECE Department
+
+    ROSIFace handles the communication with ROS.  It accepts velocity and data
+    commands from ROS and extracts the needed data from the data packets.  It
+    also sends odometry and battery information to the ROS driver.
+*/
+
 
 #include "ROSIFace.h"
  
