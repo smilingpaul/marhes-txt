@@ -1,8 +1,15 @@
-/*
- * encoderISR.c
- *
- *  Created on: Aug 21, 2010
- *      Author: Titus
+/*! \file encoderISR.c
+    \brief Encoder ISR.
+
+    Created on: Aug 21, 2010\n
+	Author: Titus Appel\n
+	Institution: UNM-ECE Department
+
+   	This file includes the Timer1 ISR and is compiled in ARM only mode.
+
+    Pin definition:\n
+    	P3.23 - CAP0.0 - Front Right Encoder Signal\n
+     	P0.23 - CAP3.0 - Front Left Encoder Signal
  */
 
 #include "encoder.h"
@@ -11,8 +18,13 @@ extern int32_t ticks[];
 extern int32_t vels[];
 extern int32_t pos[];
 
-static int32_t dx, dy, dt, ct, st;
+/*! \brief Samples the encoder counts and calculates velocities and positions.
 
+	This is the ISR for Timer1.  It stops the counter, stores the encoder
+	counts, and resets and enables the counters.  Then it calculates the linear
+	and angular velocities and the position of the TXT.  It then sends the data
+	to the ROS driver.
+ */
 void EncoderISR(void)
 {
 	ISR_ENTRY();
@@ -24,7 +36,7 @@ void EncoderISR(void)
 		T0TCR = 0;
 		T3TCR = 0;
 
-		// Store the right and left encoder counts and reset and enable the TC
+		// Store the right and left encoder counts
 		ticks[FRONT_RIGHT] = T0TC;
 		ticks[FRONT_LEFT] = T3TC;
 
@@ -35,25 +47,19 @@ void EncoderISR(void)
 		T3TCR = TCR_CE;
 		T1TCR = TCR_CE;
 
-//		vels[0] = (ticks[FRONT_RIGHT] + ticks[FRONT_LEFT]) * 30 / (2 * 2);  	// mult by 100/100
+//		vels[0] = (ticks[FRONT_RIGHT] + ticks[FRONT_LEFT]) * 30 / (2 * 2);
 //		vels[1] = (ticks[FRONT_RIGHT] - ticks[FRONT_LEFT]) * 30 / (275 * 2);
 //
 //		pos[0] = vels[0] * cos(pos[2]/1000) + pos[0];
 //		pos[1] = vels[0] * sin(pos[2]/1000) + pos[1];
 //		pos[2] = vels[1] + pos[2];
 
-//		Drive in circle
-		vels[0] = 1000;
-		vels[1] = 100;
-		ct = 1000;
-		st = pos[2];
-		dx = (int32_t)(vels[0] * 50 / 1000);
-		dy = (int32_t)(vels[0] * st * 50 / 1000000);
-		dt = (int32_t)(vels[2] * 50 / 1000);
-
-		pos[0] += dx;
-		pos[1] += dy;
-		pos[2] += dt;
+		// Drive in circle
+		vels[0] = 1000;		// Linear Velocity is 1000mm/s
+		vels[1] = 100;		// Angular Velocity is 100mrad/s
+		pos[0] += (int32_t)(vels[0] * 20 / 1000);    	// mm/s * 20ms / 1000
+		pos[1] += (int32_t)(vels[0] * pos[2] * 20 / 1000000);// mm/s * 1/1000m * 20ms / 1000
+		pos[2] += (int32_t)(vels[1] * 20 / 1000);		// mrad/s * 20ms / 1000
 
 		// Send encoder message
 		//ROSSendEncOdom(pos[0], pos[1], pos[2], vels[0], vels[1], vels[2]);
