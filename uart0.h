@@ -9,7 +9,7 @@
 #define UART0_H_
 
 #include "app_types.h"
-#include "armVIC.h"
+//#include "armVIC.h"
 #include "LPC23xx.h"
 
 //#define UART0
@@ -69,6 +69,7 @@
 
 void Uart0Init(void);
 void Uart0TxString(const char *data);
+void Uart0TxArr(uint8_t *data, uint8_t numBytes);
 int Uart0TxBufUsed(void);
 int Uart0TxBufSpace(void);
 char Uart0RxChar(void);

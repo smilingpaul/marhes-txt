@@ -1,9 +1,11 @@
 /*! \file encoderISR.c
     \brief Encoder ISR.
 
-    Created on: Aug 21, 2010\n
-	Author: Titus Appel\n
-	Institution: UNM-ECE Department
+    \date Aug 21, 2010\n
+	\author Titus Appel <titus.appel@gmail.com>\n
+	\par Institution:
+	UNM-ECE Department\n
+	MARHES Lab
 
    	This file includes the Timer1 ISR and is compiled in ARM only mode.
 
@@ -27,7 +29,7 @@ extern int32_t pos[];
  */
 void EncoderISR(void)
 {
-	ISR_ENTRY();
+//	ISR_ENTRY();
 
 	// Check for MR0 Interrupt
 	if(T1IR | IR_MR0)
@@ -50,20 +52,19 @@ void EncoderISR(void)
 //		vels[0] = (ticks[FRONT_RIGHT] + ticks[FRONT_LEFT]) * 30 / (2 * 2);
 //		vels[1] = (ticks[FRONT_RIGHT] - ticks[FRONT_LEFT]) * 30 / (275 * 2);
 //
-//		pos[0] = vels[0] * cos(pos[2]/1000) + pos[0];
-//		pos[1] = vels[0] * sin(pos[2]/1000) + pos[1];
-//		pos[2] = vels[1] + pos[2];
+//		pos[0] += vels[0] * cos(pos[2]/1000);
+//		pos[1] += vels[0] * sin(pos[2]/1000);
+//		pos[2] += vels[1];
 
 		// Drive in circle
-		vels[0] = 1000;		// Linear Velocity is 1000mm/s
-		vels[1] = 100;		// Angular Velocity is 100mrad/s
-		pos[0] += (int32_t)(vels[0] * 20 / 1000);    	// mm/s * 20ms / 1000
-		pos[1] += (int32_t)(vels[0] * pos[2] * 20 / 1000000);// mm/s * 1/1000m * 20ms / 1000
-		pos[2] += (int32_t)(vels[1] * 20 / 1000);		// mrad/s * 20ms / 1000
+		vels[0] = 1000;											// Linear Velocity is 1000mm/s
+		vels[1] = 100;											// Angular Velocity is 100mrad/s
+		pos[0] += 20;//(int32_t)(vels[0] * 20 / 1000);    			// mm/s * 20ms / 1000
+		pos[1] += 20;//(int32_t)(vels[0] * 20 / 1000);	// mm/s * 1/1000m * 20ms / 1000
+		pos[2] += 2;//(int32_t)(vels[1] * 20 / 1000);				// mrad/s * 20ms / 1000
 
 		// Send encoder message
-		//ROSSendEncOdom(pos[0], pos[1], pos[2], vels[0], vels[1], vels[2]);
-		//ROSSendEncOdom(1,1,1,1,1,1);
+		ROSSendEncOdom(pos[0], pos[1], pos[2], vels[0], vels[1]);
 
 		FIO0PIN ^= (1<<21);
 
@@ -72,5 +73,5 @@ void EncoderISR(void)
 	}
 
 	VICVectAddr = 0x00000000;
-	ISR_EXIT();
+//	ISR_EXIT();
 }

@@ -81,7 +81,7 @@
 
 .arm
 .section .STACK, "w"
-.align 4
+.align 3
 Stack_Mem:
 .space Stack_Size
 .equ Stack_Top, Stack_Mem + Stack_Size
@@ -97,7 +97,7 @@ Stack_Mem:
 
 .equ Heap_Size,   0x00000400
 .section .HEAP, "w"
-.align 4
+.align 3
 HeapMem:
 .if (Heap_Size>0)
 .space Heap_Size
@@ -123,8 +123,8 @@ Vectors:        LDR     PC, Reset_Addr
                 LDR     PC, PAbt_Addr
                 LDR     PC, DAbt_Addr
                 NOP                            @ Reserved Vector 
-@@                LDR     PC, IRQ_Addr
-                LDR     PC, [PC, #-0x0120]     @ Vector from VicVectAddr
+                LDR     PC, IRQ_Addr
+@@                LDR     PC, [PC, #-0x0120]     @ Vector from VicVectAddr
                 LDR     PC, FIQ_Addr
 
 Reset_Addr:      .word     Reset_Handler
@@ -133,7 +133,7 @@ SWI_Addr:        .word     SWI_Handler
 PAbt_Addr:       .word     PAbt_Handler
 DAbt_Addr:       .word     DAbt_Handler
                  .word     0xB9206E28             @ Reserved Address 
-@@IRQ_Addr:        .word     IRQ_Handler
+IRQ_Addr:        .word     IRQ_Handler
 FIQ_Addr:        .word     FIQ_Handler
 
 Undef_Handler:   B       Undef_Handler
@@ -141,7 +141,7 @@ SWI_Handler:     B       SWI_Handler
 PAbt_Handler:    B       PAbt_Handler
 DAbt_Handler:    B       DAbt_Handler
 @@ handled thru assembler wrapper (see below)
-@@ IRQ_Handler:    B       IRQ_Handler
+@@ IRQ_Handler:     B       IRQ_Handler
 FIQ_Handler:     B       FIQ_Handler
 
 
@@ -251,43 +251,43 @@ BSSIsEmpty:
 @@ adapted to LPC23xx/24xx VIC by M. Thomas
 @@ This wrapper avoids compiler-dependencies.
 
-@.set LPC_BASE_VIC, 0xFFFFF000
-@.set VIC_VectAddr, 0xF00
-@
-@.arm
-@IRQ_Handler:
+.set LPC_BASE_VIC, 0xFFFFF000
+.set VIC_VectAddr, 0xF00
+
+.arm
+IRQ_Handler:
 
 @- Manage Exception Entry
 @- Adjust and save LR_irq in IRQ stack
-@            sub         lr, lr, #4
-@            stmfd       sp!, {lr}
+            sub         lr, lr, #4
+            stmfd       sp!, {lr}
 
 @- Save SPSR need to be saved for nested interrupt
-@            mrs         r14, SPSR
-@            stmfd       sp!, {r14}
+            mrs         r14, SPSR
+            stmfd       sp!, {r14}
 
 @- Save and r0 in IRQ stack
-@            stmfd       sp!, {r0}
+            stmfd       sp!, {r0}
 
 @- Load the ISR-Address from VICVectAddr
-@            ldr         r14, =LPC_BASE_VIC
-@            ldr         r0 , [r14, #VIC_VectAddr]
+            ldr         r14, =LPC_BASE_VIC
+            ldr         r0 , [r14, #VIC_VectAddr]
 
 @- Enable Interrupt and Switch in Supervisor Mode
-@           msr         CPSR_c, #Mode_SVC
+           msr         CPSR_c, #Mode_SVC
 
 @- Save scratch/used registers and LR in User Stack
-@            stmfd       sp!, { r1-r3, r12, r14 }
+            stmfd       sp!, { r1-r3, r12, r14 }
 
 @- Branch to the routine pointed by the VIC_VectAddr
-@            mov         r14, pc
-@            bx          r0
+            mov         r14, pc
+            bx          r0
 
 @- Restore scratch/used registers and LR from User Stack
-@            ldmia       sp!, { r1-r3, r12, r14 }
+            ldmia       sp!, { r1-r3, r12, r14 }
 
 @- Disable Interrupt and switch back in IRQ mode
-@            msr         CPSR_c, #I_Bit | Mode_IRQ
+            msr         CPSR_c, #I_Bit | Mode_IRQ
 
 @-  Mark the End of Interrupt on the VIC
 @   by writing to VICVectAddr - not needed
@@ -296,16 +296,39 @@ BSSIsEmpty:
 @@           str         r14, [r14, #VIC_VectAddr]
 
 @- Restore R0
-@            ldmia       sp!, {r0}
+            ldmia       sp!, {r0}
 
 @- Restore SPSR_irq and r0 from IRQ stack
-@            ldmia       sp!, {r14}
-@            msr         SPSR_cxsf, r14
+            ldmia       sp!, {r14}
+            msr         SPSR_cxsf, r14
 
 @- Restore adjusted  LR_irq from IRQ stack directly in the PC
-@            ldmia       sp!, {pc}^
+            ldmia       sp!, {pc}^
 
+/*----------------------------------------------------------------------------*/
+
+.equ    NOINT,     0xc0
+
+.global arm_disable_interrupts
+arm_disable_interrupts:
+
+     mrs  r0, cpsr
+     orr  r0, r0, #NOINT
+     msr  cpsr_c, r0
+     bx   lr
+
+
+
+/*----------------------------------------------------------------------------*/
+
+.global arm_enable_interrupts
+arm_enable_interrupts:
+
+     mrs  r0, cpsr
+     bic  r0, r0, #NOINT
+     msr  cpsr_c, r0
+     bx   lr
 
 @                END
-@.end
+.end
 

@@ -18,7 +18,7 @@ void Uart2ISR(void)
 	uint8_t int_id;
 	int count = 0;
 
-	ISR_ENTRY();
+//	ISR_ENTRY();
 
 	// Take care of all interrupts
 	while (((int_id = U2IIR) & UART_NO_INT) == 0)
@@ -60,5 +60,5 @@ void Uart2ISR(void)
 	}
 
 	VICVectAddr = 0x00000000;
-	ISR_EXIT();
+//	ISR_EXIT();
 }

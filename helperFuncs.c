@@ -8,7 +8,7 @@
 // Includes
 #include "app_types.h"
 #include "LPC23xx.h"
-#include "armVIC.h"
+//#include "armVIC.h"
 //#include <string.h>
 
 #include "helperFuncs.h"

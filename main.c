@@ -52,7 +52,7 @@
 // Includes
 #include "app_types.h"
 #include "LPC23xx.h"
-#include "armVIC.h"
+//#include "armVIC.h"
 
 #include "pwm.h"
 #include "uart0.h"
@@ -73,12 +73,15 @@
 #define VECT_CNTL_INDEX 0x200
 #define VECT_PRIO_INDEX 0x200
 
+#define UART0
+
 /*************************************************************************
  *             Function declarations
  *************************************************************************/
 void InitMAM(void);
 void InitClock(void);
 void sysInit(void);
+extern void arm_enable_interrupts(void);
 
 /******************************************************************************
  *
@@ -107,14 +110,14 @@ int main(void)
 
 	// Initialize the system and turn on interrupts
 	sysInit();
-	enableIRQ();
+	arm_enable_interrupts();//enableIRQ();
 
 	// Enter infinite while loop
 	while(1)
 	{    
-//	    ROSProcessPacket();
-//	    ControllerCalcPID();
-//
+	    ROSProcessPacket();
+	    ControllerCalcPID();
+
 //	    buttonState = ButtonGetChangedHigh();
 //	    if(buttonState & BUT_CENTER_BIT)
 //	    {
@@ -187,15 +190,15 @@ void sysInit(void)
 	FIO0DIR |= (1<<21); 					// LED-Pin as output for heartbeat
 
 	// Call initialization functions of necessary peripherals
-//	PWMInit();
-//#ifdef UART0
-//	Uart0Init();
-//#else
-//	Uart2Init();
-//#endif
+	PWMInit();
+#ifdef UART0
+	Uart0Init();
+#else
+	Uart2Init();
+#endif
 //	LcdInit();
 	EncoderInit();
-//	ControllerInit();
+	ControllerInit();
 //	DisplayInit();
 //	ButtonInit();
 }
