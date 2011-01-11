@@ -1,9 +1,11 @@
 /*! \file encoder.c
     \brief Code for the encoders.
 
-    Created on: Jun 19, 2010\n
-	Author: Titus Appel\n
-	Institution: UNM-ECE Department
+    \date Jun 19, 2010\n
+	\author Titus Appel <titus.appel@gmail.com>\n
+	\par Institution:
+	UNM-ECE Department\n
+	MARHES Lab
 
    	These routines initialize Timers 0 and 3 for capture mode to
    	count the encoder ticks to measure the velocity of the TXT-1.
@@ -76,7 +78,7 @@ void EncoderInit(void)
 	VICIntSelect &= ~VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1);	// Change to IRQ
 	VICIntEnClr |= VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1); 	// Disable interrupt
 	VICVectAddr5 = (uint32_t)(void *)EncoderISR;			// Assign the ISR
-	VICVectPriority5 = 0xF;									// Set the priority
+	VICVectPriority5 = 0xE;									// Set the priority
 	VICIntEnable |= VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1);	// Enable the INT
 
 	// 6. Enable the Timer counters

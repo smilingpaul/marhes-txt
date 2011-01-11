@@ -99,6 +99,49 @@ void Uart0TxString(const char *data)
 	U0IER |= UART_THREIE;					// Enable THR Interrupt
 }
 
+void Uart0TxArr(uint8_t *data, uint8_t numBytes)
+{
+	U0IER &= ~UART_THREIE;					// Disable THR Interrupt
+
+	// If currently running add to the buffer, and if not, write to the
+	// Transmit Holding Register and set the transmit buffer flag
+	// 16 Byte TX FIFO
+	if(uart0_tx_running)
+	{
+		int count = 0;
+		while(count < numBytes)						// Write all chars to buffer
+		{
+			uart0_tx_buffer[uart0_tx_insert++] = *data;
+			data++;
+			count++;
+			uart0_tx_insert %= UART0_TX_BUF_SIZE;
+		}
+	}
+	else
+	{
+		uart0_tx_running = 1;					// Write the TX running flag
+		int count = 0;
+
+		// Can only initially write 16 bytes to the FIFO
+		while((count < numBytes) && (count < 16))	// While there is data left to write
+		{
+			U0THR = *data;					        // Load data into transmit buffer
+			data++;
+			count++;
+		}
+
+		// Write the rest of the bytes to the TX Buffer
+		while(count < numBytes)
+		{
+			uart0_tx_buffer[uart0_tx_insert++] = *data;
+			data++;
+			count++;
+			uart0_tx_insert %= UART0_TX_BUF_SIZE;
+		}
+	}
+	U0IER |= UART_THREIE;					// Enable THR Interrupt
+}
+
 int Uart0TxBufUsed(void)
 {
 	int space = uart0_tx_insert - uart0_tx_extract;

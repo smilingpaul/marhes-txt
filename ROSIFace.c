@@ -33,7 +33,7 @@ void ROSProcessPacket(void)
 {
 #ifdef UART0
     // While there is more data available in uart0
-    while (Uart0RxDataReady())
+    while (Uart0RxDataReady() && dataNum < MAX_PACKET_SIZE)
     {                
         if(dataNum == 0)                        // Look for 0xFA
         {
@@ -72,7 +72,7 @@ void ROSProcessPacket(void)
     }
 #else
     // While there is more data available in uart2
-    while (Uart2RxDataReady())
+    while (Uart2RxDataReady() && dataNum < MAX_PACKET_SIZE)
     {
         if(dataNum == 0)                        // Look for 0xFA
         {
@@ -110,6 +110,9 @@ void ROSProcessPacket(void)
         }
     }
 #endif
+
+    if (dataNum >= MAX_PACKET_SIZE)
+    	dataNum = 0;
 }
 
 int8_t ROSChecksum(void)
@@ -225,8 +228,8 @@ int ROSCalcChkSum(uint8_t dataSize)
   	return(c);
 }
 
-void ROSSendEncOdom(int32_t x_mm, int32_t y_mm, int16_t th_mrad, \
-		int16_t linVelX, int16_t linVelY, int16_t angVel)
+void ROSSendEncOdom(int32_t x_mm, int32_t y_mm, int32_t th_mrad, \
+		int32_t linVel, int32_t angVel)
 {
 	int checksum;
 
@@ -243,24 +246,31 @@ void ROSSendEncOdom(int32_t x_mm, int32_t y_mm, int16_t th_mrad, \
 	packet[10] = (uint8_t)(y_mm >> 8);
 	packet[11] = (uint8_t)(y_mm >> 0);
 
-	packet[12] = (uint8_t)(th_mrad >> 8);	// Write orientation
-	packet[13] = (uint8_t)th_mrad;
+	packet[12] = (uint8_t)(th_mrad >> 24);	// Write Orientation
+	packet[13] = (uint8_t)(th_mrad >> 16);
+	packet[14] = (uint8_t)(th_mrad >> 8);
+	packet[15] = (uint8_t)(th_mrad >> 0);
 
-	packet[14] = (uint8_t)(linVelX >> 8);	// Write linear x velocity
-	packet[15] = (uint8_t)linVelX;
+	packet[16] = (uint8_t)(linVel >> 24);	// Write linear velocity
+	packet[17] = (uint8_t)(linVel >> 16);
+	packet[18] = (uint8_t)(linVel >> 8);
+	packet[19] = (uint8_t)(linVel >> 0);
 
-	packet[16] = (uint8_t)(linVelY >> 8);	// Write linear y velocity
-	packet[17] = (uint8_t)linVelY;
-
-	packet[18] = (uint8_t)(angVel >> 8);	// Write angular velocity
-	packet[19] = (uint8_t)angVel;
+	packet[20] = (uint8_t)(angVel >> 24);	// Write angular velocity
+	packet[21] = (uint8_t)(angVel >> 16);
+	packet[22] = (uint8_t)(angVel >> 8);
+	packet[23] = (uint8_t)(angVel >> 0);
 
 	// Calculate checksum
 	checksum = ROSCalcChkSum(SIZE_ENC_ODOM);    	// Calculate the checksum
 	packet[3+SIZE_ENC_ODOM] = checksum >> 8;		// Put the checksum bytes in
 	packet[3+SIZE_ENC_ODOM+1] = checksum & 0xFF;	// reverse order
 
+#ifdef UART0
+	Uart0TxArr(packet, SIZE_ENC_ODOM + 5);
+#else
 	Uart2TxArr(packet, SIZE_ENC_ODOM + 5);
+#endif
 }
 
 int16_t ROSGetVelocityCmd(uint8_t value)

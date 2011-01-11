@@ -1,9 +1,11 @@
 /*! \file encoder.h
     \brief Encoder timer defines.
 
-    Created on: Jun 19, 2010\n
-	Author: Titus Appel\n
-	Institution: UNM-ECE Department
+    \date Jun 19, 2010\n
+	\author Titus Appel <titus.appel@gmail.com>\n
+	\par Institution:
+	UNM-ECE Department\n
+	MARHES Lab
 
    	This file includes the bit values for the timers and other constants.
  */
@@ -12,7 +14,7 @@
 #define ENCODER_H_
 
 #include "app_types.h"
-#include "armVIC.h"
+//#include "armVIC.h"
 #include "LPC23xx.h"
 #include "ROSIFace.h"
 

@@ -2,7 +2,7 @@
 #define DISPLAY_H_
 
 #include "app_types.h"
-#include "armVIC.h"
+//#include "armVIC.h"
 #include "LPC23xx.h"
 #include "lcd.h"
 #include "ROSIFace.h"

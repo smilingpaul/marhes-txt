@@ -46,7 +46,7 @@ void Uart2Init(void)
 	VICIntSelect &= ~VIC_CHAN_TO_MASK(VIC_CHAN_NUM_UART2);	// Change to IRQ
 	VICIntEnClr |= VIC_CHAN_TO_MASK(VIC_CHAN_NUM_UART2); 	// Disable interrupt
 	VICVectAddr28 = (uint32_t)(void *)Uart2ISR;				// Assign the ISR
-	VICVectPriority28 = 0xF;									// Set the priority
+	VICVectPriority28 = 0xE;									// Set the priority
 	VICIntEnable |= VIC_CHAN_TO_MASK(VIC_CHAN_NUM_UART2);	// Enable the interrupt
 	U2IER = UART_RXDAIE;									// Enable RX Data interrupt
 	uart2_rx_insert = uart2_rx_extract = 0;					// Initialize buffer positions
