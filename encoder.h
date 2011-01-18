@@ -98,5 +98,6 @@ void EncoderInit(void);
 int32_t EncoderCount(uint8_t channel);
 int32_t EncoderVel(uint8_t channel);
 void EncoderISR(void);
+int32_t anglookuptable(int32_t degrees, int32_t type);
 
 #endif /* ENCODER_H_ */

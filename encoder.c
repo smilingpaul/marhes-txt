@@ -25,7 +25,7 @@
 
 #include "encoder.h"
 
-uint32_t ticks[SIZE_ENCODER_ARR] = {0};		/*!< The number of ticks with\n
+int32_t ticks[SIZE_ENCODER_ARR] = {0};		/*!< The number of ticks with\n
                                                  {0} = front right\n
                                                  {1} = front left
 											 */
