@@ -14,7 +14,7 @@
 
 #define MAX_PACKET_SIZE		255
 
-#define UART0
+//#define UART0
 
 // Divisor for making floats a hexadecimal representation
 #define DIV_NUM		        32768000		

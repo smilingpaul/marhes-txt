@@ -18,15 +18,23 @@
 
 extern int32_t ticks[];
 extern int32_t vels[];
-extern int32_t pos[];
+extern float pos[];
+extern int32_t intCount;
 
-int32_t angtable[91]={0, 175, 349, 523, 698,872,1045,1219,1392,1564,1736,
-		1908,2079,2250,2419,2588,2756,2924,3090,3256,3420,3584,3746,3907,4067,
-		4226,4384,4540,4695,4848,5000,5150,5299,5446,5592,5736,5878,6018,6157,
-		6293,6428,6561,6691,6820,6947,7071,7193,7314,7431,7547,7660,7771,7880,
-		7986,8090,8192,8290,8387,8480,8572,8660,8746,8829,8910,8988,9063,9135,
-		9205,9272,9336,9397,9455,9511,9563,9613,9659,9703,9744,9781,9816,9848,
-		9877,9903,9925,9945,9962,9976,9986,9994,9998,10000};
+//int32_t angtable[91]={0, 175, 349, 523, 698,872,1045,1219,1392,1564,1736,
+//		1908,2079,2250,2419,2588,2756,2924,3090,3256,3420,3584,3746,3907,4067,
+//		4226,4384,4540,4695,4848,5000,5150,5299,5446,5592,5736,5878,6018,6157,
+//		6293,6428,6561,6691,6820,6947,7071,7193,7314,7431,7547,7660,7771,7880,
+//		7986,8090,8192,8290,8387,8480,8572,8660,8746,8829,8910,8988,9063,9135,
+//		9205,9272,9336,9397,9455,9511,9563,9613,9659,9703,9744,9781,9816,9848,
+//		9877,9903,9925,9945,9962,9976,9986,9994,9998,10000};
+
+int32_t angtable[91]={0,18,35,52,70,87,105,122,139,156,174,191,208,225,242,259,
+		276,292,309,326,342,358,375,391,407,423,438,454,470,485,500,515,530,545,
+		559,574,588,602,616,629,643,656,669,682,695,707,719,731,743,755,766,777,
+		788,799,809,819,829,839,848,857,866,875,883,891,899,906,914,921,927,934,
+		940,946,951,956,961,966,970,974,978,982,985,988,990,993,995,996,998,999,
+		999,1000,1000};
 
 /*! \brief Samples the encoder counts and calculates velocities and positions.
 
@@ -38,7 +46,7 @@ int32_t angtable[91]={0, 175, 349, 523, 698,872,1045,1219,1392,1564,1736,
 void EncoderISR(void)
 {
 //	ISR_ENTRY();
-	int32_t dx, dy, dth;
+	float dx, dy, dth;
 
 	// Check for MR0 Interrupt
 	if(T1IR | IR_MR0)
@@ -47,9 +55,15 @@ void EncoderISR(void)
 		T0TCR = 0;
 		T3TCR = 0;
 
-		// Store the right and left encoder counts
-		ticks[FRONT_RIGHT] = T0TC;
-		ticks[FRONT_LEFT] = T3TC;
+		// Store the right and left encoder counts, get rid of noise
+		if (T0TC > 2)
+			ticks[FRONT_LEFT] = T0TC;
+		else
+			ticks[FRONT_LEFT] = 0;
+		if (T3TC > 2)
+			ticks[FRONT_RIGHT] = T3TC;
+		else
+			ticks[FRONT_RIGHT] = 0;
 
 		// Reset and enable the TC
 		T0TCR = TCR_CR;
@@ -58,14 +72,12 @@ void EncoderISR(void)
 		T3TCR = TCR_CE;
 		T1TCR = TCR_CE;
 
-//		vels[0] = (ticks[FRONT_RIGHT] + ticks[FRONT_LEFT]) * 30 / (2 * 2);
-//		vels[1] = (ticks[FRONT_RIGHT] - ticks[FRONT_LEFT]) * 30 / (275 * 2);
+		vels[0] = (ticks[FRONT_RIGHT] + ticks[FRONT_LEFT]) * 15 / 2;
+		vels[1] = (ticks[FRONT_RIGHT] - ticks[FRONT_LEFT]) * 15000 / 285;
 
-		vels[0] = 100;
-		vels[1] = 100;
-		dx = vels[0] * anglookuptable(pos[2], 1) / 10000 * 20 / 1000;
-		dy = vels[0] * anglookuptable(pos[2], 0) / 10000 * 20 / 1000;
-		dth = vels[1] * 20 / 1000;
+		dx = (float)vels[0] * anglookuptable(pos[2], 1) * 20 / 1000000;
+		dy = (float)vels[0] * anglookuptable(pos[2], 0) * 20 / 1000000;
+		dth = (float)vels[1] * 20 / 1000;
 		pos[0] += dx;
 		pos[1] += dy;
 		pos[2] += dth;
@@ -77,7 +89,13 @@ void EncoderISR(void)
 			pos[2] += 6283;
 
 		// Send encoder message
-		ROSSendEncOdom(pos[0], pos[1], pos[2], vels[0], vels[1]);
+		if(intCount > 9)
+		{
+			ROSSendEncOdom((int32_t)pos[0], (int32_t)pos[1], (int32_t)pos[2], vels[0], vels[1]);
+			intCount = 0;
+		}
+		else
+			intCount++;
 
 		FIO0PIN ^= (1<<21);
 
