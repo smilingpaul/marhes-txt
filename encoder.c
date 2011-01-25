@@ -32,10 +32,11 @@ int32_t ticks[SIZE_ENCODER_ARR] = {0};		/*!< The number of ticks with\n
 int32_t vels[SIZE_ENCODER_VEL_ARR] = {0};	/*!< The velocity with\n
                                                  {0} = linear velocity\n
                                                  {1} = angular velocity.*/
-int32_t pos[SIZE_ENCODER_POS_ARR] = {0};	/*!< The position with\n
+float pos[SIZE_ENCODER_POS_ARR] = {0};	/*!< The position with\n
                                                  {0} = xpos\n
                                                  {1} = ypos\n
                                                  {2} = theta.*/
+int32_t intCount = 0;
 
 /*! \brief Initializes the encoder counting.
 
