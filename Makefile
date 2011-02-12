@@ -179,7 +179,7 @@ endif
 #    -adhlns...: create assembler listing
 #
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
-#CFLAGS = -g # -gdwarf-2#$(DEBUG)
+CFLAGS = -g #(DEBUG)#-gdwarf-2$
 CFLAGS += $(CDEFS) $(CINCS)
 CFLAGS += -O$(OPT) -fomit-frame-pointer
 CFLAGS += -Wall -Wcast-align -Wimplicit 
