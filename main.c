@@ -59,11 +59,13 @@
 #include "uart2.h"
 #include "encoder.h"
 #include "controller.h"
+#include "adc.h"
 #include "lcd.h"
 #include "display.h"
 #include "button.h"
 #include "ROSIFace.h"
 #include "helperFuncs.h"
+#include "timer2.h"
 
 /*************************************************************************
  *             Definitions
@@ -73,7 +75,7 @@
 #define VECT_CNTL_INDEX 0x200
 #define VECT_PRIO_INDEX 0x200
 
-#define UART0
+//#define UART0
 
 /*************************************************************************
  *             Function declarations
@@ -101,8 +103,8 @@ extern void arm_enable_interrupts(void);
 int main(void)
 {
 	// Variable initialization
-    uint8_t UpdateDisplay = 0;
-    uint8_t buttonState;
+    uint8_t UpdateDisplay = 1;
+//    uint8_t buttonState;
 	int i;
 
 	// Wait a little
@@ -114,7 +116,10 @@ int main(void)
 
 	// Enter infinite while loop
 	while(1)
-	{    
+	{
+		// Set the backlight to the LCD Display
+		int16_t val = ADCGetChannel(5);
+		PWMSetDuty(6, (val * 1407));
 	    ROSProcessPacket();
 	    ControllerCalcPID();
 
@@ -124,23 +129,23 @@ int main(void)
 //	    	UpdateDisplay ^= 1;
 //	    	LcdBacklight(UpdateDisplay);
 //	    }
-//
-//	    if(UpdateDisplay)
-//	    {
+
+	    if(UpdateDisplay)
+	    {
 //	        if (buttonState & BUT_RIGHT_BIT)
 //                DisplaySetState(DisplayGetState() + 1);
 //            if (buttonState & BUT_LEFT_BIT)
 //                DisplaySetState(DisplayGetState() - 1);
-//            if (i > 50000)
-//            {
-//                DisplayUpdate();
-//                i = 0;
-//            }
-//            else
-//            {
-//                i++;
-//            }
-//        }
+            if (i > 50000)
+            {
+                DisplayUpdate();
+                i = 0;
+            }
+            else
+            {
+                i++;
+            }
+        }
 	}
 	return 0;
 }
@@ -196,10 +201,12 @@ void sysInit(void)
 #else
 	Uart2Init();
 #endif
-//	LcdInit();
+	LcdInit();
 	EncoderInit();
+	Timer2Init();
 	ControllerInit();
-//	DisplayInit();
+	ADCInit();
+	DisplayInit();
 //	ButtonInit();
 }
 

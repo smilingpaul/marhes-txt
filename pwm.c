@@ -48,6 +48,7 @@ void PWMInit(void)
 
 	// 3. Choose the pins the PWM output is attached to
 	PINSEL4 |= PINSEL4_PWM_EN;
+	PINSEL3 |= PINSEL3_PWM6;
 
 	// 4. Set PWM mode options
 	PWM1TCR = TCR_CR;	// Reset the counter so the counting stops

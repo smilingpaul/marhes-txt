@@ -89,15 +89,15 @@ void EncoderISR(void)
 			pos[2] += 6283;
 
 		// Send encoder message
-		if(intCount > 9)
+		if(intCount > 5)
 		{
-			ROSSendEncOdom((int32_t)pos[0], (int32_t)pos[1], (int32_t)pos[2], vels[0], vels[1]);
+			ROSSendOdomEnc((int32_t)pos[0], (int32_t)pos[1], (int32_t)pos[2], vels[0], vels[1]);
 			intCount = 0;
 		}
 		else
 			intCount++;
 
-		FIO0PIN ^= (1<<21);
+//		FIO0PIN ^= (1<<21);
 
 		// Clear MR0 interrupt
 		T1IR |= IR_MR0;

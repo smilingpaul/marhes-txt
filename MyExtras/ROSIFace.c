@@ -13,9 +13,13 @@
 
 #include "ROSIFace.h"
  
-// Storage for current data from ROS
+// Storage for current data from ros
 static int16_t velocityCmd[SIZE_VEL_ARR] = {0};
-static uint32_t odomCombined[SIZE_ODOM_ARR] = {0};
+//static float imuData[SIZE_IMU_ARR] = {0};
+//static char imuDataStrings[SIZE_IMU_ARR][SIZE_MAX_RX_STR] = {{0}};
+//static int16_t gpsStatus[SIZE_GPS_STAT_ARR] = {0};
+//static float gpsData[SIZE_GPS_DATA_ARR] = {0};
+//static char gpsDataStrings[SIZE_GPS_DATA_ARR][SIZE_MAX_RX_STR] = {{0}};
 
 // Storage for leftover data
 static uint8_t data[MAX_PACKET_SIZE];
@@ -23,9 +27,6 @@ static uint8_t dataNum = 0;
 
 // Send data building array
 static uint8_t packet[MAX_PACKET_SIZE];
-
-// Received ODOM_COMB Messges Count in #secs
-uint16_t OdomCombRxCount = 0, CmdVelRxCount = 0;
 
 // Processes data in the serial port buffer.
 void ROSProcessPacket(void)
@@ -146,32 +147,44 @@ int8_t ROSChecksum(void)
 
 void ROSProcessData(void)
 {
-	switch(data[3])
+    char tempStr[15];    
+    uint8_t valueLoop, dataLoop, strPtr, size;
+    
+    switch(data[3])
     {
-    	case ODOM_COMB:
-    		if (data[2] != SIZE_VEL + 2)
-    			break;
-
-    		odomCombined[0] = (data[4] << 24) || (data[5] << 16) || \
-    		    				(data[6] << 8) || data[7];
-    		odomCombined[1] = (data[8] << 24) || (data[9] << 16) || \
-    		    				(data[10] << 8) || data[11];
-    		odomCombined[2] = (data[12] << 24) || (data[13] << 16) || \
-    		    				(data[14] << 8) || data[15];
-    		odomCombined[3] = (data[16] << 24) || (data[17] << 16) || \
-    		    				(data[18] << 8) || data[19];
-    		odomCombined[4] = (data[20] << 24) || (data[21] << 16) || \
-    		    				(data[22] << 8) || data[23];
-    		OdomCombRxCount++;
-    		break;
+        case CMD_GPS_FIX:
+        
+            break;
+        case CMD_GPS_STATUS:
+        
+            break;
+        case CMD_IMU_DATA:
+            dataLoop = 4;
+            size = data[2] - 2;
+         
+            for(valueLoop = 0; valueLoop < SIZE_IMU_ARR; valueLoop++)
+            {
+                strPtr = 0;
+                while(data[dataLoop] != ',' && dataLoop < size)
+                {
+                    tempStr[strPtr] = data[dataLoop];
+                    dataLoop++;  
+                    strPtr++;              
+                }
+                tempStr[strPtr + 1] = 0;
+                //imuData[valueLoop] = atof(tempStr);
+                //strcpy(imuDataStrings[valueLoop], tempStr);
+                dataLoop++;
+            }
+            break;
         case CMD_VEL:
-        	if (data[2] != SIZE_VEL + 2)
-        		break;
-
+            // Check size of packet
+            if (data[2] != SIZE_VEL + 2)
+                break;
             // Store velocity command values
             velocityCmd[0] = (int16_t)(data[4] << 8 | data[5]);
             velocityCmd[1] = (int16_t)(data[6] << 8 | data[7]);
-            CmdVelRxCount++;
+            FIO0PIN ^= (1<<21);
             break;
         default:
         
@@ -215,13 +228,13 @@ int ROSCalcChkSum(uint8_t dataSize)
   	return(c);
 }
 
-void ROSSendOdomEnc(int32_t x_mm, int32_t y_mm, int32_t th_mrad, \
+void ROSSendEncOdom(int32_t x_mm, int32_t y_mm, int32_t th_mrad, \
 		int32_t linVel, int32_t angVel)
 {
 	int checksum;
 
-	ROSBuildHeader(SIZE_ODOM_ENC);			// Build header
-	packet[3] = ODOM_ENC;				// Write message type
+	ROSBuildHeader(SIZE_ENC_ODOM);			// Build header
+	packet[3] = CMD_ENC_ODOM;				// Write message type
 
 	packet[4] = (uint8_t)(x_mm >> 24);		// Write x position
 	packet[5] = (uint8_t)(x_mm >> 16);
@@ -249,46 +262,43 @@ void ROSSendOdomEnc(int32_t x_mm, int32_t y_mm, int32_t th_mrad, \
 	packet[23] = (uint8_t)(angVel >> 0);
 
 	// Calculate checksum
-	checksum = ROSCalcChkSum(SIZE_ODOM_ENC);    	// Calculate the checksum
-	packet[3+SIZE_ODOM_ENC] = checksum >> 8;		// Put the checksum bytes in
-	packet[3+SIZE_ODOM_ENC+1] = checksum & 0xFF;	// reverse order
+	checksum = ROSCalcChkSum(SIZE_ENC_ODOM);    	// Calculate the checksum
+	packet[3+SIZE_ENC_ODOM] = checksum >> 8;		// Put the checksum bytes in
+	packet[3+SIZE_ENC_ODOM+1] = checksum & 0xFF;	// reverse order
 
 #ifdef UART0
-	Uart0TxArr(packet, SIZE_ODOM_ENC + 5);
+	Uart0TxArr(packet, SIZE_ENC_ODOM + 5);
 #else
-	Uart2TxArr(packet, SIZE_ODOM_ENC + 5);
-#endif
-}
-
-void ROSSendBattery(uint16_t cell1_mv, uint16_t cell2_mv, uint16_t cell3_mv)
-{
-	int checksum;
-
-	ROSBuildHeader(SIZE_BATTERY);				// Build header
-	packet[3] = CMD_BATTERY;					// Write message type
-
-	packet[4] = (uint8_t)(cell1_mv >> 8);
-	packet[5] = (uint8_t)(cell1_mv >> 0);
-
-	packet[6] = (uint8_t)(cell2_mv >> 8);
-	packet[7] = (uint8_t)(cell2_mv >> 0);
-
-	packet[8] = (uint8_t)(cell3_mv >> 8);
-	packet[9] = (uint8_t)(cell3_mv >> 0);
-
-	// Calculate checksum
-	checksum = ROSCalcChkSum(SIZE_BATTERY);    	// Calculate the checksum
-	packet[3+SIZE_BATTERY] = checksum >> 8;		// Put the checksum bytes in
-	packet[3+SIZE_BATTERY+1] = checksum & 0xFF;	// reverse order
-
-#ifdef UART0
-	Uart0TxArr(packet, SIZE_BATTERY + 5);
-#else
-	Uart2TxArr(packet, SIZE_BATTERY + 5);
+	Uart2TxArr(packet, SIZE_ENC_ODOM + 5);
 #endif
 }
 
 int16_t ROSGetVelocityCmd(uint8_t value)
 {
     return velocityCmd[value];
+}
+
+float ROSGetImuData(uint8_t value)
+{
+    return imuData[value];
+}
+
+char* ROSGetImuDataString(uint8_t value)
+{
+    return imuDataStrings[value];
+}
+
+int16_t ROSGetGpsStatus(uint8_t value)
+{
+    return gpsStatus[value];
+}
+
+float ROSGetGpsData(uint8_t value)
+{
+    return gpsData[value];
+}
+
+char* ROSGetGpsDataString(uint8_t value)
+{
+    return gpsDataStrings[value];
 }
