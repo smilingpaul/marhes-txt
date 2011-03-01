@@ -76,14 +76,16 @@ SRC = $(TARGET).c
 #SRC += syscalls.c
 SRC += uart0.c 
 SRC += uart2.c
-#SRC += lcd.c 
+SRC += lcd.c 
 SRC += pwm.c 
 SRC += encoder.c 
+SRC += adc.c
 SRC += controller.c
-#SRC += display.c
+SRC += display.c
 #SRC += button.c
 SRC += ROSIFace.c
 #SRC += helperFuncs.c
+SRC += timer2.c
 
 # List C source files here which must be compiled in ARM-Mode.
 # use file-extension c for "c-only"-files
@@ -91,6 +93,7 @@ SRC += ROSIFace.c
 SRCARM += uart0ISR.c
 SRCARM += uart2ISR.c
 SRCARM += encoderISR.c
+SRCARM += timer2ISR.c
 #SRCARM += mySine.c
 
 # List C++ source files here.

@@ -18,6 +18,7 @@
  *************************************************************************/
 
 // The PWM channels of the different motors
+#define DEFAULT_CHANNEL 			0
 #define MOTOR_CHANNEL				1
 #define FRONT_SERVO_CHANNEL			2
 #define REAR_SERVO_CHANNEL			3

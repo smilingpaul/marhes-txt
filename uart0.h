@@ -12,7 +12,7 @@
 //#include "armVIC.h"
 #include "LPC23xx.h"
 
-#define UART0
+//#define UART0
 
 /*************************************************************************
  *             Definitions

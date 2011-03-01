@@ -7,6 +7,8 @@
 
 #include "controller.h"
 
+boolean UseOdomComb = false, StopLostConn = true;
+
 static int16_t theta = 0;
 static int16_t velocity = 0;
 static float velocitySlope, velocityInt, thetaSlope, thetaInt;
@@ -33,6 +35,9 @@ void ControllerCalcPID(void)
 uint32_t ControllerCalcPWM(uint16_t channel)
 {
 	uint32_t temp;
+
+	if (StopLostConn)
+		channel = DEFAULT_CHANNEL;
 
 	switch(channel)
 	{

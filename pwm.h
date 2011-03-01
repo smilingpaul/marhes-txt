@@ -17,7 +17,8 @@
 
 #define PCPWM1 				0x0040		// PWM Power Control Bit
 #define PCLKSEL0_PWM_DIV1 	(1<<12)		// PWM Peripheral Clock Sel-CLK/1
-#define PINSEL4_PWM_EN		0x0555		// PWM Pin Enable All 6 Outputs
+#define PINSEL4_PWM_EN		0x0155		// PWM Pin Enable First 5 Outputs
+#define PINSEL3_PWM6		(2<<20)		// PWM Pin Enable #6 Output
 #define TCR_CR				(1<<1)		// Reset PWM Counters
 #define MR0_FREQ			0x15F900	// PWM Output Freq - 50Hz - 20ms
 #define MCR_MR0R			(1<<1)		// Reset counters on MR0
