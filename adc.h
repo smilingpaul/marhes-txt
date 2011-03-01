@@ -13,6 +13,9 @@
 
 #define PCADC					(1<<12)
 #define PCLKSEL0_ADC_DIV8		(3<<24)
+#define PINSEL0_AD06			(3<<24)
+#define PINSEL1_AD01			(1<<16)
+#define PINSEL1_AD03			(1<<20)
 #define PINSEL3_AD05			(3<<30)
 
 #define AD0CR_SEL0				(1<<0)

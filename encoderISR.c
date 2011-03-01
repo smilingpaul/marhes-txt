@@ -72,8 +72,10 @@ void EncoderISR(void)
 		T3TCR = TCR_CE;
 		T1TCR = TCR_CE;
 
-		vels[0] = (ticks[FRONT_RIGHT] + ticks[FRONT_LEFT]) * 15 / 2;
-		vels[1] = (ticks[FRONT_RIGHT] - ticks[FRONT_LEFT]) * 15000 / 285;
+		vels[0] = (EncoderGetDirection(FRONT_RIGHT) * ticks[FRONT_RIGHT] + \
+				EncoderGetDirection(FRONT_LEFT) * ticks[FRONT_LEFT]) * 15 / 2;
+		vels[1] = (EncoderGetDirection(FRONT_RIGHT) * ticks[FRONT_RIGHT] - \
+				EncoderGetDirection(FRONT_LEFT) * ticks[FRONT_LEFT]) * 15000 / 285;
 
 		dx = (float)vels[0] * anglookuptable(pos[2], 1) * 20 / 1000000;
 		dy = (float)vels[0] * anglookuptable(pos[2], 0) * 20 / 1000000;

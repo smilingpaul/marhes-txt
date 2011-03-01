@@ -67,8 +67,7 @@ void DisplayUpdate(void)
 //    return currentValue;
 //}
 //
-//float DisplayChangeValueF(float prevValue, float currentValue, char* str, \
-//    uint8_t xLoc, uint8_t yLoc)
+//float DisplayChangeValueF(float prevValue, float currentValue, char* str, uint8_t xLoc, uint8_t yLoc)
 //{
 //    if(prevValue != currentValue)
 //    {
