@@ -86,6 +86,9 @@ void EncoderInit(void)
 	T0TCR = TCR_CE;
 	T3TCR = TCR_CE;
 	T1TCR = TCR_CE;
+
+	// 7. Setup direction inputs (input is 0)
+	FIO3DIR &= ~LEFT_IN & ~RIGHT_IN;
 }
 
 /*! \brief Gets the ticks counted for the specified channel.
@@ -114,4 +117,19 @@ int32_t EncoderVel(uint8_t channel)
 	int32_t vel;
 	vel = vels[channel];
 	return vel;
+}
+
+int8_t EncoderGetDirection(uint8_t channel)
+{
+	uint8_t val = 0;
+	if (channel == FRONT_LEFT)
+		val = FIO3PIN & LEFT_IN;
+
+	if (channel == FRONT_RIGHT)
+		val = FIO3PIN & RIGHT_IN;
+
+	if (val > 0)
+		return -1;
+	else
+		return 1;
 }

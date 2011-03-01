@@ -33,10 +33,8 @@
 void DisplayInit(void);
 void DisplaySetState(int8_t dispNum);
 uint8_t DisplayGetState(void);
-//int16_t DisplayChangeValueS(int16_t prevValue, int16_t currentValue, \
-//    uint8_t xLoc, uint8_t yLoc);
-//float DisplayChangeValueF(float prevValue, float currentValue, char* str, \
-//    uint8_t xLoc, uint8_t yLoc);
+//int16_t DisplayChangeValueS(int16_t prevValue, int16_t currentValue, uint8_t xLoc, uint8_t yLoc);
+//float DisplayChangeValueF(float prevValue, float currentValue, char* str, uint8_t xLoc, uint8_t yLoc);
 void DisplayUpdate(void);
 void DisplayStatus(void);
 //void DisplayVelocity(void);

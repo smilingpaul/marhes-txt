@@ -29,6 +29,10 @@
 #define REAR_RIGHT				2			//!< Rear right encoder channel
 #define REAR_LEFT				3			//!< Rear left encoder channel
 
+// Encoder Direction Inputs
+#define LEFT_IN					(1<<0)
+#define RIGHT_IN				(1<<1)
+
 // Array sizes
 #define SIZE_ENCODER_TICKS_ARR	2			//!< Ticks array size
 #define SIZE_ENCODER_VEL_ARR	2			//!< Velocity array size
@@ -41,6 +45,7 @@
 void EncoderInit(void);
 int32_t EncoderCount(uint8_t channel);
 int32_t EncoderVel(uint8_t channel);
+int8_t EncoderGetDirection(uint8_t channel);
 void EncoderISR(void);
 int32_t anglookuptable(int32_t degrees, int32_t type);
 
