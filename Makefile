@@ -84,7 +84,8 @@ SRC += controller.c
 SRC += display.c
 #SRC += button.c
 SRC += ROSIFace.c
-#SRC += helperFuncs.c
+SRC += battery.c
+SRC += helperFuncs.c
 SRC += timer2.c
 
 # List C source files here which must be compiled in ARM-Mode.

@@ -12,6 +12,7 @@
 #include "LPC23xx.h"
 #include "ROSIFace.h"
 #include "adc.h"
+#include "battery.h"
 
 #define ODOM_COMB_LIMIT				5
 #define CMD_VEL_LIMIT				1

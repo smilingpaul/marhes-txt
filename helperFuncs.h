@@ -19,6 +19,6 @@
  *             Function declarations
  *************************************************************************/
 char *itoa(int i);
-char *ftostr( char* buffer, float value, int places );
+//char *ftostr( char* buffer, float value, int places );
 
 #endif /* HELPERFUNCS_H_ */

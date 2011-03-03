@@ -8,7 +8,7 @@
 #include "timer.h"
 #include "timer2.h"
 
-extern uint16_t OdomCombRxCount, CmdVelRxCount;
+extern uint16_t OdomCombRxCount, CmdVelRxCount, cell1, cell2, cell3, status;
 extern boolean UseOdomComb, StopLostConn;
 
 uint8_t twoSecCount = 0, tenSecCount = 0;
@@ -42,9 +42,10 @@ void Timer2ISR(void)
 
 		if (tenSecCount > 4)
 		{
-			int16_t val = ADCGetChannel(5);
+			BatteryUpdateVoltages();
+			BatteryUpdateStatus();
+			ROSSendBattery((uint32_t)cell1, (uint32_t)cell2, (uint32_t)cell3);
 			FIO0PIN ^= (1<<21);
-			ROSSendBattery((uint32_t)val, 3700, 3400);
 			tenSecCount = 0;
 		}
 		else

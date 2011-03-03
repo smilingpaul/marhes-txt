@@ -6,6 +6,7 @@
 #include "lcd.h"
 #include "ROSIFace.h"
 #include "encoder.h"
+#include "battery.h"
 #include "helperFuncs.h"
 
 /*************************************************************************
