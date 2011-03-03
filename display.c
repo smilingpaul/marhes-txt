@@ -1,6 +1,7 @@
 #include "display.h"
 
 extern boolean UseOdomComb, StopLostConn;
+extern uint16_t cell1, cell2, cell3, status;
 static uint8_t DisplayState;
 static int8_t Switched;
 //static int16_t currentVC[SIZE_VEL_ARR];
@@ -110,6 +111,37 @@ void DisplayStatus(void)
 		LcdPutStr("COMBINED", 32, 60, SMALL, FCOLOR, BCOLOR);
 	else
 		LcdPutStr("ENCODER ", 32, 60, SMALL, FCOLOR, BCOLOR);
+
+	if (status == BATTERY_GOOD)
+		LcdPutStr("GOOD   ", 44, 60, SMALL, GREEN, BCOLOR);
+	else if (status == BATTERY_WARN)
+		LcdPutStr("WARNING", 44, 60, SMALL, YELLOW, BCOLOR);
+	else
+		LcdPutStr("BAD    ", 44, 60, SMALL, RED, BCOLOR);
+
+	LcdSetRect(56, 60, 64, SCREEN_MAX, FILL, BCOLOR);
+	if (cell1 > BATTERY_VWARN)
+		LcdPutStr(itoa(cell1), 56, 60, SMALL, GREEN, BCOLOR);
+	else if (cell1 > BATTERY_VBAD)
+		LcdPutStr(itoa(cell1), 56, 60, SMALL, YELLOW, BCOLOR);
+	else
+		LcdPutStr(itoa(cell1), 56, 60, SMALL, RED, BCOLOR);
+
+	LcdSetRect(68, 60, 76, SCREEN_MAX, FILL, BCOLOR);
+	if (cell2 > BATTERY_VWARN)
+		LcdPutStr(itoa(cell2), 68, 60, SMALL, GREEN, BCOLOR);
+	else if (cell2 > BATTERY_VBAD)
+		LcdPutStr(itoa(cell2), 68, 60, SMALL, YELLOW, BCOLOR);
+	else
+		LcdPutStr(itoa(cell2), 68, 60, SMALL, RED, BCOLOR);
+
+	LcdSetRect(80, 60, 88, SCREEN_MAX, FILL, BCOLOR);
+	if (cell3 > BATTERY_VWARN)
+		LcdPutStr(itoa(cell3), 80, 60, SMALL, GREEN, BCOLOR);
+	else if (cell3 > BATTERY_VBAD)
+		LcdPutStr(itoa(cell3), 80, 60, SMALL, YELLOW, BCOLOR);
+	else
+		LcdPutStr(itoa(cell3), 80, 60, SMALL, RED, BCOLOR);
 }
 
 //void DisplayVelocity(void)
