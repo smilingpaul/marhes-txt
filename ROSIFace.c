@@ -163,7 +163,7 @@ void ROSProcessData(void)
     		odomCombined[4] = (data[20] << 24) || (data[21] << 16) || \
     		    				(data[22] << 8) || data[23];
     		OdomCombRxCount++;
-    		FIO0PIN ^= (1<<21);
+//    		FIO0PIN ^= (1<<21);
     		break;
         case CMD_VEL:
         	if (data[2] != SIZE_VEL + 2)
@@ -284,6 +284,7 @@ void ROSSendBattery(uint16_t cell1_mv, uint16_t cell2_mv, uint16_t cell3_mv)
 
 #ifdef UART0
 	Uart0TxArr(packet, SIZE_BATTERY + 5);
+	FIO0PIN ^= (1<<21);
 #else
 	Uart2TxArr(packet, SIZE_BATTERY + 5);
 #endif
