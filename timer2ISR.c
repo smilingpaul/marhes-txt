@@ -45,7 +45,7 @@ void Timer2ISR(void)
 			BatteryUpdateVoltages();
 			BatteryUpdateStatus();
 			ROSSendBattery((uint32_t)cell1, (uint32_t)cell2, (uint32_t)cell3);
-			FIO0PIN ^= (1<<21);
+//			FIO0PIN ^= (1<<21);
 			tenSecCount = 0;
 		}
 		else

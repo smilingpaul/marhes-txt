@@ -149,7 +149,7 @@ void ROSProcessData(void)
 	switch(data[3])
     {
     	case ODOM_COMB:
-    		if (data[2] != SIZE_VEL + 2)
+    		if (data[2] != SIZE_ODOM_COMB + 2)
     			break;
 
     		odomCombined[0] = (data[4] << 24) || (data[5] << 16) || \
@@ -163,6 +163,7 @@ void ROSProcessData(void)
     		odomCombined[4] = (data[20] << 24) || (data[21] << 16) || \
     		    				(data[22] << 8) || data[23];
     		OdomCombRxCount++;
+    		FIO0PIN ^= (1<<21);
     		break;
         case CMD_VEL:
         	if (data[2] != SIZE_VEL + 2)
