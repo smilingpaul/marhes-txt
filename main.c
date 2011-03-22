@@ -75,7 +75,7 @@
 #define VECT_CNTL_INDEX 0x200
 #define VECT_PRIO_INDEX 0x200
 
-//#define UART0
+#define UART0
 
 /*************************************************************************
  *             Function declarations
