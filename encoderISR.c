@@ -45,7 +45,6 @@ int32_t angtable[91]={0,18,35,52,70,87,105,122,139,156,174,191,208,225,242,259,
  */
 void EncoderISR(void)
 {
-//	ISR_ENTRY();
 	float dx, dy, dth;
 
 	// Check for MR0 Interrupt

@@ -15,7 +15,7 @@
  
 // Storage for current data from ROS
 static int16_t velocityCmd[SIZE_VEL_ARR] = {0};
-static uint32_t odomCombined[SIZE_ODOM_ARR] = {0};
+static int32_t odomCombined[SIZE_ODOM_ARR] = {0};
 
 // Storage for leftover data
 static uint8_t data[MAX_PACKET_SIZE];
@@ -172,6 +172,8 @@ void ROSProcessData(void)
             // Store velocity command values
             velocityCmd[0] = (int16_t)(data[4] << 8 | data[5]);
             velocityCmd[1] = (int16_t)(data[6] << 8 | data[7]);
+            ControllerSetLinearVelocity(velocityCmd[0]);
+            ControllerSetAngularVelocity(velocityCmd[1]);
             CmdVelRxCount++;
             break;
         default:
@@ -284,7 +286,7 @@ void ROSSendBattery(uint16_t cell1_mv, uint16_t cell2_mv, uint16_t cell3_mv)
 
 #ifdef UART0
 	Uart0TxArr(packet, SIZE_BATTERY + 5);
-	FIO0PIN ^= (1<<21);
+//	FIO0PIN ^= (1<<21);
 #else
 	Uart2TxArr(packet, SIZE_BATTERY + 5);
 #endif

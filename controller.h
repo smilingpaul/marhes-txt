@@ -23,6 +23,12 @@
 #define FRONT_SERVO_CHANNEL			2
 #define REAR_SERVO_CHANNEL			3
 
+// The maximum linear and angular velocities
+#define LIN_VEL_MAX					3000
+#define LIN_VEL_MIN					-3000
+#define ANG_VEL_MAX					5000
+#define ANG_VEL_MIN					-5000
+
 // The maximum and minimum velocities accepted from ROS
 #define VELOCITY_MAX 				1600
 #define VELOCITY_MIN 				-1600
@@ -40,11 +46,17 @@
  *************************************************************************/
 
 void ControllerInit(void);
-void ControllerCalcPID(void);
-uint32_t ControllerCalcPWM(uint16_t channel);
-void ControllerSetTheta(int16_t value);
-int16_t ControllerGetTheta(void);
-void ControllerSetVelocity(int16_t value);
-int16_t ControllerGetVelocity(void);
+void ControllerPIDLoop(void);
+void ControllerSetLinearVelocity(int16_t value);
+int16_t ControllerGetLinearVelocity(void);
+void ControllerSetAngularVelocity(int16_t value);
+int16_t ControllerGetAngularVelocity(void);
+
+//void ControllerCalcPID(void);
+//uint32_t ControllerCalcPWM(uint16_t channel);
+//void ControllerSetTheta(int16_t value);
+//int16_t ControllerGetTheta(void);
+//void ControllerSetVelocity(int16_t value);
+//int16_t ControllerGetVelocity(void);
 
 #endif /* CONTROLLER_H_ */
