@@ -75,7 +75,7 @@
 #define VECT_CNTL_INDEX 0x200
 #define VECT_PRIO_INDEX 0x200
 
-#define UART0
+//#define UART0
 
 /*************************************************************************
  *             Function declarations
@@ -121,7 +121,7 @@ int main(void)
 		int16_t val = ADCGetChannel(5);
 		PWMSetDuty(6, (val * 1407));
 	    ROSProcessPacket();
-	    ControllerCalcPID();
+//	    ControllerCalcPID();
 
 //	    buttonState = ButtonGetChangedHigh();
 //	    if(buttonState & BUT_CENTER_BIT)

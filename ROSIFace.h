@@ -10,11 +10,12 @@
 
 #include "uart0.h"
 #include "uart2.h"
+#include "controller.h"
 #include "app_types.h"
 
 #define MAX_PACKET_SIZE		255
 
-#define UART0
+//#define UART0
 
 #define CMD_VEL				103
 #define ODOM_ENC			104
