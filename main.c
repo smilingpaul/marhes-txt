@@ -204,7 +204,7 @@ void sysInit(void)
 	LcdInit();
 	EncoderInit();
 	Timer2Init();
-	ControllerInit();
+//	ControllerInit();
 	ADCInit();
 	DisplayInit();
 //	ButtonInit();

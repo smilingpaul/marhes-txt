@@ -11,6 +11,7 @@
 #include "app_types.h"
 #include "LPC23xx.h"
 #include "pwm.h"
+#include "timer.h"
 #include "ROSIFace.h"
 
 /*************************************************************************

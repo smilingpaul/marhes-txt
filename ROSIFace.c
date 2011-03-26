@@ -15,7 +15,7 @@
  
 // Storage for current data from ROS
 static int16_t velocityCmd[SIZE_VEL_ARR] = {0};
-static int32_t odomCombined[SIZE_ODOM_ARR] = {0};
+int32_t odomCombined[SIZE_ODOM_ARR] = {0};
 
 // Storage for leftover data
 static uint8_t data[MAX_PACKET_SIZE];
