@@ -80,7 +80,7 @@ SRC += lcd.c
 SRC += pwm.c 
 SRC += encoder.c 
 SRC += adc.c
-SRC += controller.c
+#SRC += controller.c
 SRC += display.c
 #SRC += button.c
 SRC += ROSIFace.c
@@ -95,6 +95,7 @@ SRCARM += uart0ISR.c
 SRCARM += uart2ISR.c
 SRCARM += encoderISR.c
 SRCARM += timer2ISR.c
+SRCARM += controller.c
 #SRCARM += mySine.c
 
 # List C++ source files here.

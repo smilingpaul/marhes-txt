@@ -18,6 +18,7 @@
 #include "LPC23xx.h"
 #include "ROSIFace.h"
 #include "timer.h"
+#include "controller.h"
 
 /*************************************************************************
  *             Definitions
