@@ -98,18 +98,18 @@ void EncoderISR(void)
 		else
 			intCount++;
 
-		FIO0PIN ^= (1<<21);
+//		FIO0PIN ^= (1<<21);
 
 		// Clear MR0 interrupt
 		T1IR |= IR_MR0;
 	}
 
-//	if(T1IR | IR_MR1)
-//	{
-////		ControllerPIDLoop();
-//		FIO0PIN ^= (1<<21);
-//		T1IR |= IR_MR1;
-//	}
+	if(T1IR | IR_MR1)
+	{
+		ControllerPIDLoop();
+		FIO0PIN ^= (1<<21);
+		T1IR |= IR_MR1;
+	}
 
 	VICVectAddr = 0x00000000;
 //	ISR_EXIT();

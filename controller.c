@@ -7,19 +7,16 @@
 
 #include "controller.h"
 
-extern int32_t odomCombined[];
-extern int32_t vels[];
-
 boolean UseOdomComb = false, StopLostConn = true;
 
 //static int16_t theta = 0;
 //static int16_t velocity = 0;
 //static float velocitySlope, velocityInt, thetaSlope, thetaInt;
 
-static int16_t linVelocity = 0, angVelocity = 0;
-static int32_t e_lv_last = 0, e_av_last = 0, e_lv_sum = 0, e_av_sum = 0;
-static float kp_lv = 0.5, ki_lv = 0.5, kd_lv = 0.5;
-static float kp_av = 0.5, ki_av = 0.5, kd_av = 0.5;
+int16_t linVelocity = 0, angVelocity = 0;
+int32_t e_lv_last = 0, e_av_last = 0, e_lv_sum = 0, e_av_sum = 0;
+float kp_lv = 0.5, ki_lv = 0.5, kd_lv = 0.5;
+float kp_av = 0.5, ki_av = 0.5, kd_av = 0.5;
 
 void ControllerInit(void)
 {
@@ -28,7 +25,7 @@ void ControllerInit(void)
 	//T1TCR = TCR_CR;							// Reset timer1 counter
 	//T1CTCR = CTCR_TM;						// Timer 1 is in timer mode
 	T1MR1 = MCR_10MS;						// Match at 20ms
-	T1MCR = MCR_MR1I;						// On match interrupt
+	T1MCR |= MCR_MR1I;						// On match interrupt
 
 	// Setup T1 Interrupt
 //	VICIntSelect &= ~VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1);	// Change to IRQ
@@ -46,39 +43,6 @@ void ControllerInit(void)
 //	velocityInt =  VELOCITY_PWM_MAX - velocitySlope * VELOCITY_MAX;
 //	thetaSlope = (THETA_PWM_MIN - THETA_PWM_MAX) / (THETA_MIN - THETA_MAX);
 //	thetaInt = THETA_PWM_MAX - thetaSlope * THETA_MAX;
-}
-
-void ControllerPIDLoop(void)
-{
-	int32_t e_lv, e_av, u_lv, u_av;
-
-	// Get the error signals
-	if (UseOdomComb)
-	{
-		e_lv = linVelocity - odomCombined[3];
-		e_av = angVelocity - odomCombined[4];
-	}
-	else
-	{
-		e_lv = linVelocity - vels[0];
-		e_av = angVelocity - vels[1];
-	}
-
-	e_lv_sum += e_lv;
-	e_av_sum += e_av;
-
-	// Calculate the PID linear velocity control signal
-	u_lv = (uint32_t)(kp_lv * e_lv + ki_lv * e_lv_sum + kd_lv * (e_lv - e_lv_last));
-	u_av = (uint32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * (e_av - e_av_last));
-
-	// Set the PWM duty cycles for the motor and the steering servos
-	PWMSetDuty(MOTOR_CHANNEL, u_lv);
-//	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
-//	PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
-
-	// Store last velocity errors
-	e_lv_last = e_lv;
-	e_av_last = e_av;
 }
 
 void ControllerSetLinearVelocity(int16_t value)
