@@ -8,6 +8,7 @@
 #include "encoder.h"
 #include "battery.h"
 #include "helperFuncs.h"
+#include "controller.h"
 
 /*************************************************************************
  *             Definitions
