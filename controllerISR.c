@@ -11,9 +11,13 @@ extern int32_t odomCombined[];
 extern int32_t vels[];
 extern boolean UseOdomComb, StopLostConn;
 extern int16_t linVelocity, angVelocity;
-extern int32_t e_lv_last, e_av_last, e_lv_sum, e_av_sum;
-extern float kp_lv, ki_lv, kd_lv;
-extern float kp_av, ki_av, kd_av;
+//extern int32_t e_lv_last, e_av_last, e_lv_sum, e_av_sum;
+//extern float kp_lv, ki_lv, kd_lv;
+//extern float kp_av, ki_av, kd_av;
+
+int32_t e_lv_last = 0, e_av_last = 0, e_lv_sum = 0, e_av_sum = 0;
+float kp_lv = 0.5, ki_lv = 0.5, kd_lv = 0.5;
+float kp_av = 0.5, ki_av = 0.5, kd_av = 0.5;
 
 void ControllerPIDLoop(void)
 {
