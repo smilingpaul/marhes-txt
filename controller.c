@@ -8,15 +8,11 @@
 #include "controller.h"
 
 boolean UseOdomComb = false, StopLostConn = true;
+int16_t linVelocity = 0, angVelocity = 0;
 
 //static int16_t theta = 0;
 //static int16_t velocity = 0;
 //static float velocitySlope, velocityInt, thetaSlope, thetaInt;
-
-int16_t linVelocity = 0, angVelocity = 0;
-int32_t e_lv_last = 0, e_av_last = 0, e_lv_sum = 0, e_av_sum = 0;
-float kp_lv = 0.5, ki_lv = 0.5, kd_lv = 0.5;
-float kp_av = 0.5, ki_av = 0.5, kd_av = 0.5;
 
 void ControllerInit(void)
 {
