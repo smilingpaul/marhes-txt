@@ -11,17 +11,15 @@ extern int32_t odomCombined[];
 extern int32_t vels[];
 extern boolean UseOdomComb, StopLostConn;
 extern int16_t linVelocity, angVelocity;
-//extern int32_t e_lv_last, e_av_last, e_lv_sum, e_av_sum;
-//extern float kp_lv, ki_lv, kd_lv;
-//extern float kp_av, ki_av, kd_av;
 
 int32_t e_lv_last = 0, e_av_last = 0, e_lv_sum = 0, e_av_sum = 0;
-float kp_lv = 0.5, ki_lv = 0.5, kd_lv = 0.5;
+int32_t u_lv = 0, u_av = 0;
+float kp_lv = 50, ki_lv = 0, kd_lv = 0;
 float kp_av = 0.5, ki_av = 0.5, kd_av = 0.5;
 
 void ControllerPIDLoop(void)
 {
-	int32_t e_lv, e_av, u_lv, u_av;
+	int32_t e_lv, e_av;
 
 	// Get the error signals
 	if (UseOdomComb)
@@ -43,7 +41,7 @@ void ControllerPIDLoop(void)
 	u_av = (uint32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * (e_av - e_av_last));
 
 	// Set the PWM duty cycles for the motor and the steering servos
-	PWMSetDuty(MOTOR_CHANNEL, u_lv);
+	PWMSetDuty(MOTOR_CHANNEL, u_lv + DUTY_1_5);
 //	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
 //	PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
 
