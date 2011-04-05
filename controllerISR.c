@@ -21,31 +21,44 @@ void ControllerPIDLoop(void)
 {
 	int32_t e_lv, e_av;
 
-	// Get the error signals
-	if (UseOdomComb)
+	if (StopLostConn == false)
 	{
-		e_lv = linVelocity - odomCombined[3];
-		e_av = angVelocity - odomCombined[4];
+		// Get the error signals
+		if (UseOdomComb)
+		{
+			e_lv = linVelocity - odomCombined[3];
+			e_av = angVelocity - odomCombined[4];
+		}
+		else
+		{
+			e_lv = linVelocity - vels[0];
+			e_av = angVelocity - vels[1];
+		}
+
+		e_lv_sum += e_lv;
+		e_av_sum += e_av;
+
+		// Calculate the PID linear velocity control signal
+		u_lv = (uint32_t)(kp_lv * e_lv + ki_lv * e_lv_sum + kd_lv * (e_lv - e_lv_last));
+		u_av = (uint32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * (e_av - e_av_last));
+
+		// Set the PWM duty cycles for the motor and the steering servos
+		PWMSetDuty(MOTOR_CHANNEL, u_lv + DUTY_1_5);
+	//	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
+	//	PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
+
+		// Store last velocity errors
+		e_lv_last = e_lv;
+		e_av_last = e_av;
 	}
 	else
 	{
-		e_lv = linVelocity - vels[0];
-		e_av = angVelocity - vels[1];
+		PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5);
+		e_lv_last = 0;
+		e_av_last = 0;
+		e_lv_sum = 0;
+		e_av_sum = 0;
+		u_lv = 0;
+		u_av = 0;
 	}
-
-	e_lv_sum += e_lv;
-	e_av_sum += e_av;
-
-	// Calculate the PID linear velocity control signal
-	u_lv = (uint32_t)(kp_lv * e_lv + ki_lv * e_lv_sum + kd_lv * (e_lv - e_lv_last));
-	u_av = (uint32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * (e_av - e_av_last));
-
-	// Set the PWM duty cycles for the motor and the steering servos
-	PWMSetDuty(MOTOR_CHANNEL, u_lv + DUTY_1_5);
-//	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
-//	PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
-
-	// Store last velocity errors
-	e_lv_last = e_lv;
-	e_av_last = e_av;
 }

@@ -14,35 +14,33 @@ int16_t linVelocity = 500, angVelocity = 0;
 //static int16_t velocity = 0;
 //static float velocitySlope, velocityInt, thetaSlope, thetaInt;
 
-void ControllerInit(void)
-{
+void ControllerInit(void) {
 	// Most things done in encoder.c
 	// Setup timer1 for a sample period of 20msec
 	//T1TCR = TCR_CR;							// Reset timer1 counter
 	//T1CTCR = CTCR_TM;						// Timer 1 is in timer mode
-	T1MR1 = MCR_10MS;						// Match at 20ms
-	T1MCR |= MCR_MR1I;						// On match interrupt
+	T1MR1 = MCR_10MS; // Match at 20ms
+	T1MCR |= MCR_MR1I; // On match interrupt
 
 	// Setup T1 Interrupt
-//	VICIntSelect &= ~VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1);	// Change to IRQ
-//	VICIntEnClr |= VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1); 	// Disable interrupt
-//	VICVectAddr5 = (uint32_t)(void *)EncoderISR;			// Assign the ISR
-//	VICVectPriority5 = 0xE;									// Set the priority
-//	VICIntEnable |= VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1);	// Enable the INT
+	//	VICIntSelect &= ~VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1);	// Change to IRQ
+	//	VICIntEnClr |= VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1); 	// Disable interrupt
+	//	VICVectAddr5 = (uint32_t)(void *)EncoderISR;			// Assign the ISR
+	//	VICVectPriority5 = 0xE;									// Set the priority
+	//	VICIntEnable |= VIC_CHAN_TO_MASK(VIC_CHAN_NUM_Timer1);	// Enable the INT
 
-//	// 6. Enable the Timer counters
-//	T0TCR = TCR_CE;
-//	T3TCR = TCR_CE;
-//	T1TCR = TCR_CE;
+	//	// 6. Enable the Timer counters
+	//	T0TCR = TCR_CE;
+	//	T3TCR = TCR_CE;
+	//	T1TCR = TCR_CE;
 
-//	velocitySlope = ((VELOCITY_PWM_MIN - VELOCITY_PWM_MAX) / (VELOCITY_MIN - VELOCITY_MAX));
-//	velocityInt =  VELOCITY_PWM_MAX - velocitySlope * VELOCITY_MAX;
-//	thetaSlope = (THETA_PWM_MIN - THETA_PWM_MAX) / (THETA_MIN - THETA_MAX);
-//	thetaInt = THETA_PWM_MAX - thetaSlope * THETA_MAX;
+	//	velocitySlope = ((VELOCITY_PWM_MIN - VELOCITY_PWM_MAX) / (VELOCITY_MIN - VELOCITY_MAX));
+	//	velocityInt =  VELOCITY_PWM_MAX - velocitySlope * VELOCITY_MAX;
+	//	thetaSlope = (THETA_PWM_MIN - THETA_PWM_MAX) / (THETA_MIN - THETA_MAX);
+	//	thetaInt = THETA_PWM_MAX - thetaSlope * THETA_MAX;
 }
 
-void ControllerSetLinearVelocity(int16_t value)
-{
+void ControllerSetLinearVelocity(int16_t value) {
 	if (value > LIN_VEL_MAX)
 		linVelocity = LIN_VEL_MAX;
 	else if (value < LIN_VEL_MIN)
@@ -51,13 +49,11 @@ void ControllerSetLinearVelocity(int16_t value)
 		linVelocity = value;
 }
 
-int16_t ControllerGetLinearVelocity(void)
-{
+int16_t ControllerGetLinearVelocity(void) {
 	return linVelocity;
 }
 
-void ControllerSetAngularVelocity(int16_t value)
-{
+void ControllerSetAngularVelocity(int16_t value) {
 	if (value > ANG_VEL_MAX)
 		angVelocity = ANG_VEL_MAX;
 	else if (value < ANG_VEL_MIN)
@@ -66,8 +62,7 @@ void ControllerSetAngularVelocity(int16_t value)
 		angVelocity = value;
 }
 
-int16_t ControllerGetAngularVelocity(void)
-{
+int16_t ControllerGetAngularVelocity(void) {
 	return angVelocity;
 }
 
