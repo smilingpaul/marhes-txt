@@ -152,18 +152,18 @@ void ROSProcessData(void)
     		if (data[2] != SIZE_ODOM_COMB + 2)
     			break;
 
-    		odomCombined[0] = (data[4] << 24) || (data[5] << 16) || \
-    		    				(data[6] << 8) || data[7];
-    		odomCombined[1] = (data[8] << 24) || (data[9] << 16) || \
-    		    				(data[10] << 8) || data[11];
-    		odomCombined[2] = (data[12] << 24) || (data[13] << 16) || \
-    		    				(data[14] << 8) || data[15];
-    		odomCombined[3] = (data[16] << 24) || (data[17] << 16) || \
-    		    				(data[18] << 8) || data[19];
-    		odomCombined[4] = (data[20] << 24) || (data[21] << 16) || \
-    		    				(data[22] << 8) || data[23];
+    		odomCombined[0] = (data[4] << 24) | (data[5] << 16) | \
+    		    				(data[6] << 8) | data[7];
+    		odomCombined[1] = (data[8] << 24) | (data[9] << 16) | \
+    		    				(data[10] << 8) | data[11];
+    		odomCombined[2] = (data[12] << 24) | (data[13] << 16) | \
+    		    				(data[14] << 8) | data[15];
+    		odomCombined[3] = (data[16] << 24) | (data[17] << 16) | \
+    		    				(data[18] << 8) | data[19];
+    		odomCombined[4] = (data[20] << 24) | (data[21] << 16) | \
+    		    				(data[22] << 8) | data[23];
     		OdomCombRxCount++;
-//    		FIO0PIN ^= (1<<21);
+    		FIO0PIN ^= (1<<21);
     		break;
         case CMD_VEL:
         	if (data[2] != SIZE_VEL + 2)

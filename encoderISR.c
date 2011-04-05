@@ -107,7 +107,7 @@ void EncoderISR(void)
 	if(T1IR | IR_MR1)
 	{
 		ControllerPIDLoop();
-		FIO0PIN ^= (1<<21);
+//		FIO0PIN ^= (1<<21);
 		T1IR |= IR_MR1;
 	}
 

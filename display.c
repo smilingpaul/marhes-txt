@@ -154,7 +154,7 @@ void DisplayStatus(void)
 //	LcdPutStr(itoa(ControllerGetAngularVelocity()), 104, 60, SMALL, FCOLOR, BCOLOR);
 	LcdSetRect(116, 60, 124, SCREEN_MAX, FILL, BCOLOR);
 //	LcdPutStr(itoa(odomCombined[3]), 116, 60, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr(itoa(EncoderVel(0)), 116, 60, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa(odomCombined[3]), 116, 60, SMALL, FCOLOR, BCOLOR);
 //	LcdSetRect(128, 60, 136, SCREEN_MAX, FILL, BCOLOR);
 //	LcdPutStr(itoa(1), 128, 60, SMALL, FCOLOR, BCOLOR);
 }
