@@ -8,7 +8,7 @@
 #include "controller.h"
 
 boolean UseOdomComb = false, StopLostConn = true;
-int16_t linVelocity = 0, angVelocity = 0;
+int16_t linVelocity = 500, angVelocity = 0;
 
 //static int16_t theta = 0;
 //static int16_t velocity = 0;
