@@ -25,7 +25,7 @@ static uint8_t dataNum = 0;
 static uint8_t packet[MAX_PACKET_SIZE];
 
 // Received ODOM_COMB Messges Count in #secs
-uint16_t OdomCombRxCount = 0, CmdVelRxCount = 0;
+uint32_t OdomCombRxCount = 0, CmdVelRxCount = 0;
 
 // Processes data in the serial port buffer.
 void ROSProcessPacket(void)

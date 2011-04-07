@@ -112,6 +112,7 @@ int main(void)
 
 	// Initialize the system and turn on interrupts
 	sysInit();
+	PWMSetDuty(6, 500000);
 	arm_enable_interrupts();//enableIRQ();
 
 	// Enter infinite while loop
@@ -130,22 +131,22 @@ int main(void)
 //	    	LcdBacklight(UpdateDisplay);
 //	    }
 
-//	    if(UpdateDisplay)
-//	    {
-////	        if (buttonState & BUT_RIGHT_BIT)
-////                DisplaySetState(DisplayGetState() + 1);
-////            if (buttonState & BUT_LEFT_BIT)
-////                DisplaySetState(DisplayGetState() - 1);
-//            if (i > 50000)
-//            {
-//                DisplayUpdate();
-//                i = 0;
-//            }
-//            else
-//            {
-//                i++;
-//            }
-//        }
+	    if(UpdateDisplay)
+	    {
+//	        if (buttonState & BUT_RIGHT_BIT)
+//                DisplaySetState(DisplayGetState() + 1);
+//            if (buttonState & BUT_LEFT_BIT)
+//                DisplaySetState(DisplayGetState() - 1);
+            if (i > 100000)
+            {
+                DisplayUpdate();
+                i = 0;
+            }
+            else
+            {
+                i++;
+            }
+        }
 	}
 	return 0;
 }
