@@ -8,7 +8,8 @@
 #include "timer.h"
 #include "timer2.h"
 
-extern uint16_t OdomCombRxCount, CmdVelRxCount, cell1, cell2, cell3, status;
+extern uint32_t OdomCombRxCount, CmdVelRxCount;
+extern uint16_t cell1, cell2, cell3, status;
 extern boolean UseOdomComb, StopLostConn;
 
 uint8_t twoSecCount = 0, tenSecCount = 0;
