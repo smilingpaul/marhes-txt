@@ -1,7 +1,7 @@
 #include "display.h"
 
 extern boolean UseOdomComb, StopLostConn;
-extern int32_t odomCombined[];
+extern int32_t odomCombined[], vels[], ticks[];
 extern uint16_t cell1, cell2, cell3, status;
 static uint8_t DisplayState;
 static int8_t Switched;
@@ -152,10 +152,12 @@ void DisplayStatus(void)
 	LcdPutStr(itoa(ControllerGetLinearVelocity()), 92, 60, SMALL, FCOLOR, BCOLOR);
 //	LcdSetRect(104, 60, 112, SCREEN_MAX, FILL, BCOLOR);
 //	LcdPutStr(itoa(ControllerGetAngularVelocity()), 104, 60, SMALL, FCOLOR, BCOLOR);
-	LcdSetRect(116, 60, 124, SCREEN_MAX, FILL, BCOLOR);
+	LcdSetRect(104, 60, 112, SCREEN_MAX, FILL, BCOLOR);
 //	LcdPutStr(itoa(odomCombined[3]), 116, 60, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr(itoa(odomCombined[3]), 116, 60, SMALL, FCOLOR, BCOLOR);
-//	LcdSetRect(128, 60, 136, SCREEN_MAX, FILL, BCOLOR);
+//	LcdPutStr(itoa(odomCombined[3]), 116, 60, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa(ticks[0]), 104, 60, SMALL, FCOLOR, BCOLOR);
+	LcdSetRect(112, 60, 128, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(ticks[1]), 112, 60, SMALL, FCOLOR, BCOLOR);
 //	LcdPutStr(itoa(1), 128, 60, SMALL, FCOLOR, BCOLOR);
 }
 
@@ -193,7 +195,7 @@ void DisplayStatus(void)
 //
 //    for(i = 0; i < SIZE_ENCODER_ARR; i++)
 //        currentEncoderCounts[i] = (uint32_t)DisplayChangeValueS((int16_t)currentEncoderCounts[i], \
-//        		(int16_t)EncoderCount(i), 24 + 12 * i, 36);
+//        		(int16_t)EncoderTicksGet(i), 24 + 12 * i, 36);
 //
 //    for(i = 0; i < SIZE_ENCODER_VEL_ARR; i++)
 //    	currentEncoderVels[i] = DisplayChangeValueS((int16_t)currentEncoderVels[i], \

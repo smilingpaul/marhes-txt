@@ -14,7 +14,7 @@ extern int16_t linVelocity, angVelocity;
 
 int32_t e_lv_last = 0, e_av_last = 0, e_lv_sum = 0, e_av_sum = 0;
 int32_t u_lv = 0, u_av = 0;
-float kp_lv = 1000, ki_lv = 0, kd_lv = 0;
+float kp_lv = 50, ki_lv = 0, kd_lv = 0;
 float kp_av = 0.5, ki_av = 0.5, kd_av = 0.5;
 
 void ControllerPIDLoop(void)
@@ -39,11 +39,11 @@ void ControllerPIDLoop(void)
 		e_av_sum += e_av;
 
 		// Calculate the PID linear velocity control signal
-		u_lv = (uint32_t)(kp_lv * e_lv + ki_lv * e_lv_sum + kd_lv * (e_lv - e_lv_last));
-		u_av = (uint32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * (e_av - e_av_last));
+		u_lv = (int32_t)(kp_lv * e_lv + ki_lv * e_lv_sum + kd_lv * (e_lv - e_lv_last));
+		u_av = (int32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * (e_av - e_av_last));
 
 		// Set the PWM duty cycles for the motor and the steering servos
-		PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + u_lv);
+		PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + 50000);//u_lv);
 	//	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
 	//	PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
 
