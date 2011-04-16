@@ -44,7 +44,12 @@
  *************************************************************************/
 
 void EncoderInit(void);
-int32_t EncoderCount(uint8_t channel);
+int32_t EncoderTicksGet(uint8_t channel);
+void EncoderTicksSet(uint8_t channel, int32_t num_ticks);
+int32_t EncoderVelsGet(uint8_t channel);
+void EncoderVelsSet(uint8_t channel, int32_t vel);
+float EncoderPosGet(uint8_t channel);
+void EncoderPosSet(uint8_t channel, int32_t val);
 int32_t EncoderVel(uint8_t channel);
 int8_t EncoderGetDirection(uint8_t channel);
 void EncoderISR(void);

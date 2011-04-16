@@ -113,6 +113,7 @@ int main(void)
 	// Initialize the system and turn on interrupts
 	sysInit();
 	PWMSetDuty(6, 500000);
+
 	arm_enable_interrupts();//enableIRQ();
 
 	// Enter infinite while loop

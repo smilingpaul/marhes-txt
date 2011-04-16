@@ -163,7 +163,7 @@ void ROSProcessData(void)
     		odomCombined[4] = (data[20] << 24) | (data[21] << 16) | \
     		    				(data[22] << 8) | data[23];
     		OdomCombRxCount++;
-    		FIO0PIN ^= (1<<21);
+//    		FIO0PIN ^= (1<<21);
     		break;
         case CMD_VEL:
         	if (data[2] != SIZE_VEL + 2)
@@ -175,6 +175,7 @@ void ROSProcessData(void)
             ControllerSetLinearVelocity(velocityCmd[0]);
             ControllerSetAngularVelocity(velocityCmd[1]);
             CmdVelRxCount++;
+            FIO0PIN ^= (1<<21);
             break;
         default:
         
@@ -222,7 +223,7 @@ void ROSSendOdomEnc(int32_t x_mm, int32_t y_mm, int32_t th_mrad, \
 		int32_t linVel, int32_t angVel)
 {
 	int checksum;
-
+	//arm_disable_interrupts();
 	ROSBuildHeader(SIZE_ODOM_ENC);			// Build header
 	packet[3] = ODOM_ENC;				// Write message type
 
@@ -255,18 +256,20 @@ void ROSSendOdomEnc(int32_t x_mm, int32_t y_mm, int32_t th_mrad, \
 	checksum = ROSCalcChkSum(SIZE_ODOM_ENC);    	// Calculate the checksum
 	packet[3+SIZE_ODOM_ENC] = checksum >> 8;		// Put the checksum bytes in
 	packet[3+SIZE_ODOM_ENC+1] = checksum & 0xFF;	// reverse order
+//	FIO0PIN ^= (1<<21);
 
 #ifdef UART0
 	Uart0TxArr(packet, SIZE_ODOM_ENC + 5);
 #else
 	Uart2TxArr(packet, SIZE_ODOM_ENC + 5);
 #endif
+	//arm_enable_interrupts();
 }
 
 void ROSSendBattery(uint16_t cell1_mv, uint16_t cell2_mv, uint16_t cell3_mv)
 {
 	int checksum;
-
+	//arm_disable_interrupts();
 	ROSBuildHeader(SIZE_BATTERY);				// Build header
 	packet[3] = CMD_BATTERY;					// Write message type
 
@@ -290,6 +293,7 @@ void ROSSendBattery(uint16_t cell1_mv, uint16_t cell2_mv, uint16_t cell3_mv)
 #else
 	Uart2TxArr(packet, SIZE_BATTERY + 5);
 #endif
+	//arm_enable_interrupts();
 }
 
 int16_t ROSGetVelocityCmd(uint8_t value)

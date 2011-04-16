@@ -98,25 +98,36 @@ void EncoderInit(void)
     \param channel The wheel to get the ticks.
     \return The number of ticks in the last sample period.
  */
-int32_t EncoderCount(uint8_t channel)
+int32_t EncoderTicksGet(uint8_t channel)
 {
 	int32_t count;
 	count = ticks[channel];
 	return count;
 }
 
-/*! \brief Gets the velocity for the specified direction (linear, angular).
-
-    Returns the specified velocity (linear, angular) during the previous sample.
-
-    \param channel The velocity direction to get the velocity.
-    \return The velocity from the last sample.
- */
-int32_t EncoderVel(uint8_t channel)
+void EncoderTicksSet(uint8_t channel, int32_t num_ticks)
 {
-	int32_t vel;
-	vel = vels[channel];
-	return vel;
+	ticks[channel] = num_ticks;
+}
+
+int32_t EncoderVelsGet(uint8_t channel)
+{
+	return vels[channel];
+}
+
+void EncoderVelsSet(uint8_t channel, int32_t vel)
+{
+	vels[channel] = vel;
+}
+
+float EncoderPosGet(uint8_t channel)
+{
+	return pos[channel];
+}
+
+void EncoderPosSet(uint8_t channel, int32_t val)
+{
+	pos[channel] = val;
 }
 
 int8_t EncoderGetDirection(uint8_t channel)

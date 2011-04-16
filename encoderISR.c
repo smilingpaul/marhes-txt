@@ -46,7 +46,7 @@ int32_t angtable[91]={0,18,35,52,70,87,105,122,139,156,174,191,208,225,242,259,
 void EncoderISR(void)
 {
 	float dx, dy, dth;
-
+	int32_t vel1, vel2;
 	// Check for MR0 Interrupt
 	if(T1IR | IR_MR0)
 	{
@@ -71,10 +71,17 @@ void EncoderISR(void)
 		T3TCR = TCR_CE;
 		T1TCR = TCR_CE;
 
-		vels[0] = (EncoderGetDirection(FRONT_RIGHT) * ticks[FRONT_RIGHT] + \
-				EncoderGetDirection(FRONT_LEFT) * ticks[FRONT_LEFT]) * 15 / 2;
-		vels[1] = (EncoderGetDirection(FRONT_RIGHT) * ticks[FRONT_RIGHT] - \
+//		vels[0] = (EncoderGetDirection(FRONT_RIGHT) * ticks[FRONT_RIGHT] + \
+//						EncoderGetDirection(FRONT_LEFT) * ticks[FRONT_LEFT]) * 15 / 2;
+//		vels[1] = (EncoderGetDirection(FRONT_RIGHT) * ticks[FRONT_RIGHT] - \
+//				EncoderGetDirection(FRONT_LEFT) * ticks[FRONT_LEFT]) * 15000 / 285;
+		vel1 = (EncoderGetDirection(FRONT_RIGHT) * ticks[FRONT_RIGHT] + \
+						EncoderGetDirection(FRONT_LEFT) * ticks[FRONT_LEFT]) * 15 / 2;
+		vel2 = (EncoderGetDirection(FRONT_RIGHT) * ticks[FRONT_RIGHT] - \
 				EncoderGetDirection(FRONT_LEFT) * ticks[FRONT_LEFT]) * 15000 / 285;
+
+//		int32_t temp = vels[0];
+//		temp = vels[1];
 
 		dx = (float)vels[0] * anglookuptable(pos[2], 1) * 20 / 1000000;
 		dy = (float)vels[0] * anglookuptable(pos[2], 0) * 20 / 1000000;
@@ -82,7 +89,7 @@ void EncoderISR(void)
 		pos[0] += dx;
 		pos[1] += dy;
 		pos[2] += dth;
-
+		PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + 10000);
 		if (pos[2] > 6283)
 			pos[2] -= 6283;
 
@@ -92,11 +99,11 @@ void EncoderISR(void)
 		// Send encoder message
 		if(intCount > 5)
 		{
-			ROSSendOdomEnc((int32_t)pos[0], (int32_t)pos[1], (int32_t)pos[2], vels[0], vels[1]);
+			ROSSendOdomEnc((int32_t)pos[0], (int32_t)pos[1], (int32_t)pos[2], ticks[0], ticks[1]);//vel1, vel2);//vels[0], vels[1]);
 			intCount = 0;
 		}
-		else
-			intCount++;
+
+		intCount++;
 
 //		FIO0PIN ^= (1<<21);
 
