@@ -43,7 +43,7 @@ void ControllerPIDLoop(void)
 		u_av = (int32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * (e_av - e_av_last));
 
 		// Set the PWM duty cycles for the motor and the steering servos
-		PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + 50000);//u_lv);
+		PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + u_lv);
 	//	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
 	//	PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
 
