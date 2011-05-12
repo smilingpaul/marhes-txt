@@ -8,7 +8,8 @@
 #include "controller.h"
 
 boolean UseOdomComb = false, StopLostConn = true;
-int16_t linVelocity = 500, angVelocity = 0;
+int16_t linVelocity = 0, angVelocity = 0;
+int32_t combLinVelocity = 0, combAngVelocity = 0;
 
 //static int16_t theta = 0;
 //static int16_t velocity = 0;
@@ -64,6 +65,12 @@ void ControllerSetAngularVelocity(int16_t value) {
 
 int16_t ControllerGetAngularVelocity(void) {
 	return angVelocity;
+}
+
+void ControllerSetOdomCombined(int32_t linVel, int32_t angVel)
+{
+	combLinVelocity = linVel;
+	combAngVelocity = angVel;
 }
 
 //void ControllerCalcPID(void)

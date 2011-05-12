@@ -162,6 +162,7 @@ void ROSProcessData(void)
     		    				(data[18] << 8) | data[19];
     		odomCombined[4] = (data[20] << 24) | (data[21] << 16) | \
     		    				(data[22] << 8) | data[23];
+    		ControllerSetOdomCombined(odomCombined[3], odomCombined[4]);
     		OdomCombRxCount++;
 //    		FIO0PIN ^= (1<<21);
     		break;
