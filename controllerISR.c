@@ -7,14 +7,15 @@
 
 #include "controller.h"
 
-extern int32_t odomCombined[];
+//extern int32_t odomCombined[];
 extern int32_t vels[];
 extern boolean UseOdomComb, StopLostConn;
 extern int16_t linVelocity, angVelocity;
+extern int32_t combLinVelocity, combAngVelocity;
 
 int32_t e_lv_last = 0, e_av_last = 0, e_lv_sum = 0, e_av_sum = 0;
 int32_t u_lv = 0, u_av = 0;
-float kp_lv = 50, ki_lv = 0, kd_lv = 0;
+float kp_lv = 500, ki_lv = 0, kd_lv = 0;
 float kp_av = 0.5, ki_av = 0.5, kd_av = 0.5;
 
 void ControllerPIDLoop(void)
@@ -26,8 +27,8 @@ void ControllerPIDLoop(void)
 		// Get the error signals
 		if (UseOdomComb)
 		{
-			e_lv = linVelocity - odomCombined[3];
-			e_av = angVelocity - odomCombined[4];
+			e_lv = linVelocity - combLinVelocity;
+			e_av = angVelocity - combAngVelocity;
 		}
 		else
 		{

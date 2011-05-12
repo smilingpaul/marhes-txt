@@ -14,7 +14,7 @@
 #include "adc.h"
 #include "battery.h"
 
-#define ODOM_COMB_LIMIT				5
+#define ODOM_COMB_LIMIT				2
 #define CMD_VEL_LIMIT				1
 
 void Timer2Init(void);
