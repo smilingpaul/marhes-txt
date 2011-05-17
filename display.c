@@ -3,6 +3,8 @@
 extern boolean UseOdomComb, StopLostConn;
 extern int32_t odomCombined[], vels[], ticks[];
 extern uint16_t cell1, cell2, cell3, status;
+extern int32_t kp_lv, ki_lv, kd_lv;
+extern int32_t kp_av, ki_av, kd_av;
 static uint8_t DisplayState;
 static int8_t Switched;
 //static int16_t currentVC[SIZE_VEL_ARR];
@@ -94,7 +96,7 @@ void DisplayStatus(void)
 		LcdPutStr("CELL3:    ", 80, 0, SMALL, FCOLOR, BCOLOR);
 		LcdPutStr("CMD_LV:   ", 92, 0, SMALL, FCOLOR, BCOLOR);
 //		LcdPutStr("CMD_AV:   ", 104, 0, SMALL, FCOLOR, BCOLOR);
-		LcdPutStr("RX_LV:    ", 116, 0, SMALL, FCOLOR, BCOLOR);
+//		LcdPutStr("RX_LV:    ", 116, 0, SMALL, FCOLOR, BCOLOR);
 //		LcdPutStr("RX_AV:    ", 128, 0, SMALL, FCOLOR, BCOLOR);
 		LcdSetLine(18, 0, 18, 131, FCOLOR);
 //		LcdSetLine(30, 0, 30, 131, FCOLOR);
@@ -150,15 +152,17 @@ void DisplayStatus(void)
 
 	LcdSetRect(92, 60, 100, SCREEN_MAX, FILL, BCOLOR);
 	LcdPutStr(itoa(ControllerGetLinearVelocity()), 92, 60, SMALL, FCOLOR, BCOLOR);
-//	LcdSetRect(104, 60, 112, SCREEN_MAX, FILL, BCOLOR);
-//	LcdPutStr(itoa(ControllerGetAngularVelocity()), 104, 60, SMALL, FCOLOR, BCOLOR);
 	LcdSetRect(104, 60, 112, SCREEN_MAX, FILL, BCOLOR);
-//	LcdPutStr(itoa(odomCombined[3]), 116, 60, SMALL, FCOLOR, BCOLOR);
-//	LcdPutStr(itoa(odomCombined[3]), 116, 60, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr(itoa(ticks[0]), 104, 60, SMALL, FCOLOR, BCOLOR);
-	LcdSetRect(112, 60, 128, SCREEN_MAX, FILL, BCOLOR);
-	LcdPutStr(itoa(ticks[1]), 112, 60, SMALL, FCOLOR, BCOLOR);
-//	LcdPutStr(itoa(1), 128, 60, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa(ControllerGetAngularVelocity()), 104, 60, SMALL, FCOLOR, BCOLOR);
+
+	LcdSetRect(116, 60, 124, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(kp_lv), 116, 60, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa(ki_lv), 116, 85, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa(kd_lv), 116, 110, SMALL, FCOLOR, BCOLOR);
+	LcdSetRect(128, 60, 136, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(kp_av), 128, 60, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa(ki_av), 128, 85, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa(kd_av), 128, 110, SMALL, FCOLOR, BCOLOR);
 }
 
 //void DisplayVelocity(void)

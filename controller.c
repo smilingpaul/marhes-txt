@@ -10,6 +10,8 @@
 boolean UseOdomComb = false, StopLostConn = true;
 int16_t linVelocity = 0, angVelocity = 0;
 int32_t combLinVelocity = 0, combAngVelocity = 0;
+int32_t kp_lv = 0, ki_lv = 0, kd_lv = 0;
+int32_t kp_av = 0, ki_av = 0, kd_av = 0;
 
 //static int16_t theta = 0;
 //static int16_t velocity = 0;
@@ -71,6 +73,17 @@ void ControllerSetOdomCombined(int32_t linVel, int32_t angVel)
 {
 	combLinVelocity = linVel;
 	combAngVelocity = angVel;
+}
+
+void ControllerSetPid(int32_t lp, int32_t li, int32_t ld, \
+					  int32_t ap, int32_t ai, int32_t ad)
+{
+  kp_lv = lp;
+  ki_lv = li;
+  kd_lv = ld;
+  kp_av = ap;
+  ki_av = ai;
+  kd_av = ad;
 }
 
 //void ControllerCalcPID(void)
