@@ -52,7 +52,9 @@ void ControllerSetLinearVelocity(int16_t value);
 int16_t ControllerGetLinearVelocity(void);
 void ControllerSetAngularVelocity(int16_t value);
 int16_t ControllerGetAngularVelocity(void);
-
+void ControllerSetOdomCombined(int32_t linVel, int32_t angVel);
+void ControllerSetPid(int32_t lp, int32_t li, int32_t ld, \
+					  int32_t ap, int32_t ai, int32_t ad);
 //void ControllerCalcPID(void);
 //uint32_t ControllerCalcPWM(uint16_t channel);
 //void ControllerSetTheta(int16_t value);

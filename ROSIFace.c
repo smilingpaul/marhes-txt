@@ -16,6 +16,7 @@
 // Storage for current data from ROS
 static int16_t velocityCmd[SIZE_VEL_ARR] = {0};
 int32_t odomCombined[SIZE_ODOM_ARR] = {0};
+static int32_t pidVals[SIZE_PID_ARR] = {0};
 
 // Storage for leftover data
 static uint8_t data[MAX_PACKET_SIZE];
@@ -67,7 +68,7 @@ void ROSProcessPacket(void)
                 dataNum = 0;                    // If cksum doesn't match, 
                                                 // restart the process
             }
-        }      
+        }
     }
 #else
     // While there is more data available in uart2
@@ -178,6 +179,25 @@ void ROSProcessData(void)
             CmdVelRxCount++;
             FIO0PIN ^= (1<<21);
             break;
+        case CMD_PID_RX:
+        	if (data[2] != SIZE_PID_RX + 2)
+        		break;
+
+        	pidVals[0] = (data[4] << 24) | (data[5] << 16) | \
+    				     (data[6] << 8) | data[7];
+        	pidVals[1] = (data[8] << 24) | (data[9] << 16) | \
+    				     (data[10] << 8) | data[11];
+        	pidVals[2] = (data[12] << 24) | (data[13] << 16) | \
+    				     (data[14] << 8) | data[15];
+        	pidVals[3] = (data[16] << 24) | (data[17] << 16) | \
+    				     (data[18] << 8) | data[19];
+        	pidVals[4] = (data[20] << 24) | (data[21] << 16) | \
+    				     (data[22] << 8) | data[23];
+        	pidVals[5] = (data[24] << 24) | (data[25] << 16) | \
+    				     (data[26] << 8) | data[27];
+        	ControllerSetPid(pidVals[0], pidVals[1], pidVals[2], \
+        			         pidVals[3], pidVals[4], pidVals[5]);
+        	break;
         default:
         
             break;   
