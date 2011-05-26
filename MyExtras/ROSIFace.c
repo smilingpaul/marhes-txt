@@ -184,7 +184,7 @@ void ROSProcessData(void)
             // Store velocity command values
             velocityCmd[0] = (int16_t)(data[4] << 8 | data[5]);
             velocityCmd[1] = (int16_t)(data[6] << 8 | data[7]);
-            FIO0PIN ^= (1<<21);
+            //FIO0PIN ^= (1<<21);
             break;
         default:
         

@@ -20,6 +20,7 @@ extern int32_t ticks[];
 extern int32_t vels[];
 extern float pos[];
 extern int32_t intCount;
+int32_t cnt = 0;
 
 //int32_t angtable[91]={0, 175, 349, 523, 698,872,1045,1219,1392,1564,1736,
 //		1908,2079,2250,2419,2588,2756,2924,3090,3256,3420,3584,3746,3907,4067,
@@ -89,7 +90,7 @@ void EncoderISR(void)
 		pos[0] += dx;
 		pos[1] += dy;
 		pos[2] += dth;
-		PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + 10000);
+		//PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + 10000);
 		if (pos[2] > 6283)
 			pos[2] -= 6283;
 
@@ -114,7 +115,12 @@ void EncoderISR(void)
 	if(T1IR | IR_MR1)
 	{
 		ControllerPIDLoop();
-//		FIO0PIN ^= (1<<21);
+		cnt++;
+		if(cnt > 10)
+		{
+		  FIO0PIN ^= (1<<21);
+		  cnt = 0;
+		}
 		T1IR |= IR_MR1;
 	}
 

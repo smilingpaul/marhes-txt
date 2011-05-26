@@ -177,7 +177,7 @@ void ROSProcessData(void)
             ControllerSetLinearVelocity(velocityCmd[0]);
             ControllerSetAngularVelocity(velocityCmd[1]);
             CmdVelRxCount++;
-            FIO0PIN ^= (1<<21);
+            //FIO0PIN ^= (1<<21);
             break;
         case CMD_PID_RX:
         	if (data[2] != SIZE_PID_RX + 2)
