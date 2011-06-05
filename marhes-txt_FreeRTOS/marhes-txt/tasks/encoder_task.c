@@ -1,3 +1,26 @@
+/**
+ @file encoder_task.c
+  
+ @brief The encoder task measures the amount of ticks on the encoders in certain
+        time intervals.
+        
+ The encoder task uses timer 0 and 3 to count rising and falling ticks from the
+ exclusive or'ed A and B quadrature signals from the encoders.  The task runs
+ at 20ms or 50Hz. The task then calculates the linear and angular velocities and 
+ the position and orientation from the encoder values. The encoder send task
+ sends the encoder packet to the ROS computer every 100 ms. The direction is
+ read using a flip flop with the A and B encoder signals. The direction is then 
+ a high or low signal.
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2011/06/03
+
+ Contact: titus.appel@gmail.com
+*/
+
 #include "tasks/encoder_task.h"
 
 extern xComPortHandle debugPortHandle, rosPortHandle;
@@ -15,17 +38,36 @@ float pos[SIZE_ENCODER_POS_ARR] = {0};			  /*!< The position with\n
                                                  {1} = ypos\n
                                                  {2} = theta.
                                                */
-                                               
+
+/// The lookup table for getting the cos and sin more efficiently.                                               
 int32_t angtable[91]={0,18,35,52,70,87,105,122,139,156,174,191,208,225,242,259,
 		276,292,309,326,342,358,375,391,407,423,438,454,470,485,500,515,530,545,
 		559,574,588,602,616,629,643,656,669,682,695,707,719,731,743,755,766,777,
 		788,799,809,819,829,839,848,857,866,875,883,891,899,906,914,921,927,934,
 		940,946,951,956,961,966,970,974,978,982,985,988,990,993,995,996,998,999,
 		999,1000,1000};  
+
+/// Storage for sending the encoder message to the ROS computer 
 static msg_u data;
-		
+
 int32_t anglookuptable(int32_t radians, int32_t type);
 
+/**
+ @brief The encoder task counts the ticks and calculates the position and 
+        velocities.
+        
+ The basic outline if as follows.
+ - Stop the counters.
+ - Filter out the noise of small rotations when stationary and store the tick 
+   counts.
+ - Reset and enable the counters.
+ - Calculate the velocities, change in position and orientation, and then add to 
+   position and orientation totals.
+ - Fix orientation to 0 - 2*Pi
+ - Delay until next reading
+ @param[in] pvParameters The parameters from the task create call
+ @todo Make the encoder sample rate variable
+*/
 static void vEncoderTask( void *pvParameters )
 {
   portTickType xLastWakeTime;
@@ -83,6 +125,11 @@ static void vEncoderTask( void *pvParameters )
   }
 }
 
+/**
+ @brief The encoder send task sends the current odometry information at a rate.
+ @param[in] pvParameters The parameters from the task create call
+ @todo Make the encoder send rate variable 
+*/
 static void vEncoderSendTask( void *pvParameters )
 {
   portTickType xLastWakeTime;
@@ -96,6 +143,10 @@ static void vEncoderSendTask( void *pvParameters )
 	}
 }
 
+/**
+ @brief Start both the encoder and the encoder send tasks.
+ @todo Should make the Priority and Stack Size reconfigurable. 
+*/
 void vEncoderTaskStart(void)
 {
   xTaskCreate( vEncoderTask, "EncoderTask", configMINIMAL_STACK_SIZE * 2, NULL, 4, NULL );
@@ -106,7 +157,8 @@ void vEncoderTaskStart(void)
 
     Initializes the Timer 0 and 3 peripherals to count rising and falling
     edges of the encoder signals.  The A and B encoder signals are XORed on the
-    connector board to get twice the resolution.  
+    connector board to get twice the resolution.  Also sets up the direction 
+    inputs.
  */
 void EncoderInit(void)
 {
@@ -144,6 +196,11 @@ void EncoderInit(void)
 	portEXIT_CRITICAL();
 }
 
+/**
+ @brief Gets the direction of the encoder.
+ @param[in] channel The encoder channel to get the direction
+ @return The direction of the encoder channel
+*/
 int8_t EncoderGetDirection(uint8_t channel)
 {
 	uint8_t val = 0;
@@ -159,16 +216,29 @@ int8_t EncoderGetDirection(uint8_t channel)
 		return 1;
 }
 
+/**
+ @brief Get the linear velocity from the encoders
+ @return The linear velocity
+*/
 int32_t EncoderLinVel(void)
 {
   return vels[VELS_LINEAR];
 }
 
+/**
+ @brief Get the angular velocity from the encoders
+ @return The angular velocity
+*/
 int32_t EncoderAngVel(void)
 {
   return vels[VELS_ANGULAR];
 }
 
+/**
+ @brief Calculates the cos or sin with radians from a lookup table
+ @param[in] radians The radians from 0-2*Pi
+ @param[in] type    The operation to do -> 0 - cos, 1 - sin
+*/
 //trig lookup table, type 0 for cos, 1 for sin, degrees is from 0->360
 int32_t anglookuptable(int32_t radians, int32_t type)
 {

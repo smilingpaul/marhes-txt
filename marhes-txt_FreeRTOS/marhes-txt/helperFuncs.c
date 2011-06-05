@@ -1,24 +1,28 @@
-/*
- * helperFuncs.c
+/**
+ * @file helperFuncs.c
+ * 
+ * @brief Includes some helper functions - itoa.
  *
- *  Created on: Aug 30, 2010
- *      Author: Titus
+ * @author Titus Appel
+ *
+ * @version 1.0
+ *
+ * @date 2010/08/30
+ *
+ * Contact: titus.appel@gmail.com
  */
 
-// Includes
 #include "helperFuncs.h"
 
-/*
-** itoa() - will convert integers to char array
-**
-** expects: an integer
-**
-** returns: pointer to it's buffer
-*/
-
-/* 10 digits + 1 sign + 1 trailing nul */
+/// The character buffer for conversion
 static char itoa_buf[INT_STR_LENGTH];
 
+/**
+ * @brief Converts an integer to a char array
+ *
+ * @param[in] i Input integer (positive or negative)
+ * @return Pointer to the char array's buffer
+ */
 char *itoa(int32_t i)
 {
     char *pos = itoa_buf + sizeof(itoa_buf) - 1;

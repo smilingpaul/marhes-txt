@@ -18,6 +18,11 @@
  *
  ****************************************************************************/
 
+/**
+ @file lpc23xx.h
+ @brief Hardware specific macro's and defines
+*/
+
 #ifndef __LPC23xx_H
 #define __LPC23xx_H
 

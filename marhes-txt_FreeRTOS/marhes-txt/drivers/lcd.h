@@ -1,9 +1,16 @@
-/*
- * lcd.h
- *
- *  Created on: Jul 25, 2010
- *      Author: Titus
- */
+/**
+ @file lcd.h
+  
+ @brief Contains function declarations and bit definitions for the LCD display.
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2010/07/25
+
+ Contact: titus.appel@gmail.com
+*/
 
 #ifndef LCD_H_
 #define LCD_H_
@@ -118,7 +125,6 @@
  *             Function declarations
  *************************************************************************/
 void LcdInit(void);
-void LcdChipSelect(char select);
 void LcdSendCommand(unsigned char command);
 void LcdSendData(unsigned char data);
 void LcdBacklight(unsigned char state);

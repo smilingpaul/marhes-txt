@@ -1,11 +1,31 @@
-/*
- * adc.c
- *
- *  Created on: Feb 23, 2011
- *      Author: titus
- */
+/**
+ @file adc.c
+  
+ @brief Includes functions to initialize the ADC on AD0.1, 3, 5, and 6 and get
+ the reading from specific channels
+
+ The ADC is set up to continuously sample the specified channels without
+ interrupting the processor. The clock is set up and after converting one one
+ channel it goes to the next and then repeats forever. Each channel has its own
+ register so the most up-to-date reading is in its channel's register. When the 
+ application needs a value it just reads the appropriate register.
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2011/06/03
+
+ Contact: titus.appel@gmail.com
+*/
 
 #include "adc.h"
+
+/**
+ @brief Initialize the ADC.
+ 
+ Setup the ADC to sample continuously on channels 1, 3, 5, and 6. 
+*/
 
 void ADCInit(void)
 {
@@ -23,6 +43,13 @@ void ADCInit(void)
 	AD0CR |= AD0CR_PDN;
 }
 
+/**
+ @brief Get the most up-to-date reading from the specified channel.
+ @param[in] channel The channel number to be read. Make sure its initialized
+                    first.
+ @return The value of the specified channel's reading  
+ @note Unused channels are commented out.
+*/
 unsigned portBASE_TYPE ADCGetChannel(unsigned portBASE_TYPE channel)
 {
 	switch(channel)

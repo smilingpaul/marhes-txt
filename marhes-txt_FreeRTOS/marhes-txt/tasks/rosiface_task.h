@@ -1,3 +1,20 @@
+/**
+ @file rosiface_task.h
+  
+ @brief Header for ROS Interface Packet Description
+         
+ Contains message types and sizes, and defines the packet structure with message
+ and header typedefs.
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2011/06/03
+
+ Contact: titus.appel@gmail.com
+*/
+
 #ifndef ROSIFACE_TASK_H_
 #define ROSIFACE_TASK_H_
 
@@ -36,31 +53,47 @@
 #define ROS_LINEAR_VEL		0
 #define ROS_ANGULAR_VEL		1
 
+/**
+ @brief The header of the message.  Provides access to individual bytes of the 
+        message header.
+*/
 #pragma pack(1)
 typedef struct {
-  uint8_t start_byte_1;
-  uint8_t start_byte_2;
-  uint8_t length;
-  uint8_t command;
+  uint8_t start_byte_1;           ///< The first start byte of the packet - 0xFA 
+  uint8_t start_byte_2;           ///< The first start byte of the packet - 0xFB 
+  uint8_t length;                 ///< The length of the data portion 
+  uint8_t command;                ///< The command byte 
 } header_t;
 #pragma pack()
 
+/**
+ @brief The union of the header struct with a byte array.  Allows the header
+        to be accessed byte name or by byte number.
+*/
 typedef union {
-  header_t var;
-  uint8_t bytes[HEADER_SIZE];
+  header_t var;                   ///< Access to the header struct 
+  uint8_t bytes[HEADER_SIZE];     ///< Access to numbered bytes
 } header_u;
 
+/**
+ @brief The message structure includes the header, data and the checksum.
+ @note The chksum value if not used. The checksum is normally part of the data.
+*/
 #pragma pack(1)
 typedef struct {
-  header_u header;
-  uint8_t data[MAX_DATA_SIZE];
-  uint16_t chksum;
+  header_u header;                ///< The message header
+  uint8_t data[MAX_DATA_SIZE];    ///< The data portion of the message
+  uint16_t chksum;                ///< The checksum of the message
 } msg_t;
 #pragma pack()
 
+/**
+ @brief The union of the message structure with a byte array.  Allows the 
+        message to be accessed by name or by byte number.
+*/
 typedef union {
-  msg_t var;
-  uint8_t bytes[MAX_PACKET_SIZE];
+  msg_t var;                      ///< Access to the message struct
+  uint8_t bytes[MAX_PACKET_SIZE]; ///< Access to numbered bytes
 } msg_u;
 
 void ROSBuildHeader(msg_u * pmsg, uint8_t dataSize, uint8_t command);

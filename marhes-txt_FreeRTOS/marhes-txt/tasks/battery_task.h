@@ -1,3 +1,17 @@
+/**
+ @file battery_task.h
+  
+ @brief Provides the constants and function declarations for the battery task.
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2011/06/03
+
+ Contact: titus.appel@gmail.com
+*/
+
 #ifndef BATTERY_TASK_H_
 #define BATTERY_TASK_H_
 
@@ -7,15 +21,15 @@
 #include "drivers/adc.h"
 #include "tasks/rosiface_task.h"
 
-#define BATTERY_1		1
-#define BATTERY_2		3
+#define BATTERY_1		1               ///< Battery 1 ADC input channel
+#define BATTERY_2		3               ///< Battery 1 ADC input channel
 
-#define BATTERY_GOOD		0
-#define BATTERY_WARN		1
-#define BATTERY_BAD			2
+#define BATTERY_GOOD		0           ///< Battery status good
+#define BATTERY_WARN		1           ///< Battery status warning
+#define BATTERY_BAD			2           ///< Battery status bad
 
-#define BATTERY_VWARN		900
-#define BATTERY_VBAD		700
+#define BATTERY_VWARN		900         ///< Battery status warning voltage
+#define BATTERY_VBAD		700         ///< Battery status bad voltage
 
 void vBatteryTaskStart(void);
 void BatteryUpdateVoltages(void);

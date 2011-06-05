@@ -1,9 +1,16 @@
-/*
- * timer.h
- *
- *  Created on: Feb 27, 2011
- *      Author: titus
- */
+/**
+ @file timer.h
+  
+ @brief Includes general define bits for all four timers
+        
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2011/02/27
+
+ Contact: titus.appel@gmail.com
+*/
 
 #ifndef TIMER_H_
 #define TIMER_H_

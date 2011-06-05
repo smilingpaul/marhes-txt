@@ -1,8 +1,36 @@
+/**
+ @file display_task.c
+  
+ @brief This task updates the display and sets the brightness of the backlight.
+ 
+ The task updates the display and brightness every 100ms.  The display is
+ preconfigured to a few types:
+ - Display Status
+ - Display 2
+ - Display 3
+ The data in the display is updated at every step. If the display is switched,
+ then the labels of the data are updated once. The brightness uses PWM6 and AD5.
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2011/06/03
+
+ Contact: titus.appel@gmail.com
+*/
+
 #include "display_task.h"
 
-static int8_t DisplayState;
-static int8_t SwitchedState;
+static int8_t DisplayState;           ///< The display type to show
+static int8_t SwitchedState;          ///< If the display has switch states
 
+/**
+ @brief The display task first initializes the display, then updates it and the
+        brightness of the backlight.
+ @param[in] pvParameters The parameters from the task create call
+ @todo Allow the delay to be variable 
+*/
 static void vDisplayTask( void *pvParameters )
 {
   DisplayInit();
@@ -16,11 +44,19 @@ static void vDisplayTask( void *pvParameters )
   }
 }
 
+/**
+ @brief Start the display task.
+ @todo Should make the Priority and Stack Size reconfigurable.
+*/
 void vDisplayTaskStart(void)
 {
   xTaskCreate( vDisplayTask, "DisplayTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
 }
 
+/**
+ @brief Initialize the display to the status screen and start by clearing the 
+        screen.
+*/
 void DisplayInit(void)
 {
     DisplayState = DISPLAY_STATUS;
@@ -28,6 +64,9 @@ void DisplayInit(void)
     LcdClearScreen(BCOLOR);
 }
 
+/**
+ @brief Decrease the screen state type.
+*/
 void DisplayDecreaseState(void)
 {
   DisplayState--;
@@ -36,6 +75,9 @@ void DisplayDecreaseState(void)
   SwitchedState = 1;  
 }
 
+/**
+ @brief Increase the screen state type.
+*/
 void DisplayIncreaseState(void)
 {
   DisplayState++;
@@ -44,6 +86,9 @@ void DisplayIncreaseState(void)
   SwitchedState = 1;  
 }
 
+/**
+ @brief Update the display to the correct type.
+*/
 void DisplayUpdate(void)
 {
   switch(DisplayState)
@@ -63,12 +108,18 @@ void DisplayUpdate(void)
   }
 }
 
+/**
+ @brief Read the potentiometer and then set the duty cycle of the backlight.
+*/
 void DisplayBrightUpdate(void)
 {
   int16_t val = ADCGetChannel(5);
   PWMSetDuty(6, (val * 1407));
 }
 
+/**
+ @brief Update the display to the status screen.
+*/
 void DisplayStatus(void)
 {
   unsigned portBASE_TYPE temp;
@@ -141,6 +192,9 @@ void DisplayStatus(void)
 	LcdPutStr(itoa(ControllerGetPid(5)), 116, 110, SMALL, FCOLOR, BCOLOR);
 }
 
+/**
+ @brief Update the display to the 2nd screen.
+*/
 void Display2(void)
 {
 	if (SwitchedState)
@@ -152,6 +206,9 @@ void Display2(void)
   }
 }
 
+/**
+ @brief Update the display to the 3rd screen.
+*/
 void Display3(void)
 {
 	if (SwitchedState)

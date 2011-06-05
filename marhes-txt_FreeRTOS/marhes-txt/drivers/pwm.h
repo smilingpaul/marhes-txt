@@ -1,9 +1,16 @@
-/*
- * pwm.h
- *
- *  Created on: May 29, 2010
- *      Author: Titus
- */
+/**
+ @file pwm.h
+  
+ @brief Includes PWM bit defines and functions declarations.
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2010/05/29
+
+ Contact: titus.appel@gmail.com
+*/
 
 #ifndef PWM_H_
 #define PWM_H_

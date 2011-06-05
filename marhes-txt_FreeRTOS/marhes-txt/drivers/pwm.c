@@ -1,38 +1,43 @@
-/*
- * pwm.c
- *
- *  Created on: May 29, 2010
- *      Author: Titus
- *
- *  Description:
- *  	pwm.c allows the setup of the PWM peripheral for control of the
- *  	motor controller and servos.  Both motors take a PWM signal
- *  	at 50Hz.  1msec on time is full one way, 1.5msec on time is in
- *  	the middle, and 2msec on time is full the other way.  All six
- *  	PWM outputs are set up for 50Hz and 1.5msec on time. A function
- *  	is provided to set the PWM on times.  Another function get the
- *  	current on time.
- *
- *  Output Pins:
- *  	  P2.0 - PWM1.1 - EXT2-37
- *    	P2.1 - PWM1.2 - EXT2-36
- *    	P2.2 - PWM1.3 - EXT2-35
- *    	P2.3 - PWM1.4 - EXT2-34
- *    	P2.4 - PWM1.5 - EXT2-33
- *    	P2.5 - PWM1.6 - EXT2-32
- */
+/**
+ @file pwm.c
+  
+ @brief Sets up the PWM peripheral for the motor controller and servos.
+ 
+ @par Description
+ pwm.c allows the setup of the PWM peripheral for control of the
+ motor controller and servos.  Both motors take a PWM signal
+ at 50Hz.  1msec on time is full one way, 1.5msec on time is in
+ the middle, and 2msec on time is full the other way.  All six
+ PWM outputs are set up for 50Hz and 1.5msec on time. A function
+ is provided to set the PWM on times.  Another function get the
+ current on time.
+ 
+ @par Output Pins 
+ - P2.0 - PWM1.1 - EXT2-37
+ - P2.1 - PWM1.2 - EXT2-36
+ - P2.2 - PWM1.3 - EXT2-35
+ - P2.3 - PWM1.4 - EXT2-34
+ - P2.4 - PWM1.5 - EXT2-33
+ - P1.26- PWM1.6 - EXT2-20 
+ 
+ @note PWM1.6 is used for the backlight of the LCD
+  
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2010/05/29
+
+ Contact: titus.appel@gmail.com
+*/
 
 #include "pwm.h"
 
-/*************************************************************************
- * Function Name: PWMInit
- * Parameters: void
- * Return: void
- *
- * Description: Sets up PWM 1-6 on pins P2.0-P2.5, initial frequency is 50Hz
- * and initial duty cycle is 1.5ms on time.
- *
- *************************************************************************/
+ /**
+ @brief Sets up PWM 1-6 on pins P2.0-P2.5, initial frequency is 50Hz
+        and initial duty cycle is 1.5ms on time.
+ @note  PWM6 is for LCD Brightness
+*/
 void PWMInit(void)
 {
 	// 1. First turn on PWM peripheral
@@ -75,16 +80,12 @@ void PWMInit(void)
 	PWM1LER = LER_ALL;
 }
 
-/*************************************************************************
- * Function Name: PWMSetDuty
- * Parameters: channel - the pwm channel, valid values are 1-6
- * 			   duty - the value to load in the channels match register
- * Return: void
- *
- * Description: Sets the match register of the specified channel to change
- *              the duty cycle.  The output goes low on match.
- *
- *************************************************************************/
+/**
+ @brief Sets the match register of the specified channel to change
+        the duty cycle.  The output goes low on match.
+ @param[in] channel The pwm channel, valid values are 1-6
+ @param[in] duty    The value to load in the channels match register
+*/
 void PWMSetDuty(char channel, unsigned long duty)
 {
 	// Load the correct match register with duty
@@ -118,14 +119,11 @@ void PWMSetDuty(char channel, unsigned long duty)
 		PWM1LER |= (1<<channel);
 }
 
-/*************************************************************************
- * Function Name: PWMGetDuty
- * Parameters: 	channel - the pwm channel, valid values are 1-6
- *
- * Return: 		duty - the value loaded in the channels match register
- *
- * Description: Gets the match register of the specified channel.
- *************************************************************************/
+/**
+ @brief Gets the match register of the specified channel.
+ @param[in] channel The pwm channel, valid values are 1-6
+ @return            The value to load in the channels match register
+*/
 unsigned long PWMGetDuty(char channel)
 {
 	unsigned long duty = 0;
