@@ -1,10 +1,62 @@
+/**
+ @file rosiface_task.c
+  
+ @brief Parses or assembles messages from the ROS serial port.
+ 
+ @par TX
+ This code provides the functions needed to assemble and build different
+ message types to send to the ROS computer. The checksums are also calculated
+ here.
+ 
+ @par RX
+ A FreeRTOS task is made to received and parse messages and then update data.
+ The task is blocked until data is on the RX queue and then it is processed
+ accordingly.
+ 
+ @par Message Format
+ The message format is a simple header, a data section, and then a 2-byte 
+ checksum. The following table shows this structure.  The checksum is the
+ addition of the command byte to the last data byte in two byte pairs. If there
+ is an odd byte at the end, exclusive or it to the lower byte of the checksum.
+ <table border="0" rules="all" cellpadding="5">
+   <tr>
+     <th colspan="4">Header</th>
+     <th>Data</th>
+     <th>Checksum</th>
+   </tr>
+   <tr>
+     <th>Start Byte 1 - 0xFA</th>
+     <th>Start Byte 2 - 0xFB</th>
+     <th>Data Length Byte</th>
+     <th>Command Byte</th>
+     <th>Data Bytes ( <= 249 )</th>
+     <th>Checksum Bytes = 2</th> 
+   </tr>
+ </table> 
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2011/06/03
+
+ Contact: titus.appel@gmail.com
+*/
+
 #include "tasks/rosiface_task.h"
 
 extern xComPortHandle rosPortHandle;
 
-static msg_u data;
-int32_t pidVals[6];
+///< The message structure that stores incoming data for parsing.
+static msg_u data;                           
 
+/**
+ @brief Builds the ROS header for a message.
+ @param[out] pmsg A pointer to the message to build the header
+ @param[in] dataSize The size of the message
+ @param[in] command The command to write to the message 
+ @note Called from BuildMsg functions.
+*/
 void ROSBuildHeader(msg_u * pmsg, uint8_t dataSize, uint8_t command)
 {
   pmsg->var.header.var.start_byte_1 = 0xFA;   // Write 2 header bytes
@@ -14,6 +66,11 @@ void ROSBuildHeader(msg_u * pmsg, uint8_t dataSize, uint8_t command)
   
 }
 
+/**
+ @brief Calculates and returns the checksum of the message.
+ @param[out] pmsg A pointer to the message to build the header
+ @return          The checksum of the message
+*/
 uint16_t ROSCalcChkSum(msg_u * pmsg)
 {
   uint8_t *buffer = &pmsg->var.header.var.command;
@@ -39,6 +96,15 @@ uint16_t ROSCalcChkSum(msg_u * pmsg)
   return((uint16_t)c);
 }
 
+/**
+ @brief Builds an encoder odometry message to send to the ROS computer.
+ @param[out] pmsg A pointer to the message to build the header
+ @param[in] x_mm    The x position in mm
+ @param[in] y_mm    The y position in mm
+ @param[in] th_mrad The orientation in mrad
+ @param[in] linVel  The linear velocity in mm/s
+ @param[in] andVel  The angular velocity in mrad/s
+*/
 void ROSSendOdomEnc(msg_u * pmsg, \
                     int32_t x_mm, int32_t y_mm, int32_t th_mrad, \
 		                int32_t linVel, int32_t angVel)
@@ -80,6 +146,12 @@ void ROSSendOdomEnc(msg_u * pmsg, \
 	vSerialPutString( rosPortHandle, pmsg->bytes,  pmsg->var.header.var.length + HEADER_SIZE + CHKSUM_SIZE);
 }
 
+/**
+ @brief Builds a battery message to send to the ROS computer.
+ @param[out] pmsg   A pointer to the message to build the header
+ @param[in] batt1   The voltage of Battery 1
+ @param[in] batt2   The voltage of Battery 2
+*/
 void ROSSendBattery(msg_u * pmsg, uint16_t batt1, uint16_t batt2)
 {
 	uint16_t checksum;
@@ -100,6 +172,15 @@ void ROSSendBattery(msg_u * pmsg, uint16_t batt1, uint16_t batt2)
 	//FIO0PIN ^= (1<<21);
 }
 
+/**
+ @brief The task to parse received data.
+ 
+ This task runs continuously but is blocked infinitely when there is no data on
+ the queue. When data arrives, it waits for the two start bytes. Then it 
+ receives data until the all the data required by the data length byte and the 
+ two byte checksum are received. Then the checksum is verified and if true, 
+ the message is processed.
+*/
 static void vRxTask( void *pvParameters )
 {
   // Storage for leftover data
@@ -146,11 +227,19 @@ static void vRxTask( void *pvParameters )
   }
 }
 
+/**
+ @brief Starts the receive task.
+ @todo Should make the Priority and Stack Size reconfigurable.
+*/
 void vRxTaskStart(void)
 {
   xTaskCreate( vRxTask, "RxTask", configMINIMAL_STACK_SIZE, NULL, 3, NULL );
 }
 
+/**
+ @brief Verifies if the received checksum and the calculated checksum identical.
+ @return True if checksum is correct, false if incorrect.
+*/
 int8_t ROSChecksum(void)
 {
   uint8_t *buffer = &data.var.header.var.command;
@@ -182,8 +271,20 @@ int8_t ROSChecksum(void)
   return 0;
 }
 
+/**
+ @brief Processes the verified data and updates variables.
+ 
+ Uses the command byte to process the data correctly. Then checks if the size of
+ the message is correct for the command byte. Then it processes the data. The
+ types of messages that are processed are:
+ - Combined Odometry Message - The filtered odometry from the ROS computer.
+ - Velocity Command Message - The desired velocity from the ROS computer.
+ - PID Gain Set Message - The desired PID gains from the ROS computer.
+*/
 void ROSProcessData(void)
 {
+  static int32_t pidVals[6];
+  
   switch(data.var.header.var.command)
   {
     case CMD_ODOM_COMB:

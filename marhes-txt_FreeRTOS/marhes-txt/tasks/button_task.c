@@ -1,7 +1,29 @@
+/**
+ @file button_task.c
+  
+ @brief The task that reads the button inputs and detectes pressed transitions.
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2011/06/03
+
+ Contact: titus.appel@gmail.com
+*/
+
 #include "tasks/button_task.h"
 
 extern xComPortHandle debugPortHandle;
 
+/**
+ @brief The button task checks the state of the button inputs every 1/10 second.
+ 
+ After it checks the state, it adjusts the Display if the Left of Right buttons
+ are pressed. It also prints to the debug serial port if anything changed.
+ 
+ @param[in] pvParameters The parameters from the task create call
+*/
 static void vButtonTask( void *pvParameters )
 {
   uint8_t buttonChanged;
@@ -26,11 +48,18 @@ static void vButtonTask( void *pvParameters )
   }
 }
 
+/**
+ @brief Start the button task
+ @todo Should make the Priority and Stack Size reconfigurable. 
+*/
 void vButtonTaskStart(void)
 {
   xTaskCreate( vButtonTask, "ButtonTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
 }
 
+/**
+ @brief Initialize the button inputs
+*/
 void ButtonInit(void)
 {
     // Set direction for buttons to inputs (clear the bit)
@@ -38,6 +67,16 @@ void ButtonInit(void)
     FIO1DIR &= ~(BUT_CENTER | BUT_UP | BUT_DOWN | BUT_RIGHT | BUT_LEFT);
 }
 
+/**
+ @brief Get the buttons that have changed from unpressed to pressed.
+ 
+ This method gets the inputs that have been pressed since the previous call to 
+ this method. Since this method depends on the previous call, it should be
+ called regularly to get changes in the button presses.
+ 
+ @return The buttonState where 1's are buttons that have been pressed from the 
+         previous timestep.
+*/
 uint8_t ButtonGetChangedHigh(void)
 {
     static uint8_t prevButtonState = 0;

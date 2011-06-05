@@ -1,3 +1,22 @@
+/**
+ @file controller_task.c
+  
+ @brief This task controls the linear and angular velocities.
+ 
+ Need to work on more.
+  
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2011/06/03
+
+ Contact: titus.appel@gmail.com
+ 
+ @todo Linear velocity controller
+ @todo Angular velocity controller
+*/
+
 #include "tasks/controller_task.h"
 
 extern xComPortHandle debugPortHandle;

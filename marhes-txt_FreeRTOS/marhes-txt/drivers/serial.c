@@ -1,3 +1,21 @@
+/**
+ @file serial.c
+  
+ @brief Includes functions to initialize, read and write data to uart 0 and 1.
+        
+ This code is from the FreeRTOS Demo application. It is modified to use both
+ serial ports 0 and 1. Baudrates can be set, but the data is fixed 8N1. This 
+ uses the serial.h in the Common/includes directory of FreeRTOS.
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2010/07/25
+
+ Contact: titus.appel@gmail.com
+*/
+
 /*
     FreeRTOS V7.0.1 - Copyright (C) 2011 Real Time Engineers Ltd.
 	
@@ -126,23 +144,27 @@
 
 /*-----------------------------------------------------------*/
 
-/* Queues used to hold received characters, and characters waiting to be
-transmitted. */
+/// Queue used to hold received characters
 static xQueueHandle xRxedChars[2]; 
+
+/// Queue used to hold characters waiting to be transmitted
 static xQueueHandle xCharsForTx[2]; 
+
+/// Communication flag between the interrupt service routine and serial API
+static volatile long *plTHREEmpty[2];
+
+/// The handles for serial port 0 and 1
+const uint32_t portHandles[2] = {0, 1};
 
 /*-----------------------------------------------------------*/
 
-/* Communication flag between the interrupt service routine and serial API. */
-static volatile long *plTHREEmpty[2];
-
-const uint32_t portHandles[2] = {0, 1};
-
-/**
- * Lookup the baud rate from the enum.
- */
 static unsigned long prvBaud( eBaud eWantedBaud ); 
 
+/**
+ @brief Lookup the baud rate from the enum.
+ @param[in] eWantedBaud The specified baud rate from the enum.
+ @return                The integer value of the baud rate.
+*/
 static unsigned long prvBaud( eBaud eWantedBaud )
 {
 	switch( eWantedBaud )
@@ -171,11 +193,24 @@ static unsigned long prvBaud( eBaud eWantedBaud )
  * The queues are created in serialISR.c as they are used from the ISR.
  * Obtain references to the queues and THRE Empty flag. 
  */
-void vSerialISRCreateQueues(	unsigned portBASE_TYPE port, unsigned portBASE_TYPE uxQueueLength, xQueueHandle *pxRxedChars, 
-								xQueueHandle *pxCharsForTx, long volatile **pplTHREEmptyFlag );
+extern void vSerialISRCreateQueues(	unsigned portBASE_TYPE port, \
+     unsigned portBASE_TYPE uxQueueLength, xQueueHandle *pxRxedChars, \
+     xQueueHandle *pxCharsForTx, long volatile **pplTHREEmptyFlag );
 
 /*-----------------------------------------------------------*/
 
+/**
+ @brief Initializes the specified serial port (0, 1) to the desired baud rate
+        and queue size.
+ @param[in] ePort The desired port number.
+ @param[in] eWantedBaud     The specified baud rate from the enum.
+ @param[in] eWantedParity   The specified parity
+ @param[in] eWantedDataBits The specified number of data bits
+ @param[in] eWantedStopBits The specified number of stop bits
+ @param[in] uxBufferLength  The specified queue length
+ @return                    The Serial Port Handle.
+ @note The parity, data bits, and stop bits are permanently set to 8N1.
+*/
 xComPortHandle xSerialPortInit( eCOMPort ePort, eBaud eWantedBaud, eParity eWantedParity, eDataBits eWantedDataBits, eStopBits        
                                 eWantedStopBits, unsigned portBASE_TYPE uxBufferLength )
 {
@@ -293,6 +328,13 @@ unsigned char ucPort;
   return xReturn;
 }
 
+/**
+ @brief Initializes the UART0 to the desired baud rate and queue size.
+ @param[in] ulWantedBaud    The specified baud rate.
+ @param[in] ulQueueLength   The specified queue length
+ @return                    The Serial Port Handle.
+ @note The parity, data bits, and stop bits are permanently set to 8N1.
+*/
 xComPortHandle xSerialPortInitMinimal( unsigned long ulWantedBaud, unsigned portBASE_TYPE uxQueueLength )
 {
 unsigned long ulDivisor, ulWantedClock;
@@ -355,6 +397,13 @@ extern void ( vUART_ISR_Wrapper )( void );
 }
 /*-----------------------------------------------------------*/
 
+/**
+ @brief Gets the next character on the rx queue.
+ @param[in]  pxPort      The port to read.
+ @param[out] *pcRxedChar The location to write the received character.
+ @param[in]  xBlockTime  The time to wait for next character until exiting.
+ @return                 True, if character received. False, if no character.
+*/
 signed portBASE_TYPE xSerialGetChar( xComPortHandle pxPort, signed char *pcRxedChar, portTickType xBlockTime )
 {
 	/* The port handle is not required as this driver only supports UART0. */
@@ -375,6 +424,13 @@ signed portBASE_TYPE xSerialGetChar( xComPortHandle pxPort, signed char *pcRxedC
 }
 /*-----------------------------------------------------------*/
 
+/**
+ @brief Write the string to the port.
+ @param[in] pxPort         The port to write to.
+ @param[in] *pcString      The array of characters to write to the port.
+ @param[in] usStringLength The size of the charater array.
+ @note Enters critical mode until all data is written.
+*/
 void vSerialPutString( xComPortHandle pxPort, const signed char * const pcString, unsigned short usStringLength )
 {
 signed char *pxNext;
@@ -402,6 +458,18 @@ unsigned short cnt = 0;
 }
 /*-----------------------------------------------------------*/
 
+/**
+ @brief Writes the character to the port.
+ 
+ If there is room in the fifo data is written directly to it. If there is no 
+ room, it is stored in the queue for the ISR to handle it.
+ 
+ @param[in] pxPort     The port to write to.
+ @param[in] cOutChar   The character to write to the port.
+ @param[in] xBlockTime The time to wait to write to the queue.
+ @return               True is success, false if failure.
+ @note Enters critical mode until character is written.
+*/
 signed portBASE_TYPE xSerialPutChar( xComPortHandle pxPort, signed char cOutChar, portTickType xBlockTime )
 {
 signed portBASE_TYPE xReturn;
@@ -452,6 +520,11 @@ signed portBASE_TYPE xReturn;
 }
 /*-----------------------------------------------------------*/
 
+/**
+ @brief Closes serial port
+ @param[in] xPort The serial port handle to close
+ @note Not Implemented
+*/
 void vSerialClose( xComPortHandle xPort )
 {
 	/* Not supported as not required by the demo application. */

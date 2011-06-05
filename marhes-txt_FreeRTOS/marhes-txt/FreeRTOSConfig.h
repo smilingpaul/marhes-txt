@@ -68,6 +68,17 @@
  *
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
+ 
+/**
+ @file FreeRTOSConfig.h
+ @brief Application specific definitions.
+ 
+ These definitions should be adjusted for your particular hardware and
+ application requirements.
+ THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
+ FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE. 
+ See http://www.freertos.org/a00110.html.
+*/
 
 /* Value to use on old rev '-' devices. */
 //#define configPINSEL2_VALUE	0x50151105
@@ -132,11 +143,5 @@ to exclude the API function. */
 
 #ifndef BIT
 #define BIT(x)	(1 << (x))
-
-typedef struct
-{
-	long xColumn;
-	char *pcMessage;
-} xLCDMessage;
 
 #endif

@@ -1,3 +1,17 @@
+/**
+ @file controller_task.h
+  
+ @brief Contains the PWM channels, min and max values, and function declarations
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2011/06/03
+
+ Contact: titus.appel@gmail.com
+*/
+
 #ifndef CONTROLLER_TASK_H_
 #define CONTROLLER_TASK_H_
 
@@ -33,9 +47,16 @@
 #define THETA_PWM_MAX				144000	// PWM - Freq = 0x15F900 (1440000)
 #define THETA_PWM_MIN				72000
 
-// Gain Defines
-enum GAINS{ KP_LV, KI_LV, KD_LV, KP_AV, KI_AV, KD_AV };
-
+/**
+ @brief Array indices for the pid gain matrix
+*/
+enum GAINS{ KP_LV,                  ///< Linear Velocity Proportional Gain 
+            KI_LV,                  ///< Linear Velocity Integral Gain
+            KD_LV,                  ///< Linear Velocity Derivative Gain
+            KP_AV,                  ///< Angular Velocity Proportional Gain
+            KI_AV,                  ///< Angular Velocity Integral Gain
+            KD_AV                   ///< Angular Velocity Derivative Gain
+          };
 void vControllerTaskStart(void);
 void ControllerSetLinearVelocity(int16_t value);
 int16_t ControllerGetLinearVelocity(void);

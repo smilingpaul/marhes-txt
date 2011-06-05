@@ -1,3 +1,23 @@
+/**
+ @file serialISR.c
+  
+ @brief Includes the serial ISR and a queue initialization function.
+        
+ This code is from the FreeRTOS Demo application. It is modified to use both
+ serial ports 0 and 1. It handles serial interrupts to efficiently send and 
+ receive data.
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2010/07/25
+ 
+ @note Must be compiled in ARM mode because of ISR.
+
+ Contact: titus.appel@gmail.com
+*/
+
 /*
     FreeRTOS V7.0.1 - Copyright (C) 2011 Real Time Engineers Ltd.
 	
@@ -84,10 +104,13 @@
 #define serSOURCE_RX					( ( unsigned char ) 0x04 )
 #define serINTERRUPT_SOURCE_MASK		( ( unsigned char ) 0x0f )
 
-/* Queues used to hold received characters, and characters waiting to be
-transmitted. */
+/// Queue used to hold received characters
 static xQueueHandle xRxedChars[2]; 
+
+/// Queue used to hold characters waiting to be transmitted
 static xQueueHandle xCharsForTx[2]; 
+
+/// Communication flag between the interrupt service routine and serial API
 static volatile long lTHREEmpty[2];
 
 /*-----------------------------------------------------------*/
@@ -96,18 +119,41 @@ static volatile long lTHREEmpty[2];
  * The queues are created in serialISR.c as they are used from the ISR.
  * Obtain references to the queues and THRE Empty flag. 
  */
-void vSerialISRCreateQueues(	unsigned portBASE_TYPE port, unsigned portBASE_TYPE uxQueueLength, xQueueHandle *pxRxedChars, 
-								xQueueHandle *pxCharsForTx, long volatile **pplTHREEmptyFlag );
+/**
+ @brief Creates the RX and TX queues in the ISR so it can use them. Returns
+        their pointers so serial.c can used them also.
+ @param[in] port                The serial port queues to create
+ @param[in] uxQueueLength       The length of the queues
+ @param[out] *pxRxedChars       Queue used to hold received characters
+ @param[out] *pxCharsForTx      Queue to hold characters waiting transmittion
+ @param[out] **pplTHREEmptyFlag Communication flag between the interrupt service 
+                                routine and serial API
+*/
+void vSerialISRCreateQueues(	unsigned portBASE_TYPE port, \
+     unsigned portBASE_TYPE uxQueueLength, xQueueHandle *pxRxedChars, \
+     xQueueHandle *pxCharsForTx, long volatile **pplTHREEmptyFlag );
 
-/* UART0 interrupt service routine entry point. */
+/* UART interrupt service routine entry point. */
 void vUART_ISR_Wrapper( void ) __attribute__ ((naked));
 
-/* UART0 interrupt service routine handler. */
+/* UART interrupt service routine handler. */
 void vUART_ISR_Handler( void ) __attribute__ ((noinline));
 
 /*-----------------------------------------------------------*/
-void vSerialISRCreateQueues(	unsigned portBASE_TYPE port, unsigned portBASE_TYPE uxQueueLength, xQueueHandle *pxRxedChars, 
-								xQueueHandle *pxCharsForTx, long volatile **pplTHREEmptyFlag )
+
+/**
+ @brief Creates the RX and TX queues in the ISR so it can use them. Returns
+        their pointers so serial.c can used them also.
+ @param[in] port                The serial port queues to create
+ @param[in] uxQueueLength       The length of the queues
+ @param[out] *pxRxedChars       Queue used to hold received characters
+ @param[out] *pxCharsForTx      Queue to hold characters waiting transmittion
+ @param[out] **pplTHREEmptyFlag Communication flag between the interrupt service 
+                                routine and serial API
+*/
+void vSerialISRCreateQueues(	unsigned portBASE_TYPE port, \
+     unsigned portBASE_TYPE uxQueueLength, xQueueHandle *pxRxedChars, \
+     xQueueHandle *pxCharsForTx, long volatile **pplTHREEmptyFlag )
 {
 	/* Create the queues used to hold Rx and Tx characters. */
 	xRxedChars[port] = xQueueCreate( uxQueueLength, ( unsigned portBASE_TYPE ) sizeof( signed char ) );
@@ -124,6 +170,12 @@ void vSerialISRCreateQueues(	unsigned portBASE_TYPE port, unsigned portBASE_TYPE
 }
 /*-----------------------------------------------------------*/
 
+/**
+ @brief Wrapper for the serial interrupt vector.
+ 
+ FreeRTOS can save the context (all registers, stack positions, etc.) 
+ so everything doesn't get screwed up because the ARM doesn't do that for you.
+*/
 void vUART_ISR_Wrapper( void )
 {
 	/* Save the context of the interrupted task. */
@@ -138,6 +190,14 @@ void vUART_ISR_Wrapper( void )
 }
 /*-----------------------------------------------------------*/
 
+/**
+ @brief Serial ISR
+ 
+ This ISR handles both UART0 and 1. The ISR handles data that wouldn't fit in 
+ the ISR by writing the data written to the queue. The received data is put onto
+ the queue. Error interrupts are not handled, the interrupts are just cleared.
+ @note Use the wrapper function instead so the context gets saved.
+*/
 void vUART_ISR_Handler( void )
 {
 signed char cChar;

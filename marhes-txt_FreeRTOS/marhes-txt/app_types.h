@@ -1,22 +1,29 @@
-/******************************************************************************
+/**
+ * @file app_types.h
+ * 
+ * @brief Defines some regularly used typedefs
  *
- * $RCSfile: $
- * $Revision: $
+ * @author Titus Appel
  *
- * This module defines some regularly used typedefs
+ * @version 1.0
  *
- *****************************************************************************/
+ * @date 2011/06/03
+ *
+ * Contact: titus.appel@gmail.com
+ */
 
 #ifndef APP_TYPES_H__
 #define APP_TYPES_H__
 
-/*  typedefs are here  */
-#include <stdint.h>
-#include <stdlib.h> /* NULL */
+// Typedefs are here
+#include <stdint.h>  
+// NULL                   
+#include <stdlib.h>                     
 //#include <string.h>
 #include <stdio.h>
 #include <math.h>
 
+/// The boolean type
 typedef enum {false, true}  boolean;
 
 #endif

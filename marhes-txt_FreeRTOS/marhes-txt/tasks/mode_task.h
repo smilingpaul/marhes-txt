@@ -1,3 +1,17 @@
+/**
+ @file mode_task.h
+  
+ @brief Provides function declarations to update the modes of operation.
+ 
+ @author Titus Appel
+
+ @version 1.0
+
+ @date 2011/06/03
+
+ Contact: titus.appel@gmail.com
+*/
+
 #ifndef MODE_TASK_H_
 #define MODE_TASK_H_
 
