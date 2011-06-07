@@ -24,7 +24,7 @@
 #include "helperFuncs.h"
 
 #define DISPLAY_STATUS		  0             ///< Status display type
-#define DISPLAY_VEL		      1             ///< Velocity display type
+#define DISPLAY_PWM		      1             ///< PWM display type
 #define DISPLAY_ENCODER		  2             ///< Encoder display type
 
 #define DISPLAY_MIN         0             ///< Min display type
@@ -42,7 +42,7 @@ void DisplayIncreaseState(void);
 void DisplayUpdate(void);
 void DisplayBrightUpdate(void);
 void DisplayStatus(void);
-void Display2(void);
+void DisplayPWM(void);
 void Display3(void);
 
 #endif

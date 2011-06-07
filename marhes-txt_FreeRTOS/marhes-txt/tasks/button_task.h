@@ -20,6 +20,7 @@
 #include "task.h"
 #include "app_types.h"
 #include "serial.h"
+#include "tasks/controller_task.h"
 #include "tasks/display_task.h"
 
 #define BUT_BUT1        (1<<29) ///< The bit in the PORT1 register of the button

@@ -96,8 +96,8 @@ void DisplayUpdate(void)
     case DISPLAY_STATUS:
     	DisplayStatus();
 	    break;
-    case DISPLAY_VEL:
-    	Display2();
+    case DISPLAY_PWM:
+    	DisplayPWM();
 	    break;
     case DISPLAY_ENCODER:
     	Display3();
@@ -195,15 +195,41 @@ void DisplayStatus(void)
 /**
  @brief Update the display to the 2nd screen.
 */
-void Display2(void)
+void DisplayPWM(void)
 {
 	if (SwitchedState)
 	{
     LcdClearScreen(BCOLOR);
-		LcdPutStr("TXT1 2", 0, 0, LARGE, FCOLOR, BCOLOR);
+		LcdPutStr("TXT1 PWM", 0, 0, LARGE, FCOLOR, BCOLOR);
+		LcdPutStr("PWM1:     ", 20, 0, SMALL, FCOLOR, BCOLOR);
+		LcdPutStr("PWM2:     ", 32, 0, SMALL, FCOLOR, BCOLOR);
+		LcdPutStr("PWM3:     ", 44, 0, SMALL, FCOLOR, BCOLOR);
+		LcdPutStr("PWM4:     ", 56, 0, SMALL, FCOLOR, BCOLOR);
+		LcdPutStr("PWM5:     ", 68, 0, SMALL, FCOLOR, BCOLOR);
+		LcdPutStr("PWM6:     ", 80, 0, SMALL, FCOLOR, BCOLOR);
+    LcdPutStr("Mode:     ", 92, 0, SMALL, FCOLOR, BCOLOR);
 	  LcdSetLine(18, 0, 18, 131, FCOLOR);
 		SwitchedState = 0;
   }
+  
+  LcdSetRect(20, 60, 28, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(PWMGetDuty(1)), 20, 60, SMALL, FCOLOR, BCOLOR);
+	LcdSetRect(32, 60, 40, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(PWMGetDuty(2)), 32, 60, SMALL, FCOLOR, BCOLOR);
+	LcdSetRect(44, 60, 52, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(PWMGetDuty(3)), 44, 60, SMALL, FCOLOR, BCOLOR);
+	LcdSetRect(56, 60, 64, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(PWMGetDuty(4)), 56, 60, SMALL, FCOLOR, BCOLOR);
+	LcdSetRect(68, 60, 76, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(PWMGetDuty(5)), 68, 60, SMALL, FCOLOR, BCOLOR);
+	LcdSetRect(80, 60, 88, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(PWMGetDuty(6)), 80, 60, SMALL, FCOLOR, BCOLOR);
+	LcdSetRect(92, 60, 100, SCREEN_MAX, FILL, BCOLOR);
+	if (ControllerGetMode())
+	  LcdPutStr("Controller", 92, 60, SMALL, FCOLOR, BCOLOR);
+	else
+	  LcdPutStr("Manual", 92, 60, SMALL, FCOLOR, BCOLOR);
+		
 }
 
 /**
