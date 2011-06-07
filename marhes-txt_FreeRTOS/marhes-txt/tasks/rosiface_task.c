@@ -284,6 +284,7 @@ int8_t ROSChecksum(void)
 void ROSProcessData(void)
 {
   static int32_t pidVals[6];
+  static int32_t temp;
   
   switch(data.var.header.var.command)
   {
@@ -332,6 +333,22 @@ void ROSProcessData(void)
       ControllerSetPid(pidVals[0], pidVals[1], pidVals[2], \
 		               pidVals[3], pidVals[4], pidVals[5]);
       break;
+    case CMD_PWM_RX:
+      if (data.var.header.var.length != SIZE_PWM_RX)
+        break;
+       
+      temp = (data.var.data[0] << 24)  | (data.var.data[1] << 16) | \
+	           (data.var.data[2] << 8)   | data.var.data[3];
+	    PWMSetDuty(1, DUTY_1_5 + temp);
+	    
+      temp = (data.var.data[4] << 24)  | (data.var.data[5] << 16) | \
+	           (data.var.data[6] << 8)   | data.var.data[7];
+	    PWMSetDuty(2, DUTY_1_5 + temp);
+	    
+      temp = (data.var.data[8] << 24)  | (data.var.data[9] << 16) | \
+	           (data.var.data[10] << 8)   | data.var.data[11];
+	    PWMSetDuty(3, DUTY_1_5 + temp);	    	    
+      
     default:
       break;   
   }

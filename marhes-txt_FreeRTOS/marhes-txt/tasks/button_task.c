@@ -42,7 +42,13 @@ static void vButtonTask( void *pvParameters )
     {
       DisplayDecreaseState();
       vSerialPutString( debugPortHandle, "LEFT\r\n", 6 );
-    } 
+    }
+    
+    if (buttonChanged && BUT_CENTER_BIT)
+    {
+      ControllerToggleMode();
+      vSerialPutString( debugPortHandle, "CENTER\r\n", 8 );
+    }
     
     vTaskDelay( 100 / portTICK_RATE_MS );
   }

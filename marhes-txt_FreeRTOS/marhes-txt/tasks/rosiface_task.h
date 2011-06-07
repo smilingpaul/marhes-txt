@@ -22,6 +22,7 @@
 #include "task.h"
 #include "serial.h"
 #include "app_types.h"
+#include "drivers/pwm.h"
 #include "tasks/controller_task.h"
 #include "tasks/mode_task.h"
 
@@ -36,6 +37,7 @@
 #define CMD_ODOM_COMB     105
 #define CMD_BATTERY			  106
 #define CMD_PID_RX			  107
+#define CMD_PWM_RX			  108
 
 // Size doesn't include header or chksum
 #define SIZE_VEL			    4
@@ -43,6 +45,7 @@
 #define SIZE_ODOM_COMB		20
 #define SIZE_BATTERY		  4
 #define SIZE_PID_RX			  24
+#define SIZE_PWM_RX			  12
 
 // Size of arrays
 #define SIZE_VEL_ARR      2

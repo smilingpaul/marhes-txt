@@ -23,6 +23,7 @@ extern xComPortHandle debugPortHandle;
 
 static int16_t linVelocity, angVelocity;
 static int32_t combLinVelocity, combAngVelocity;
+static int8_t controllerMode = 1;
 static int32_t kp_lv, ki_lv, kd_lv;
 static int32_t kp_av, ki_av, kd_av;
 
@@ -39,48 +40,51 @@ static void vControllerTask( void *pvParameters )
   {
 	  int32_t e_lv, e_av;
 
-	  if (ModeStopLostConn() == pdFALSE)
-	  {
-		  // Get the error signals
-		  if (ModeUseOdomComb() == pdTRUE)
-		  {
-			  e_lv = linVelocity - combLinVelocity;
-			  e_av = angVelocity - combAngVelocity;
-		  }
-		  else
-		  {
-			  e_lv = linVelocity - EncoderLinVel();
-			  e_av = angVelocity - EncoderAngVel();
-		  }
+    if (controllerMode)
+    {
+	    if (ModeStopLostConn() == pdFALSE)
+	    {
+		    // Get the error signals
+		    if (ModeUseOdomComb() == pdTRUE)
+		    {
+			    e_lv = linVelocity - combLinVelocity;
+			    e_av = angVelocity - combAngVelocity;
+		    }
+		    else
+		    {
+			    e_lv = linVelocity - EncoderLinVel();
+			    e_av = angVelocity - EncoderAngVel();
+		    }
 
-		  e_lv_sum += e_lv;
-		  e_av_sum += e_av;
+		    e_lv_sum += e_lv;
+		    e_av_sum += e_av;
 
-		  // Calculate the PID linear velocity control signal
-		  u_lv = (int32_t)(kp_lv * e_lv + ki_lv * e_lv_sum + kd_lv * (e_lv - e_lv_last));
-		  u_av = (int32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * (e_av - e_av_last));
+		    // Calculate the PID linear velocity control signal
+		    u_lv = (int32_t)(kp_lv * e_lv + ki_lv * e_lv_sum + kd_lv * (e_lv - e_lv_last));
+		    u_av = (int32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * (e_av - e_av_last));
 
-		  // Set the PWM duty cycles for the motor and the steering servos
-		  PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + u_lv);
-	  //	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
-	  //	PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
+		    // Set the PWM duty cycles for the motor and the steering servos
+		    PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + u_lv);
+	    //	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
+	    //	PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
 
-		  // Store last velocity errors
-		  e_lv_last = e_lv;
-		  e_av_last = e_av;
-	  }
-	  else
-	  {
-		  count = count + 100;
-		  if (count > 2147483647)
-			  count = 0;
-		  PWMSetDuty(MOTOR_CHANNEL, count);//DUTY_1_5);
-		  e_lv_last = 0;
-		  e_av_last = 0;
-		  e_lv_sum = 0;
-		  e_av_sum = 0;
-		  u_lv = 0;
-		  u_av = 0;
+		    // Store last velocity errors
+		    e_lv_last = e_lv;
+		    e_av_last = e_av;
+	    }
+	    else
+	    {
+		    count = count + 100;
+		    if (count > 2147483647)
+			    count = 0;
+		    PWMSetDuty(MOTOR_CHANNEL, count);//DUTY_1_5);
+		    e_lv_last = 0;
+		    e_av_last = 0;
+		    e_lv_sum = 0;
+		    e_av_sum = 0;
+		    u_lv = 0;
+		    u_av = 0;
+	    }
 	  }
 	  //FIO0PIN ^= (1<<21);
 
@@ -165,4 +169,14 @@ int32_t ControllerGetPid(uint8_t gain)
     default:
       break;
   }
+}
+
+void ControllerToggleMode(void)
+{
+  controllerMode ^= 1;
+}
+
+int8_t ControllerGetMode(void)
+{
+  return controllerMode;
 }
