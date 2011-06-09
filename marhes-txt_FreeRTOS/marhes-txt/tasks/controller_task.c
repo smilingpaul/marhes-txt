@@ -71,6 +71,12 @@ static void vControllerTask( void *pvParameters )
 		    // Calculate the PID linear velocity control signal
 		    u_lv = (int32_t)(kp_lv * e_lv + ki_lv * e_lv_sum + kd_lv * e_lv_diff);//(e_lv - e_lv_last));
 		    u_av = (int32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * e_av_diff);//(e_av - e_av_last));
+		    
+		    if (u_lv > PWM_MAX)
+		      u_lv = PWM_MAX;
+		      		    
+		    if (u_lv < PWM_MIN)
+		      u_lv = PWM_MIN;
 
 		    // Set the PWM duty cycles for the motor and the steering servos
 		    PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + u_lv);
