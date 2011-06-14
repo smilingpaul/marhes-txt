@@ -303,7 +303,7 @@ void ROSProcessData(void)
                       (data.var.data[16] << 24) | (data.var.data[17] << 16) | \
     		    				  (data.var.data[18] << 8)  | data.var.data[19]);
       vModeOdomCombRx();
-//      FIO0PIN ^= (1<<21);
+      FIO0PIN ^= (1<<21);
       break;
     case CMD_VEL:
       if (data.var.header.var.length != SIZE_VEL)

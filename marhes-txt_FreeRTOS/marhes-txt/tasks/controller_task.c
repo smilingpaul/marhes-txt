@@ -29,8 +29,12 @@ static int32_t kp_av, ki_av, kd_av;
 
 static int32_t e_lv_last = 0, e_av_last = 0, e_lv_sum = 0, e_av_sum = 0;
 static int32_t lv = 0, av = 0, lv_last = 0, av_last = 0, e_lv_diff = 0, e_av_diff = 0;
+static int32_t lv_last2 = 0, av_last2 = 0;
+static float pterm, iterm, dterm;
 static int32_t u_lv = 0, u_av = 0;
 static int32_t count = 0;
+static float dt;
+static uint32_t ticks, lastTicks = 0;
 
 static void vControllerTask( void *pvParameters )
 {
@@ -43,9 +47,9 @@ static void vControllerTask( void *pvParameters )
 
     if (controllerMode)
     {
-	    if (ModeStopLostConn() == pdFALSE)
+	    if (ModeStopLostConn() == pdFALSE && ModeUseOdomComb() == pdTRUE)
 	    {
-		    // Get the error signals
+		    // Get the error signals and process signals
 		    if (ModeUseOdomComb() == pdTRUE)
 		    {
 		      lv = combLinVelocity;
@@ -61,6 +65,23 @@ static void vControllerTask( void *pvParameters )
 			    e_av = angVelocity - av;
 		    }
 
+        ticks = xTaskGetTickCount();
+        if (ticks > lastTicks)
+          dt = (float)(ticks - lastTicks) / configTICK_RATE_HZ;
+        else
+          dt = (float)(0xFFFFFFFF - lastTicks + ticks + 1) / configTICK_RATE_HZ;
+        lastTicks = ticks;
+		    
+		    // VELOCITY PID CONTROLLER
+		    // du = kp * (e(t) - e(t-1)) + ki * e(t) * dt - kd * (meas(t) - 2meas(t-1) + meas(t-2)) / dt
+		    pterm = e_lv - e_lv_last;
+		    iterm = (float)e_lv * dt;//0.02;//DELTA_T / 1000;
+		    dterm = (float)(lv - 2 * lv_last + lv_last2) / dt;//0.02;//1000 / DELTA_T;
+		    
+		    u_lv += (int32_t)((float)kp_lv * pterm + (float)ki_lv * iterm - (float)kd_lv * dterm);
+		    
+
+/*        // POSITIONAL PID CONTROLLER
         // ui = kc / Ti * sum(((e - e_last) / 2) * dt)
 		    e_lv_sum += ((e_lv - e_lv_last) >> 2) * DELTA_T / 1000;
 		    e_av_sum += ((e_av - e_av_last) >> 2) * DELTA_T / 1000;
@@ -69,14 +90,15 @@ static void vControllerTask( void *pvParameters )
  		    e_av_diff = av - av_last;
 		    		    
 		    // Calculate the PID linear velocity control signal
-		    u_lv = (int32_t)(kp_lv * e_lv + ki_lv * e_lv_sum + kd_lv * e_lv_diff);//(e_lv - e_lv_last));
-		    u_av = (int32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * e_av_diff);//(e_av - e_av_last));
-		    
-		    if (u_lv > PWM_MAX)
-		      u_lv = PWM_MAX;
+		    u_lv += (int32_t)(kp_lv * e_lv + ki_lv * e_lv_sum + kd_lv * e_lv_diff);//(e_lv - e_lv_last));
+		    u_av += (int32_t)(kp_av * e_av + ki_av * e_av_sum + kd_av * e_av_diff);//(e_av - e_av_last));
+*/
+
+		    if (u_lv > VELOCITY_PWM_MAX)
+		      u_lv = VELOCITY_PWM_MAX;
 		      		    
-		    if (u_lv < PWM_MIN)
-		      u_lv = PWM_MIN;
+		    if (u_lv < VELOCITY_PWM_MIN)
+		      u_lv = VELOCITY_PWM_MIN;
 
 		    // Set the PWM duty cycles for the motor and the steering servos
 		    PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + u_lv);
@@ -86,6 +108,8 @@ static void vControllerTask( void *pvParameters )
 		    // Store last velocity errors
 		    e_lv_last = e_lv;
 		    e_av_last = e_av;
+		    lv_last2 = lv_last;
+		    av_last2 = av_last;
 		    lv_last = lv;
 		    av_last = lv;
 	    }
