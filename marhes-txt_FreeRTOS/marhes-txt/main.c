@@ -211,7 +211,7 @@ int main( void )
   // xTaskCreate( vuIP_Task, ( signed portCHAR * ) "uIP", \
   //        mainBASIC_WEB_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY - 1, NULL );
 
-  vStartLEDFlashTasks( mainFLASH_PRIORITY ); // Flash the LEDs
+  //vStartLEDFlashTasks( mainFLASH_PRIORITY ); // Flash the LEDs
   vModeTaskStart();                          // Keep track of Link/Encoder Modes
   vBatteryTaskStart();                       // Check battery status
   vDisplayTaskStart();                       // Update display

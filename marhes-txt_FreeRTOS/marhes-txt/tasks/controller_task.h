@@ -44,8 +44,8 @@
 #define THETA_MIN  					-1600
 
 // The maximum and minimum PWM values for the servos/motor controller
-#define VELOCITY_PWM_MAX			144000	// PWM - Freq = 0x15F900 (1440000)
-#define VELOCITY_PWM_MIN			72000
+#define VELOCITY_PWM_MAX			(PWM_MAX - DUTY_1_5)
+#define VELOCITY_PWM_MIN			(PWM_MIN - DUTY_1_5)
 #define THETA_PWM_MAX				144000	// PWM - Freq = 0x15F900 (1440000)
 #define THETA_PWM_MIN				72000
 
