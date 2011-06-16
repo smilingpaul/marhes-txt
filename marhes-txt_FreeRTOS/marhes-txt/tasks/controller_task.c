@@ -78,7 +78,7 @@ static void vControllerTask( void *pvParameters )
 		    iterm = (float)e_lv * dt;//0.02;//DELTA_T / 1000;
 		    dterm = (float)(lv - 2 * lv_last + lv_last2) / dt;//0.02;//1000 / DELTA_T;
 		    
-		    u_lv += (int32_t)((float)kp_lv * pterm + (float)ki_lv * iterm - (float)kd_lv * dterm);
+		    u_lv += (int32_t)((float)kp_lv * pterm + (float)ki_lv * iterm + (float)kd_lv * dterm);
 		    
 
 /*        // POSITIONAL PID CONTROLLER
