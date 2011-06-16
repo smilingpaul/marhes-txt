@@ -44,7 +44,7 @@ static void vButtonTask( void *pvParameters )
       vSerialPutString( debugPortHandle, "LEFT\r\n", 6 );
     }
     
-    if (buttonChanged && BUT_CENTER_BIT)
+    if (buttonChanged == BUT_CENTER_BIT)
     {
       ControllerToggleMode();
       vSerialPutString( debugPortHandle, "CENTER\r\n", 8 );

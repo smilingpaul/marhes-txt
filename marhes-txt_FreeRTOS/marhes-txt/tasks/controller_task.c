@@ -45,7 +45,7 @@ static void vControllerTask( void *pvParameters )
   {
 	  int32_t e_lv, e_av;
 
-    if (controllerMode)
+    if (controllerMode == 1)
     {
 	    if (ModeStopLostConn() == pdFALSE && ModeUseOdomComb() == pdTRUE)
 	    {
@@ -135,6 +135,7 @@ static void vControllerTask( void *pvParameters )
 
 void vControllerTaskStart(void)
 {
+  controllerMode = 1;
   xTaskCreate( vControllerTask, "ControllerTask", configMINIMAL_STACK_SIZE * 2, NULL, 4, NULL );
 }
 
