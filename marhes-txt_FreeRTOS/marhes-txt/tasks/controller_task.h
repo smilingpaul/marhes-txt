@@ -67,7 +67,7 @@ int16_t ControllerGetAngularVelocity(void);
 void ControllerSetOdomCombined(int32_t linVel, int32_t angVel);
 void ControllerSetPid(int32_t lp, int32_t li, int32_t ld, \
 					  int32_t ap, int32_t ai, int32_t ad);
-int32_t ControllerGetPid(uint8_t gain);
+float ControllerGetPid(uint8_t gain);
 void ControllerToggleMode(void);
 int8_t ControllerGetMode(void);
 

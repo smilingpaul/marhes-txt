@@ -38,6 +38,7 @@
 #define CMD_BATTERY			  106
 #define CMD_PID_RX			  107
 #define CMD_PWM_RX			  108
+#define CMD_PID_TERMS     109
 
 // Size doesn't include header or chksum
 #define SIZE_VEL			    4
@@ -46,6 +47,7 @@
 #define SIZE_BATTERY		  4
 #define SIZE_PID_RX			  24
 #define SIZE_PWM_RX			  12
+#define SIZE_PID_TERMS    16
 
 // Size of arrays
 #define SIZE_VEL_ARR      2
@@ -105,6 +107,9 @@ void ROSSendOdomEnc(msg_u * pmsg, \
                     int32_t x_mm, int32_t y_mm, int32_t th_mrad, \
 		                int32_t linVel, int32_t angVel);
 void ROSSendBattery(msg_u * pmsg, uint16_t batt1, uint16_t batt2);
+void ROSSendPidTerms(msg_u * pmsg, \
+                     int32_t pterm, int32_t iterm, int32_t dterm, \
+		                 int32_t signal);
 void ROSBuildHeader(msg_u * pmsg, uint8_t dataSize, uint8_t command);
 void vRxTaskStart(void);
 int8_t ROSChecksum(void);
