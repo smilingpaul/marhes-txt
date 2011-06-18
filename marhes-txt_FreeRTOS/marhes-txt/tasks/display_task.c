@@ -183,13 +183,13 @@ void DisplayStatus(void)
 	LcdPutStr(itoa(ControllerGetAngularVelocity()), 92, 60, SMALL, FCOLOR, BCOLOR);
 
 	LcdSetRect(104, 60, 112, SCREEN_MAX, FILL, BCOLOR);
-	LcdPutStr(itoa(ControllerGetPid(0)), 104, 60, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr(itoa(ControllerGetPid(1)), 104, 85, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr(itoa(ControllerGetPid(2)), 104, 110, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetPid(0)), 104, 60, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetPid(1)), 104, 85, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetPid(2)), 104, 110, SMALL, FCOLOR, BCOLOR);
 	LcdSetRect(116, 60, 124, SCREEN_MAX, FILL, BCOLOR);
-	LcdPutStr(itoa(ControllerGetPid(3)), 116, 60, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr(itoa(ControllerGetPid(4)), 116, 85, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr(itoa(ControllerGetPid(5)), 116, 110, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetPid(3)), 116, 60, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetPid(4)), 116, 85, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetPid(5)), 116, 110, SMALL, FCOLOR, BCOLOR);
 }
 
 /**

@@ -173,6 +173,51 @@ void ROSSendBattery(msg_u * pmsg, uint16_t batt1, uint16_t batt2)
 }
 
 /**
+ @brief Builds an encoder odometry message to send to the ROS computer.
+ @param[out] pmsg A pointer to the message to build the header
+ @param[in] x_mm    The x position in mm
+ @param[in] y_mm    The y position in mm
+ @param[in] th_mrad The orientation in mrad
+ @param[in] linVel  The linear velocity in mm/s
+ @param[in] andVel  The angular velocity in mrad/s
+*/
+void ROSSendPidTerms(msg_u * pmsg, \
+                     int32_t pterm, int32_t iterm, int32_t dterm, \
+		                 int32_t signal)
+{
+	uint16_t checksum;
+	ROSBuildHeader(pmsg, SIZE_PID_TERMS, CMD_PID_TERMS);    // Build header
+
+	pmsg->var.data[0] = (uint8_t)(pterm >> 24);      // Write x position
+	pmsg->var.data[1] = (uint8_t)(pterm >> 16);
+	pmsg->var.data[2] = (uint8_t)(pterm >> 8);
+	pmsg->var.data[3] = (uint8_t)(pterm >> 0);
+
+	pmsg->var.data[4] = (uint8_t)(iterm >> 24);      // Write y position
+	pmsg->var.data[5] = (uint8_t)(iterm >> 16);
+	pmsg->var.data[6] = (uint8_t)(iterm >> 8);
+	pmsg->var.data[7] = (uint8_t)(iterm >> 0);
+
+	pmsg->var.data[8] = (uint8_t)(dterm >> 24);   // Write Orientation
+	pmsg->var.data[9] = (uint8_t)(dterm >> 16);
+	pmsg->var.data[10] = (uint8_t)(dterm >> 8);
+	pmsg->var.data[11] = (uint8_t)(dterm >> 0);
+
+	pmsg->var.data[12] = (uint8_t)(signal >> 24);   // Write linear velocity
+	pmsg->var.data[13] = (uint8_t)(signal >> 16);
+	pmsg->var.data[14] = (uint8_t)(signal >> 8);
+	pmsg->var.data[15] = (uint8_t)(signal >> 0);
+
+	// Calculate checksum, Put the checksum bytes in reverse order
+	checksum = ROSCalcChkSum(pmsg);                 
+	pmsg->var.data[SIZE_PID_TERMS] = checksum >> 8;
+	pmsg->var.data[SIZE_PID_TERMS + 1] = checksum & 0xFF;
+	//	FIO0PIN ^= (1<<21);
+
+	vSerialPutString( rosPortHandle, pmsg->bytes,  pmsg->var.header.var.length + HEADER_SIZE + CHKSUM_SIZE);
+}
+
+/**
  @brief The task to parse received data.
  
  This task runs continuously but is blocked infinitely when there is no data on

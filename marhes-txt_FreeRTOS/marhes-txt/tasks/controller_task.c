@@ -24,17 +24,20 @@ extern xComPortHandle debugPortHandle;
 static int16_t linVelocity, angVelocity;
 static int32_t combLinVelocity, combAngVelocity;
 static int8_t controllerMode = 1;
-static int32_t kp_lv, ki_lv, kd_lv;
-static int32_t kp_av, ki_av, kd_av;
+static float kp_lv, ki_lv, kd_lv;
+static float kp_av, ki_av, kd_av;
 
 static int32_t e_lv_last = 0, e_av_last = 0, e_lv_sum = 0, e_av_sum = 0;
 static int32_t lv = 0, av = 0, lv_last = 0, av_last = 0, e_lv_diff = 0, e_av_diff = 0;
+static int32_t e_lv_last2 = 0, e_av_last2 = 0;
 static int32_t lv_last2 = 0, av_last2 = 0;
 static float pterm, iterm, dterm;
 static int32_t u_lv = 0, u_av = 0;
 static int32_t count = 0;
 static float dt;
 static uint32_t ticks, lastTicks = 0;
+
+static msg_u data;
 
 static void vControllerTask( void *pvParameters )
 {
@@ -74,11 +77,13 @@ static void vControllerTask( void *pvParameters )
 		    
 		    // VELOCITY PID CONTROLLER
 		    // du = kp * (e(t) - e(t-1)) + ki * e(t) * dt - kd * (meas(t) - 2meas(t-1) + meas(t-2)) / dt
-		    pterm = e_lv - e_lv_last;
+		    pterm = (float)(e_lv - e_lv_last);
 		    iterm = (float)e_lv * dt;//0.02;//DELTA_T / 1000;
-		    dterm = (float)(lv - 2 * lv_last + lv_last2) / dt;//0.02;//1000 / DELTA_T;
+		    //dterm = (float)(lv - 2 * lv_last + lv_last2) / dt;//0.02;//1000 / DELTA_T;
+		    dterm = (float)(e_lv - 2 * e_lv_last + e_lv_last2) / dt;
 		    
-		    u_lv += (int32_t)((float)kp_lv * pterm + (float)ki_lv * iterm + (float)kd_lv * dterm);
+		    u_lv += (int32_t)(kp_lv * pterm + ki_lv * iterm + kd_lv * dterm);
+		    
 		    
 
 /*        // POSITIONAL PID CONTROLLER
@@ -104,10 +109,16 @@ static void vControllerTask( void *pvParameters )
 		    PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + u_lv);
 	    //	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
 	    //	PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
+	    
+	      
+	      ROSSendPidTerms(&data, (int32_t)pterm, (int32_t)iterm, (int32_t)dterm, u_lv);
 
 		    // Store last velocity errors
+		    e_lv_last2 = e_lv_last;
+ 		    e_av_last2 = e_av_last;
 		    e_lv_last = e_lv;
 		    e_av_last = e_av;
+		    
 		    lv_last2 = lv_last;
 		    av_last2 = av_last;
 		    lv_last = lv;
@@ -178,15 +189,15 @@ void ControllerSetOdomCombined(int32_t linVel, int32_t angVel)
 void ControllerSetPid(int32_t lp, int32_t li, int32_t ld, \
 					  int32_t ap, int32_t ai, int32_t ad)
 {
-  kp_lv = lp;
-  ki_lv = li;
-  kd_lv = ld;
-  kp_av = ap;
-  ki_av = ai;
-  kd_av = ad;
+  kp_lv = (float)lp / 1000;
+  ki_lv = (float)li / 1000;
+  kd_lv = (float)ld / 1000;
+  kp_av = (float)ap / 1000;
+  ki_av = (float)ai / 1000;
+  kd_av = (float)ad / 1000;
 }
 
-int32_t ControllerGetPid(uint8_t gain)
+float ControllerGetPid(uint8_t gain)
 {
   switch(gain)
   {
