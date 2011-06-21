@@ -21,6 +21,7 @@
 #include "tasks/mode_task.h"
 #include "tasks/battery_task.h"
 #include "tasks/controller_task.h"
+#include "tasks/encoder_task.h"
 #include "helperFuncs.h"
 
 #define DISPLAY_STATUS		  0             ///< Status display type
@@ -43,6 +44,6 @@ void DisplayUpdate(void);
 void DisplayBrightUpdate(void);
 void DisplayStatus(void);
 void DisplayPWM(void);
-void Display3(void);
+void DisplayEncoders(void);
 
 #endif

@@ -50,7 +50,7 @@ static void vControllerTask( void *pvParameters )
 
     if (controllerMode == 1)
     {
-	    if (ModeStopLostConn() == pdFALSE && ModeUseOdomComb() == pdTRUE)
+	    if (ModeStopLostConn() == pdFALSE)// && ModeUseOdomComb() == pdTRUE)
 	    {
 		    // Get the error signals and process signals
 		    if (ModeUseOdomComb() == pdTRUE)

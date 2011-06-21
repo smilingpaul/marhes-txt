@@ -98,14 +98,18 @@ static void vEncoderTask( void *pvParameters )
 	  T3TCR = TCR_CR;
 	  T0TCR = TCR_CE;
 	  T3TCR = TCR_CE;
-
+    
+    vels[VELS_LINEAR] = (ticks[TICKS_FR] + ticks[TICKS_FL]) * 30 / 2;  // Make 15 for xored enc inputs
+		vels[VELS_ANGULAR] = (ticks[TICKS_FR] - ticks[TICKS_FL]) * 15000 / 285;
+		      
+    /*
 		vels[VELS_LINEAR] = (EncoderGetDirection(TICKS_FR) * \
 		      ticks[TICKS_FR] + EncoderGetDirection(TICKS_FL) * \
 		      ticks[TICKS_FL]) * 15 / 2;
 		vels[VELS_ANGULAR] = (EncoderGetDirection(TICKS_FR) * \
 		      ticks[TICKS_FR] - EncoderGetDirection(TICKS_FL) * \
 		      ticks[TICKS_FL]) * 15000 / 285;
-
+     */
 	  dx = (float)vels[VELS_LINEAR] * anglookuptable(pos[2], 1) * 20 / 1000000;
 	  dy = (float)vels[VELS_LINEAR] * anglookuptable(pos[2], 0) * 20 / 1000000;
 	  dth = (float)vels[VELS_ANGULAR] * 20 / 1000;
