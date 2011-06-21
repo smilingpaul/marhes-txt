@@ -22,6 +22,9 @@
 
 #include "display_task.h"
 
+extern int32_t ticks[SIZE_ENCODER_TICKS_ARR];
+extern int32_t vels[SIZE_ENCODER_VEL_ARR];
+
 static int8_t DisplayState;           ///< The display type to show
 static int8_t SwitchedState;          ///< If the display has switch states
 
@@ -100,7 +103,7 @@ void DisplayUpdate(void)
     	DisplayPWM();
 	    break;
     case DISPLAY_ENCODER:
-    	Display3();
+    	DisplayEncoders();
 	    break;		    		    
     default:
 	    // Don't do anything
@@ -235,13 +238,26 @@ void DisplayPWM(void)
 /**
  @brief Update the display to the 3rd screen.
 */
-void Display3(void)
+void DisplayEncoders(void)
 {
 	if (SwitchedState)
 	{
     LcdClearScreen(BCOLOR);
-		LcdPutStr("TXT1 3", 0, 0, LARGE, FCOLOR, BCOLOR);
+		LcdPutStr("TXT1 ENCODERS", 0, 0, LARGE, FCOLOR, BCOLOR);
+    LcdPutStr("TICKS FR:   ", 20, 0, SMALL, FCOLOR, BCOLOR);
+		LcdPutStr("TICKS FL:   ", 32, 0, SMALL, FCOLOR, BCOLOR);
+		LcdPutStr("VEL LIN:    ", 44, 0, SMALL, FCOLOR, BCOLOR);
+		LcdPutStr("VEL ANG:    ", 56, 0, SMALL, FCOLOR, BCOLOR);
 	  LcdSetLine(18, 0, 18, 131, FCOLOR);
 		SwitchedState = 0;
   }
+  
+  LcdSetRect(20, 60, 28, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(ticks[TICKS_FR]), 20, 60, SMALL, FCOLOR, BCOLOR);
+	LcdSetRect(32, 60, 40, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(ticks[TICKS_FL]), 32, 60, SMALL, FCOLOR, BCOLOR);
+	LcdSetRect(44, 60, 52, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(vels[VELS_LINEAR]), 44, 60, SMALL, FCOLOR, BCOLOR);
+	LcdSetRect(56, 60, 64, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa(vels[VELS_ANGULAR]), 56, 60, SMALL, FCOLOR, BCOLOR);
 }
