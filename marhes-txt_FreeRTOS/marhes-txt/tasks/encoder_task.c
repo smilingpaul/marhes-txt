@@ -70,6 +70,8 @@ int32_t anglookuptable(int32_t radians, int32_t type);
 */
 static void vEncoderTask( void *pvParameters )
 {
+  static int32_t ticks_fl_0, ticks_fl_1, ticks_fl_2, ticks_fl_3, ticks_fl_4;
+  static int32_t ticks_fr_0, ticks_fr_1, ticks_fr_2, ticks_fr_3, ticks_fr_4;
   portTickType xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
   EncoderInit();
@@ -85,22 +87,34 @@ static void vEncoderTask( void *pvParameters )
 
 	  // Store the right and left encoder counts, get rid of noise
 	  if (T0TC > 2)
-		  ticks[TICKS_FL] = T0TC;
+		  ticks_fl_0 = T0TC;
 	  else
-		  ticks[TICKS_FL] = 0;
+		  ticks_fl_0 = 0;
 	  if (T3TC > 2)
-		  ticks[TICKS_FR] = T3TC;
+		  ticks_fr_0 = T3TC;
 	  else
-		  ticks[TICKS_FR] = 0;
+		  ticks_fr_0 = 0;
 
 	  // Reset and enable the TC
 	  T0TCR = TCR_CR;
 	  T3TCR = TCR_CR;
 	  T0TCR = TCR_CE;
 	  T3TCR = TCR_CE;
+	  
+	  ticks[TICKS_FL] = (ticks_fl_0 + ticks_fl_1 + ticks_fl_2 + ticks_fl_3 + ticks_fl_4) / 5;
+	  ticks[TICKS_FR] = (ticks_fr_0 + ticks_fr_1 + ticks_fr_2 + ticks_fr_3 + ticks_fr_4) / 5;
+	  
+	  ticks_fl_4 = ticks_fl_3;
+	  ticks_fl_3 = ticks_fl_2;
+	  ticks_fl_2 = ticks_fl_1;
+	  ticks_fl_1 = ticks_fl_0;
+ 	  ticks_fr_4 = ticks_fr_3;
+	  ticks_fr_3 = ticks_fr_2;
+ 	  ticks_fr_2 = ticks_fr_1;
+	  ticks_fr_1 = ticks_fr_0;
     
-    vels[VELS_LINEAR] = (ticks[TICKS_FR] + ticks[TICKS_FL]) * 30 / 2;  // Make 15 for xored enc inputs
-		vels[VELS_ANGULAR] = (ticks[TICKS_FR] - ticks[TICKS_FL]) * 15000 / 285;
+    vels[VELS_LINEAR] = EncoderGetDirection(TICKS_FL) * (ticks[TICKS_FR] + ticks[TICKS_FL]) * 15 / 2;  // Make 15 for xored enc inputs
+		vels[VELS_ANGULAR] = EncoderGetDirection(TICKS_FL) * (ticks[TICKS_FR] - ticks[TICKS_FL]) * 15000 / 285;
 		      
     /*
 		vels[VELS_LINEAR] = (EncoderGetDirection(TICKS_FR) * \

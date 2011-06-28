@@ -110,8 +110,12 @@ static void vControllerTask( void *pvParameters )
 	    //	PWMSetDuty(FRONT_SERVO_CHANNEL, ControllerCalcPWM(FRONT_SERVO_CHANNEL));
 	    //	PWMSetDuty(REAR_SERVO_CHANNEL, ControllerCalcPWM(REAR_SERVO_CHANNEL));
 	    
-	      
-	      ROSSendPidTerms(&data, (int32_t)pterm, (int32_t)iterm, (int32_t)dterm, u_lv);
+	      count++;
+	      if (count > 5)
+	      {
+	        ROSSendPidTerms(&data, (int32_t)pterm, (int32_t)iterm, (int32_t)dterm, u_lv);
+	        count = 0;
+	      }
 
 		    // Store last velocity errors
 		    e_lv_last2 = e_lv_last;

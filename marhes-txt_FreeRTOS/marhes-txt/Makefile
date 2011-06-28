@@ -93,16 +93,6 @@ THUMB_SOURCE= \
 		syscalls.c \
 		helperFuncs.c \
 		$(DEMO_COMMON_DIR)/flash.c \
-		./webserver/uIP_Task.c \
-		./webserver/emac.c \
-		./webserver/httpd.c \
-		./webserver/httpd-cgi.c \
-		./webserver/httpd-fs.c \
-		./webserver/http-strings.c \
-		$(UIP_COMMON_DIR)/uip_arp.c \
-		$(UIP_COMMON_DIR)/psock.c \
-		$(UIP_COMMON_DIR)/timer.c \
-		$(UIP_COMMON_DIR)/uip.c \
 		$(RTOS_SOURCE_DIR)/list.c \
 		$(RTOS_SOURCE_DIR)/queue.c \
 		$(RTOS_SOURCE_DIR)/tasks.c \
@@ -120,11 +110,23 @@ THUMB_SOURCE= \
 		./tasks/controller_task.c \
 		./tasks/encoder_task.c \
 		./tasks/rosiface_task.c
+		
+		#./webserver/uIP_Task.c \
+		#./webserver/emac.c \
+		#./webserver/httpd.c \
+		#./webserver/httpd-cgi.c \
+		#./webserver/httpd-fs.c \
+		#./webserver/http-strings.c \
+		#$(UIP_COMMON_DIR)/uip_arp.c \
+		#$(UIP_COMMON_DIR)/psock.c \
+		#$(UIP_COMMON_DIR)/timer.c \
+		#$(UIP_COMMON_DIR)/uip.c \
 
 ARM_SOURCE= \
 		$(RTOS_SOURCE_DIR)/portable/GCC/ARM7_LPC23xx/portISR.c \
-		./webserver/EMAC_ISR.c \
 		./drivers/serialISR.c
+		
+		#./webserver/EMAC_ISR.c \
 
 THUMB_OBJS = $(THUMB_SOURCE:.c=.o)
 ARM_OBJS = $(ARM_SOURCE:.c=.o)

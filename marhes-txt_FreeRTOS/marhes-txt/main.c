@@ -291,7 +291,7 @@ static void prvSetupHardware( void )
 	ADCInit();
 	LcdInit();
 	rosPortHandle = xSerialPortInit( serCOM1, ser57600, serNO_PARITY, serBITS_8,
-	                                  serSTOP_1, 256 );
+	                                  serSTOP_1, 250 );
 	debugPortHandle = xSerialPortInit( serCOM2, ser57600, serNO_PARITY, serBITS_8,
-	                                  serSTOP_1, 256 );
+	                                  serSTOP_1, 250 );
 }
