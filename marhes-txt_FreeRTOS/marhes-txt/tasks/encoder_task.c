@@ -101,8 +101,8 @@ static void vEncoderTask( void *pvParameters )
 	  T0TCR = TCR_CE;
 	  T3TCR = TCR_CE;
 	  
-	  ticks[TICKS_FL] = (ticks_fl_0 + ticks_fl_1 + ticks_fl_2 + ticks_fl_3 + ticks_fl_4) / 5;
-	  ticks[TICKS_FR] = (ticks_fr_0 + ticks_fr_1 + ticks_fr_2 + ticks_fr_3 + ticks_fr_4) / 5;
+	  ticks[TICKS_FL] = (ticks_fl_0);// + ticks_fl_1) / 2;// + ticks_fl_2 + ticks_fl_3 + ticks_fl_4) / 5;
+	  ticks[TICKS_FR] = (ticks_fr_0);// + ticks_fr_1) / 2;// + ticks_fr_2 + ticks_fr_3 + ticks_fr_4) / 5;
 	  
 	  ticks_fl_4 = ticks_fl_3;
 	  ticks_fl_3 = ticks_fl_2;
