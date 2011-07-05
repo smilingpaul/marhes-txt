@@ -114,7 +114,7 @@ static void vEncoderTask( void *pvParameters )
 	  ticks_fr_1 = ticks_fr_0;
     
     vels[VELS_LINEAR] = EncoderGetDirection(TICKS_FL) * (ticks[TICKS_FR] + ticks[TICKS_FL]) * 15 / 2;  // Make 15 for xored enc inputs
-		vels[VELS_ANGULAR] = EncoderGetDirection(TICKS_FL) * (ticks[TICKS_FR] - ticks[TICKS_FL]) * 15000 / 285;
+		vels[VELS_ANGULAR] = EncoderGetDirection(TICKS_FL) * (ticks[TICKS_FR] - ticks[TICKS_FL]) * 15000 / 554;
 		      
     /*
 		vels[VELS_LINEAR] = (EncoderGetDirection(TICKS_FR) * \
@@ -137,7 +137,7 @@ static void vEncoderTask( void *pvParameters )
 	  if (pos[POS_T] < 0)
 		  pos[POS_T] += 6283;
 
-		//FIO0PIN ^= (1<<21);
+		FIO0PIN ^= (1<<21);
 
     vTaskDelayUntil( &xLastWakeTime, ( 20 / portTICK_RATE_MS ) );
   }
@@ -167,7 +167,7 @@ static void vEncoderSendTask( void *pvParameters )
 */
 void vEncoderTaskStart(void)
 {
-  xTaskCreate( vEncoderTask, "EncoderTask", configMINIMAL_STACK_SIZE * 2, NULL, 4, NULL );
+  xTaskCreate( vEncoderTask, "EncoderTask", configMINIMAL_STACK_SIZE * 2, NULL, 3, NULL );
   xTaskCreate( vEncoderSendTask, "EncoderSendTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
 }
 
