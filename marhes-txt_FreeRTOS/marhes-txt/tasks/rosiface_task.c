@@ -278,7 +278,7 @@ static void vRxTask( void *pvParameters )
 */
 void vRxTaskStart(void)
 {
-  xTaskCreate( vRxTask, "RxTask", configMINIMAL_STACK_SIZE, NULL, 3, NULL );
+  xTaskCreate( vRxTask, "RxTask", configMINIMAL_STACK_SIZE, NULL, 4, NULL );
 }
 
 /**

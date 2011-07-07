@@ -137,7 +137,7 @@ static void vEncoderTask( void *pvParameters )
 	  if (pos[POS_T] < 0)
 		  pos[POS_T] += 6283;
 
-		FIO0PIN ^= (1<<21);
+		//FIO0PIN ^= (1<<21);
 
     vTaskDelayUntil( &xLastWakeTime, ( 20 / portTICK_RATE_MS ) );
   }
