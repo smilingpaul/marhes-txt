@@ -278,7 +278,7 @@ static void vRxTask( void *pvParameters )
 */
 void vRxTaskStart(void)
 {
-  xTaskCreate( vRxTask, "RxTask", configMINIMAL_STACK_SIZE, NULL, 4, NULL );
+  xTaskCreate( vRxTask, "RxTask", configMINIMAL_STACK_SIZE * 4, NULL, 4, NULL );
 }
 
 /**
@@ -342,6 +342,7 @@ void ROSProcessData(void)
 //    	                  (data.var.data[6] << 8)  | data.var.data[7];
 //      odomCombined[2] = (data.var.data[8] << 24) | (data.var.data[9] << 16) | \
 //                        (data.var.data[10] << 8) | data.var.data[11];
+      portENTER_CRITICAL();
       ControllerSetOdomCombined( \
                       (data.var.data[12] << 24) | (data.var.data[13] << 16) | \
     		    				  (data.var.data[14] << 8)  | data.var.data[15], \
@@ -349,14 +350,17 @@ void ROSProcessData(void)
     		    				  (data.var.data[18] << 8)  | data.var.data[19]);
       vModeOdomCombRx();
       FIO0PIN ^= (1<<21);
+      portEXIT_CRITICAL();
       break;
     case CMD_VEL:
       if (data.var.header.var.length != SIZE_VEL)
         break;
       // Store velocity command values
+      portENTER_CRITICAL();
       ControllerSetLinearVelocity((int16_t)(data.var.data[0] << 8 | data.var.data[1]));
       ControllerSetAngularVelocity((int16_t)(data.var.data[2] << 8 | data.var.data[3]));
       vModeCmdVelRx();
+      portEXIT_CRITICAL();
       //FIO0PIN ^= (1<<21);
       break;
     case CMD_PID_RX:
@@ -384,15 +388,15 @@ void ROSProcessData(void)
        
       temp = (data.var.data[0] << 24)  | (data.var.data[1] << 16) | \
 	           (data.var.data[2] << 8)   | data.var.data[3];
-	    PWMSetDuty(1, DUTY_1_5 + temp);
+	    PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + temp);
 	    
       temp = (data.var.data[4] << 24)  | (data.var.data[5] << 16) | \
 	           (data.var.data[6] << 8)   | data.var.data[7];
-	    PWMSetDuty(2, DUTY_1_5 + temp);
+	    PWMSetDuty(FRONT_SERVO_CHANNEL, DUTY_1_5 + temp);
 	    
       temp = (data.var.data[8] << 24)  | (data.var.data[9] << 16) | \
 	           (data.var.data[10] << 8)   | data.var.data[11];
-	    PWMSetDuty(3, DUTY_1_5 + temp);	    	    
+	    PWMSetDuty(REAR_SERVO_CHANNEL, DUTY_1_5 + temp);	    	    
       
     default:
       break;   

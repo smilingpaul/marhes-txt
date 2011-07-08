@@ -52,7 +52,7 @@ static void vBatteryTask( void *pvParameters )
 */
 void vBatteryTaskStart(void)
 {
-  xTaskCreate( vBatteryTask, "BatteryTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
+  xTaskCreate( vBatteryTask, "BatteryTask", configMINIMAL_STACK_SIZE, NULL, 1, NULL );
 }
 
 /**
