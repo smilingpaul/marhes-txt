@@ -41,17 +41,21 @@ static void vControllerTask( void *pvParameters )
   static int32_t count = 0;
   static float dt;
   static uint32_t ticks, lastTicks = 0;
+  
+  static int64_t e_sum = 0;
 
   portTickType xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount();
 
   for( ;; )
   {
+    portENTER_CRITICAL();
     if (controllerMode == 1)
     {
 	    if (ModeStopLostConn() == pdFALSE)// && ModeUseOdomComb() == pdTRUE)
 	    {
 		    // Get the error signals and process signals
+		    
 		    if (ModeUseOdomComb() == pdTRUE)
 		    {
 		      lv = combLinVelocity;
@@ -66,7 +70,7 @@ static void vControllerTask( void *pvParameters )
 			    e_lv = linVelocity - lv;
 			    e_av = angVelocity - av;
 		    }
-
+        
         ticks = xTaskGetTickCount();
         if (ticks > lastTicks)
           dt = (float)(ticks - lastTicks) / configTICK_RATE_HZ;
@@ -75,11 +79,12 @@ static void vControllerTask( void *pvParameters )
         lastTicks = ticks;
 		    
 		    // VELOCITY PID CONTROLLER
-		    lpterm = (float)(e_lv - e_lv_last);
-		    literm = (float)e_lv * dt;
-		    ldterm = (float)(e_lv - 2 * e_lv_last + e_lv_last2) / dt;
+		    lpterm = (float)kp_lv * (e_lv - e_lv_last);
+		    //e_sum += e_lv;
+		    literm = (float)ki_lv * (e_lv + e_lv_last) / 2 * dt;
+		    ldterm = (float)kd_lv * (e_lv - 2 * e_lv_last + e_lv_last2) / dt;
 		    
-		    u_lv += (int32_t)(kp_lv * lpterm + ki_lv * literm + kd_lv * ldterm);
+		    u_lv += (int32_t)(lpterm + literm - ldterm);
 		    
 		    if (u_lv > VELOCITY_PWM_MAX)
 		      u_lv = VELOCITY_PWM_MAX;
@@ -131,6 +136,7 @@ static void vControllerTask( void *pvParameters )
 	    }
 	  }
 	  //FIO0PIN ^= (1<<21);
+	  portEXIT_CRITICAL();
 
     vTaskDelayUntil( &xLastWakeTime, ( DELTA_T / portTICK_RATE_MS ) );
   }
@@ -139,17 +145,19 @@ static void vControllerTask( void *pvParameters )
 void vControllerTaskStart(void)
 {
   controllerMode = 1;
-  xTaskCreate( vControllerTask, "ControllerTask", configMINIMAL_STACK_SIZE * 2, NULL, 4, NULL );
+  xTaskCreate( vControllerTask, "ControllerTask", configMINIMAL_STACK_SIZE * 4, NULL, 4, NULL );
 }
 
 void ControllerSetLinearVelocity(int16_t value) 
 {
+  portENTER_CRITICAL();
 	if (value > LIN_VEL_MAX)
 		linVelocity = LIN_VEL_MAX;
 	else if (value < LIN_VEL_MIN)
 		linVelocity = LIN_VEL_MIN;
 	else
 		linVelocity = value;
+  portEXIT_CRITICAL();
 }
 
 int16_t ControllerGetLinearVelocity(void) 
@@ -159,12 +167,14 @@ int16_t ControllerGetLinearVelocity(void)
 
 void ControllerSetAngularVelocity(int16_t value) 
 {
+  portENTER_CRITICAL();
 	if (value > ANG_VEL_MAX)
 		angVelocity = ANG_VEL_MAX;
 	else if (value < ANG_VEL_MIN)
 		angVelocity = ANG_VEL_MIN;
 	else
 		angVelocity = value;
+  portEXIT_CRITICAL();
 }
 
 int16_t ControllerGetAngularVelocity(void) 
@@ -174,8 +184,10 @@ int16_t ControllerGetAngularVelocity(void)
 
 void ControllerSetOdomCombined(int32_t linVel, int32_t angVel)
 {
+  portENTER_CRITICAL();
 	combLinVelocity = linVel;
 	combAngVelocity = angVel;
+	portEXIT_CRITICAL();
 }
 
 void ControllerSetPid(int32_t lp, int32_t li, int32_t ld, \
@@ -218,7 +230,9 @@ float ControllerGetPid(uint8_t gain)
 
 void ControllerToggleMode(void)
 {
+  portENTER_CRITICAL();
   controllerMode ^= 1;
+  portEXIT_CRITICAL();
 }
 
 int8_t ControllerGetMode(void)

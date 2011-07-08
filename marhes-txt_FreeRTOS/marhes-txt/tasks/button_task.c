@@ -60,7 +60,7 @@ static void vButtonTask( void *pvParameters )
 */
 void vButtonTaskStart(void)
 {
-  xTaskCreate( vButtonTask, "ButtonTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
+  xTaskCreate( vButtonTask, "ButtonTask", configMINIMAL_STACK_SIZE, NULL, 1, NULL );
 }
 
 /**

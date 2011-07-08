@@ -29,7 +29,7 @@
 #define FRONT_SERVO_CHANNEL			2
 #define REAR_SERVO_CHANNEL			3
 
-#define DELTA_T               20
+#define DELTA_T               50
 
 // The maximum linear and angular velocities
 #define LIN_VEL_MAX					3000

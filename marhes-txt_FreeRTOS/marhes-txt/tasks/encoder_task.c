@@ -113,9 +113,10 @@ static void vEncoderTask( void *pvParameters )
  	  ticks_fr_2 = ticks_fr_1;
 	  ticks_fr_1 = ticks_fr_0;
     
+    portENTER_CRITICAL();
     vels[VELS_LINEAR] = EncoderGetDirection(TICKS_FL) * (ticks[TICKS_FR] + ticks[TICKS_FL]) * 15 / 2;  // Make 15 for xored enc inputs
 		vels[VELS_ANGULAR] = EncoderGetDirection(TICKS_FL) * (ticks[TICKS_FR] - ticks[TICKS_FL]) * 15000 / 554;
-		      
+		portEXIT_CRITICAL();
     /*
 		vels[VELS_LINEAR] = (EncoderGetDirection(TICKS_FR) * \
 		      ticks[TICKS_FR] + EncoderGetDirection(TICKS_FL) * \
@@ -167,7 +168,7 @@ static void vEncoderSendTask( void *pvParameters )
 */
 void vEncoderTaskStart(void)
 {
-  xTaskCreate( vEncoderTask, "EncoderTask", configMINIMAL_STACK_SIZE * 2, NULL, 3, NULL );
+  xTaskCreate( vEncoderTask, "EncoderTask", configMINIMAL_STACK_SIZE * 4, NULL, 3, NULL );
   xTaskCreate( vEncoderSendTask, "EncoderSendTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
 }
 
@@ -240,7 +241,9 @@ int8_t EncoderGetDirection(uint8_t channel)
 */
 int32_t EncoderLinVel(void)
 {
+  portENTER_CRITICAL();
   return vels[VELS_LINEAR];
+  portEXIT_CRITICAL();
 }
 
 /**
@@ -249,7 +252,9 @@ int32_t EncoderLinVel(void)
 */
 int32_t EncoderAngVel(void)
 {
+  portENTER_CRITICAL();
   return vels[VELS_ANGULAR];
+  portEXIT_CRITICAL();
 }
 
 /**

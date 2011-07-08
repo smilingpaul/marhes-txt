@@ -53,7 +53,7 @@ static void vDisplayTask( void *pvParameters )
 */
 void vDisplayTaskStart(void)
 {
-  xTaskCreate( vDisplayTask, "DisplayTask", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
+  xTaskCreate( vDisplayTask, "DisplayTask", configMINIMAL_STACK_SIZE * 2, NULL, 2, NULL );
 }
 
 /**
