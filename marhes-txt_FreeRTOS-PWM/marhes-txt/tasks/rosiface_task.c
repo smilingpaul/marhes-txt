@@ -104,7 +104,7 @@ static void vRxTask( void *pvParameters )
         if(dataNum >= 8)
         {
           FIO0PIN ^= (1<<21);
-          temp = 72000 + ((data.var.data[0] << 8) | data.var.data[1]);
+          temp = 72000 + (int16_t)((data.var.data[0] << 8) | data.var.data[1]);
           PWMSetDuty(4, temp);
           temp = (int16_t)((data.var.data[2] << 8) | data.var.data[3]);
           temp = 72000 - temp;
