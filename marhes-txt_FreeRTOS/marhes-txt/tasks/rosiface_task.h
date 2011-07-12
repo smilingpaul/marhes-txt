@@ -37,8 +37,10 @@
 #define CMD_ODOM_COMB     105
 #define CMD_BATTERY			  106
 #define CMD_PID_RX			  107
-#define CMD_PWM_RX			  108
+#define CMD_PWM_TEST      108
 #define CMD_PID_TERMS     109
+#define CMD_SWITCH_PWR    110
+#define CMD_PWM           111
 
 // Size doesn't include header or chksum
 #define SIZE_VEL			    4
@@ -46,8 +48,10 @@
 #define SIZE_ODOM_COMB		20
 #define SIZE_BATTERY		  4
 #define SIZE_PID_RX			  24
-#define SIZE_PWM_RX			  12
+#define SIZE_PWM_TEST		  20
 #define SIZE_PID_TERMS    16
+#define SIZE_SWITCH_PWR   2
+#define SIZE_PWM          8
 
 // Size of arrays
 #define SIZE_VEL_ARR      2
@@ -57,6 +61,9 @@
 // Command Vel Array Indexes
 #define ROS_LINEAR_VEL		0
 #define ROS_ANGULAR_VEL		1
+
+#define PWR_SOURCE_ATX    0
+#define PWR_SOURCE_ESC    1
 
 /**
  @brief The header of the message.  Provides access to individual bytes of the 
