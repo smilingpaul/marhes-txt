@@ -112,7 +112,7 @@ static void vControllerTask( void *pvParameters )
 	      count++;
 	      if (count > 5)
 	      {
-	        ROSSendPidTerms(&data, (int32_t)lpterm, (int32_t)literm, (int32_t)ldterm, u_lv);
+	        //ROSSendPidTerms(&data, (int32_t)lpterm, (int32_t)literm, (int32_t)ldterm, u_lv);
 	        count = 0;
 	      }
 

@@ -54,12 +54,12 @@ static void vModeTask( void *pvParameters )
     if (OdomCombRxCount > ODOM_COMB_LIMIT)
     {
 			UseOdomComb = pdTRUE;
-			vSerialPutString( debugPortHandle, "ODOM_COMB\r\n", 11 );
+//			vSerialPutString( debugPortHandle, "ODOM_COMB\r\n", 11 );
 		}
 		else
 		{
 			UseOdomComb = pdFALSE;
-			vSerialPutString( debugPortHandle, "ODOM_ENCR\r\n", 11 );
+//			vSerialPutString( debugPortHandle, "ODOM_ENCR\r\n", 11 );
     }
     
 		OdomCombRxCount = 0;
@@ -67,12 +67,12 @@ static void vModeTask( void *pvParameters )
   	if (CmdVelRxCount > CMD_VEL_LIMIT)
 		{
 			StopLostConn = pdFALSE;
-			vSerialPutString( debugPortHandle, "LINK_ACTIVE\r\n", 13 );
+//			vSerialPutString( debugPortHandle, "LINK_ACTIVE\r\n", 13 );
 	  }
 		else
 		{
 			StopLostConn = pdTRUE;
-			vSerialPutString( debugPortHandle, "LINK_ERROR\r\n", 12 );
+//			vSerialPutString( debugPortHandle, "LINK_ERROR\r\n", 12 );
 		}
 
 		CmdVelRxCount = 0;

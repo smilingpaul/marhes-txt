@@ -36,18 +36,18 @@ static void vButtonTask( void *pvParameters )
     if (buttonChanged == BUT_RIGHT_BIT)
     {
       DisplayIncreaseState();
-      vSerialPutString( debugPortHandle, "RIGHT\r\n", 7 );
+//      vSerialPutString( debugPortHandle, "RIGHT\r\n", 7 );
     }
     else if (buttonChanged == BUT_LEFT_BIT)
     {
       DisplayDecreaseState();
-      vSerialPutString( debugPortHandle, "LEFT\r\n", 6 );
+//      vSerialPutString( debugPortHandle, "LEFT\r\n", 6 );
     }
     
     if (buttonChanged == BUT_CENTER_BIT)
     {
       ControllerToggleMode();
-      vSerialPutString( debugPortHandle, "CENTER\r\n", 8 );
+//      vSerialPutString( debugPortHandle, "CENTER\r\n", 8 );
     }
     
     vTaskDelay( 100 / portTICK_RATE_MS );
