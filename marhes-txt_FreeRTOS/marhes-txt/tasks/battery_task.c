@@ -40,7 +40,7 @@ static void vBatteryTask( void *pvParameters )
   {
     BatteryUpdateVoltages();
     BatteryUpdateStatus();
-    ROSSendBattery(&data, batt1, batt2);
+//    ROSSendBattery(&data, batt1, batt2);
   
     vTaskDelay( 1000 / portTICK_RATE_MS );
   }
@@ -72,17 +72,17 @@ void BatteryUpdateStatus(void)
 	if((batt1 > BATTERY_VWARN) && (batt2 > BATTERY_VWARN))
 	{
 		status = BATTERY_GOOD;
-		vSerialPutString( debugPortHandle, "BATTERY_GOOD\r\n", 14 );
+//		vSerialPutString( debugPortHandle, "BATTERY_GOOD\r\n", 14 );
 	}
 	else if ((batt1 > BATTERY_VBAD) && (batt2 > BATTERY_VBAD))
 	{
 		status = BATTERY_WARN;
-		vSerialPutString( debugPortHandle, "BATTERY_WARN\r\n", 14 );
+//		vSerialPutString( debugPortHandle, "BATTERY_WARN\r\n", 14 );
 	}
 	else
 	{
 		status = BATTERY_BAD;
-		vSerialPutString( debugPortHandle, "BATTERY_BAD\r\n", 13 );
+//		vSerialPutString( debugPortHandle, "BATTERY_BAD\r\n", 13 );
   }
 }
 
