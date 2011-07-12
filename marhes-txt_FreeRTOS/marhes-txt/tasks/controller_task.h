@@ -24,10 +24,12 @@
 #include "tasks/encoder_task.h"
 
 // The PWM channels of the different motors
-#define DEFAULT_CHANNEL 			0
-#define MOTOR_CHANNEL				4
+#define DEFAULT_CHANNEL 		    0
+#define MOTOR_CHANNEL				    4
 #define FRONT_SERVO_CHANNEL			2
 #define REAR_SERVO_CHANNEL			3
+#define PWM4                    4
+#define PWM5                    5
 
 #define DELTA_T               50
 
