@@ -41,6 +41,7 @@ static void vControllerTask( void *pvParameters )
   static int32_t count = 0;
   static float dt;
   static uint32_t ticks, lastTicks = 0;
+  //static int32_t y, y_prev = 0, lv_last = 0;;
   
   static int64_t e_sum = 0;
 
@@ -58,6 +59,7 @@ static void vControllerTask( void *pvParameters )
 		    
 		    if (ModeUseOdomComb() == pdTRUE)
 		    {
+		      //lv = ki_av * combLinVelocity + (1-ki_av) * lv_last;
 		      lv = combLinVelocity;
 		      av = combAngVelocity;
 			    e_lv = linVelocity - lv;
@@ -84,7 +86,7 @@ static void vControllerTask( void *pvParameters )
 		    literm = (float)ki_lv * (e_lv + e_lv_last) / 2 * dt;
 		    ldterm = (float)kd_lv * (e_lv - 2 * e_lv_last + e_lv_last2) / dt;
 		    
-		    u_lv += (int32_t)(lpterm + literm - ldterm);
+		    u_lv += (int32_t)(lpterm + literm + ldterm);
 		    
 		    if (u_lv > VELOCITY_PWM_MAX)
 		      u_lv = VELOCITY_PWM_MAX;
@@ -97,6 +99,11 @@ static void vControllerTask( void *pvParameters )
 		    adterm = (float)(e_av - 2 * e_av_last + e_av_last2) / dt;
 		    
 		    u_av += (int32_t)(kp_av * apterm + ki_av * aiterm + kd_av * adterm);
+		    
+		    //y = kp_av * u_lv + (1 - kp_av) * y_prev;
+		    //y_prev = y;
+		    //u_lv = y;
+		    //lv_last = lv;
 		    
 		    if (u_av > VELOCITY_PWM_MAX)
 		      u_av = VELOCITY_PWM_MAX;
