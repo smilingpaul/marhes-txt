@@ -34,8 +34,8 @@
 #define DELTA_T               50
 
 // The maximum linear and angular velocities
-#define LIN_VEL_MAX					1500
-#define LIN_VEL_MIN					-1500
+#define LIN_VEL_MAX					1000
+#define LIN_VEL_MIN					-1000
 
 #define RADIUS_MIN          555  // In mm
 
