@@ -34,22 +34,16 @@
 #define DELTA_T               50
 
 // The maximum linear and angular velocities
-#define LIN_VEL_MAX					3000
-#define LIN_VEL_MIN					-3000
-#define ANG_VEL_MAX					5000
-#define ANG_VEL_MIN					-5000
+#define LIN_VEL_MAX					1500
+#define LIN_VEL_MIN					-1500
 
-// The maximum and minimum velocities accepted from ROS
-#define VELOCITY_MAX 				1600
-#define VELOCITY_MIN 				-1600
-#define THETA_MAX 					1600
-#define THETA_MIN  					-1600
+#define RADIUS_MIN          555  // In mm
 
 // The maximum and minimum PWM values for the servos/motor controller
 #define VELOCITY_PWM_MAX			(PWM_MAX - DUTY_1_5)
 #define VELOCITY_PWM_MIN			(PWM_MIN - DUTY_1_5)
-#define THETA_PWM_MAX				144000	// PWM - Freq = 0x15F900 (1440000)
-#define THETA_PWM_MIN				72000
+#define ANGULAR_PWM_MAX				18000
+#define ANGULAR_PWM_MIN				-18000
 
 /**
  @brief Array indices for the pid gain matrix
@@ -62,9 +56,8 @@ enum GAINS{ KP_LV,                  ///< Linear Velocity Proportional Gain
             KD_AV                   ///< Angular Velocity Derivative Gain
           };
 void vControllerTaskStart(void);
-void ControllerSetLinearVelocity(int16_t value);
+void ControllerSetVelocity(int16_t lv, int16_t av);
 int16_t ControllerGetLinearVelocity(void);
-void ControllerSetAngularVelocity(int16_t value);
 int16_t ControllerGetAngularVelocity(void);
 void ControllerSetOdomCombined(int32_t linVel, int32_t angVel);
 void ControllerSetPid(int32_t lp, int32_t li, int32_t ld, \

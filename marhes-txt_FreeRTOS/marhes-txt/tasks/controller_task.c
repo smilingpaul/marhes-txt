@@ -29,6 +29,9 @@ static float kp_av, ki_av, kd_av;
 
 static msg_u data;
 
+static int16_t absValue(int16_t value);
+static int16_t signValue(int16_t value);
+
 static void vControllerTask( void *pvParameters )
 {
   static int32_t lv = 0, av = 0;
@@ -55,23 +58,21 @@ static void vControllerTask( void *pvParameters )
     {
 	    if (ModeStopLostConn() == pdFALSE)// && ModeUseOdomComb() == pdTRUE)
 	    {
-		    // Get the error signals and process signals
-		    
 		    if (ModeUseOdomComb() == pdTRUE)
 		    {
 		      //lv = ki_av * combLinVelocity + (1-ki_av) * lv_last;
 		      lv = combLinVelocity;
 		      av = combAngVelocity;
-			    e_lv = linVelocity - lv;
-			    e_av = angVelocity - av;
 		    }
 		    else
 		    {
 		      lv = EncoderLinVel();
 		      av = EncoderAngVel();
-			    e_lv = linVelocity - lv;
-			    e_av = angVelocity - av;
-		    }
+		    }        
+        
+        // Get the error signals and process signals
+		    e_lv = linVelocity - lv;
+		    e_av = angVelocity - av;
         
         ticks = xTaskGetTickCount();
         if (ticks > lastTicks)
@@ -82,7 +83,6 @@ static void vControllerTask( void *pvParameters )
 		    
 		    // VELOCITY PID CONTROLLER
 		    lpterm = (float)kp_lv * (e_lv - e_lv_last);
-		    //e_sum += e_lv;
 		    literm = (float)ki_lv * (e_lv + e_lv_last) / 2 * dt;
 		    ldterm = (float)kd_lv * (e_lv - 2 * e_lv_last + e_lv_last2) / dt;
 		    
@@ -94,27 +94,22 @@ static void vControllerTask( void *pvParameters )
 		    if (u_lv < VELOCITY_PWM_MIN)
 		      u_lv = VELOCITY_PWM_MIN;
 		      
-		    apterm = (float)(e_av - e_av_last);
-		    aiterm = (float)e_av * dt;
-		    adterm = (float)(e_av - 2 * e_av_last + e_av_last2) / dt;
+		    apterm = (float)kp_av * (e_av - e_av_last);
+		    aiterm = (float)ki_av * (e_av + e_av_last) / 2 * dt;
+		    adterm = (float)kd_av * (e_av - 2 * e_av_last + e_av_last2) / dt;
 		    
-		    u_av += (int32_t)(kp_av * apterm + ki_av * aiterm + kd_av * adterm);
+		    u_av += (int32_t)(apterm + aiterm + adterm);
 		    
-		    //y = kp_av * u_lv + (1 - kp_av) * y_prev;
-		    //y_prev = y;
-		    //u_lv = y;
-		    //lv_last = lv;
-		    
-		    if (u_av > VELOCITY_PWM_MAX)
-		      u_av = VELOCITY_PWM_MAX;
+		    if (u_av > ANGULAR_PWM_MAX)
+		      u_av = ANGULAR_PWM_MAX;
 		      		    
-		    if (u_av < VELOCITY_PWM_MIN)
-		      u_av = VELOCITY_PWM_MIN;
+		    if (u_av < ANGULAR_PWM_MIN)
+		      u_av = ANGULAR_PWM_MIN;
 
 		    // Set the PWM duty cycles for the motor and the steering servos
 		    PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + u_lv);
-	      PWMSetDuty(FRONT_SERVO_CHANNEL, DUTY_1_5 - angVelocity * 9);//u_av);
-	      PWMSetDuty(REAR_SERVO_CHANNEL, DUTY_1_5 + angVelocity * 9);//u_av);
+	      PWMSetDuty(FRONT_SERVO_CHANNEL, DUTY_1_5 - u_av);
+	      PWMSetDuty(REAR_SERVO_CHANNEL, DUTY_1_5 + u_av);
 	    
 	      count++;
 	      if (count > 5)
@@ -155,33 +150,35 @@ void vControllerTaskStart(void)
   xTaskCreate( vControllerTask, "ControllerTask", configMINIMAL_STACK_SIZE * 4, NULL, 4, NULL );
 }
 
-void ControllerSetLinearVelocity(int16_t value) 
+void ControllerSetVelocity(int16_t lv, int16_t av) 
 {
+  float maxAV;
   portENTER_CRITICAL();
-	if (value > LIN_VEL_MAX)
-		linVelocity = LIN_VEL_MAX;
-	else if (value < LIN_VEL_MIN)
-		linVelocity = LIN_VEL_MIN;
-	else
-		linVelocity = value;
+  
+  if (lv > LIN_VEL_MAX)
+    linVelocity = LIN_VEL_MAX;
+  else if (lv < LIN_VEL_MIN)
+    linVelocity = LIN_VEL_MIN;
+  else
+    linVelocity = lv;
+    
+  maxAV = 1000 * absValue(linVelocity) / RADIUS_MIN;
+  
+  if (absValue(av) > maxAV)
+  {
+    angVelocity = signValue(av) * maxAV;
+  }
+  else
+  {
+    angVelocity = av;
+  }
+		
   portEXIT_CRITICAL();
 }
 
 int16_t ControllerGetLinearVelocity(void) 
 {
 	return linVelocity;
-}
-
-void ControllerSetAngularVelocity(int16_t value) 
-{
-  portENTER_CRITICAL();
-	if (value > ANG_VEL_MAX)
-		angVelocity = ANG_VEL_MAX;
-	else if (value < ANG_VEL_MIN)
-		angVelocity = ANG_VEL_MIN;
-	else
-		angVelocity = value;
-  portEXIT_CRITICAL();
 }
 
 int16_t ControllerGetAngularVelocity(void) 
@@ -245,4 +242,21 @@ void ControllerToggleMode(void)
 int8_t ControllerGetMode(void)
 {
   return controllerMode;
+}
+
+static int16_t absValue(int16_t value)
+{
+  int16_t retVal = value;
+  if (value < 0)
+    retVal = -value;
+  
+  return retVal;
+}
+
+static int16_t signValue(int16_t value)
+{
+  int16_t retValue = 1;
+  if (value < 0)
+    retValue = -1;
+  return retValue;
 }
