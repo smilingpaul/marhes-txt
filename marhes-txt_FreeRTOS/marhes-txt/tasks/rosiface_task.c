@@ -351,8 +351,8 @@ void ROSProcessData(void)
         break;
       // Store velocity command values
       portENTER_CRITICAL();
-      ControllerSetLinearVelocity((int16_t)(data.var.data[0] << 8 | data.var.data[1]));
-      ControllerSetAngularVelocity((int16_t)(data.var.data[2] << 8 | data.var.data[3]));
+      ControllerSetVelocity((int16_t)(data.var.data[0] << 8 | data.var.data[1]),
+                            (int16_t)(data.var.data[2] << 8 | data.var.data[3]));
       vModeCmdVelRx();
       portEXIT_CRITICAL();
       //FIO0PIN ^= (1<<21);
