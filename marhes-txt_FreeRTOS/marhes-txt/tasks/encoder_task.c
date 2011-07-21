@@ -87,11 +87,11 @@ static void vEncoderTask( void *pvParameters )
 
 	  // Store the right and left encoder counts, get rid of noise
 	  if (T0TC > 2)
-		  ticks_fl_0 = T0TC;
+		  ticks_fl_0 = T0TC * EncoderGetDirection(TICKS_FL);
 	  else
 		  ticks_fl_0 = 0;
 	  if (T3TC > 2)
-		  ticks_fr_0 = T3TC;
+		  ticks_fr_0 = T3TC * EncoderGetDirection(TICKS_FR);
 	  else
 		  ticks_fr_0 = 0;
 
@@ -101,8 +101,8 @@ static void vEncoderTask( void *pvParameters )
 	  T0TCR = TCR_CE;
 	  T3TCR = TCR_CE;
 	  
-	  ticks[TICKS_FL] = (ticks_fl_0);// + ticks_fl_1) / 2;// + ticks_fl_2 + ticks_fl_3 + ticks_fl_4) / 5;
-	  ticks[TICKS_FR] = (ticks_fr_0);// + ticks_fr_1) / 2;// + ticks_fr_2 + ticks_fr_3 + ticks_fr_4) / 5;
+	  ticks[TICKS_FL] = (ticks_fl_0);// + ticks_fl_1 + ticks_fl_2) / 3;// + ticks_fl_3 + ticks_fl_4) / 5;
+	  ticks[TICKS_FR] = (ticks_fr_0);// + ticks_fr_1 + ticks_fr_2) / 3;// + ticks_fr_3 + ticks_fr_4) / 5;
 	  
 	  ticks_fl_4 = ticks_fl_3;
 	  ticks_fl_3 = ticks_fl_2;
@@ -114,17 +114,10 @@ static void vEncoderTask( void *pvParameters )
 	  ticks_fr_1 = ticks_fr_0;
     
     portENTER_CRITICAL();
-    vels[VELS_LINEAR] = EncoderGetDirection(TICKS_FL) * (ticks[TICKS_FR] + ticks[TICKS_FL]) * 15 / 2;  // Make 15 for xored enc inputs
-		vels[VELS_ANGULAR] = EncoderGetDirection(TICKS_FL) * (ticks[TICKS_FR] - ticks[TICKS_FL]) * 15000 / 554;
+    vels[VELS_LINEAR] =  (ticks[TICKS_FR] + ticks[TICKS_FL]) * 7.5;  // Make 15 for xored enc inputs
+		vels[VELS_ANGULAR] = (ticks[TICKS_FR] - ticks[TICKS_FL]) * 60;
 		portEXIT_CRITICAL();
-    /*
-		vels[VELS_LINEAR] = (EncoderGetDirection(TICKS_FR) * \
-		      ticks[TICKS_FR] + EncoderGetDirection(TICKS_FL) * \
-		      ticks[TICKS_FL]) * 15 / 2;
-		vels[VELS_ANGULAR] = (EncoderGetDirection(TICKS_FR) * \
-		      ticks[TICKS_FR] - EncoderGetDirection(TICKS_FL) * \
-		      ticks[TICKS_FL]) * 15000 / 285;
-     */
+
 	  dx = (float)vels[VELS_LINEAR] * anglookuptable(pos[2], 1) * 20 / 1000000;
 	  dy = (float)vels[VELS_LINEAR] * anglookuptable(pos[2], 0) * 20 / 1000000;
 	  dth = (float)vels[VELS_ANGULAR] * 20 / 1000;
