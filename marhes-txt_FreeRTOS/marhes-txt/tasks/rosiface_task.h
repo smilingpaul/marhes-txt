@@ -41,6 +41,7 @@
 #define CMD_PID_TERMS     109
 #define CMD_SWITCH_PWR    110
 #define CMD_PWM           111
+#define CMD_PID           112
 
 // Size doesn't include header or chksum
 #define SIZE_VEL			    4
@@ -52,6 +53,7 @@
 #define SIZE_PID_TERMS    16
 #define SIZE_SWITCH_PWR   2
 #define SIZE_PWM          8
+#define SIZE_PID_MAX      108
 
 // Size of arrays
 #define SIZE_VEL_ARR      2
@@ -64,6 +66,9 @@
 
 #define PWR_SOURCE_ATX    0
 #define PWR_SOURCE_ESC    1
+
+#define RESP_OK           0x3C
+#define RESP_ERROR        0x55
 
 /**
  @brief The header of the message.  Provides access to individual bytes of the 
@@ -117,6 +122,8 @@ void ROSSendBattery(msg_u * pmsg, uint16_t batt1, uint16_t batt2);
 void ROSSendPidTerms(msg_u * pmsg, \
                      int32_t pterm, int32_t iterm, int32_t dterm, \
 		                 int32_t signal);
+void ROSSendPidResponse(msg_u * pmsg, \
+                        uint8_t resp);
 void ROSBuildHeader(msg_u * pmsg, uint8_t dataSize, uint8_t command);
 void vRxTaskStart(void);
 int8_t ROSChecksum(void);
