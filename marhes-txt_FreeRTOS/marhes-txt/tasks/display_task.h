@@ -27,9 +27,10 @@
 #define DISPLAY_STATUS		  0             ///< Status display type
 #define DISPLAY_PWM		      1             ///< PWM display type
 #define DISPLAY_ENCODER		  2             ///< Encoder display type
+#define DISPLAY_GAINS       3             ///< Gains display type
 
 #define DISPLAY_MIN         0             ///< Min display type
-#define DISPLAY_MAX         2             ///< Max display type
+#define DISPLAY_MAX         3             ///< Max display type
 
 #define FCOLOR			        YELLOW        ///< Foreground color
 #define BCOLOR			        BLACK         ///< Background color
@@ -45,5 +46,6 @@ void DisplayBrightUpdate(void);
 void DisplayStatus(void);
 void DisplayPWM(void);
 void DisplayEncoders(void);
+void DisplayGains(void);
 
 #endif

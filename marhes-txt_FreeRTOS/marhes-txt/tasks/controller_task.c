@@ -27,6 +27,10 @@ static int8_t controllerMode = 1;
 static float kp_lv, ki_lv, kd_lv;
 static float kp_av, ki_av, kd_av;
 
+static uint8_t ang_pid_cnt = 0; 
+static float lin_pids[3], ang_pids[ANG_PID_CNT_MAX];
+static int32_t lv = 0, av = 0;
+
 static msg_u data;
 
 static int16_t absValue(int16_t value);
@@ -34,17 +38,17 @@ static int16_t signValue(int16_t value);
 
 static void vControllerTask( void *pvParameters )
 {
-  static int32_t lv = 0, av = 0;
   static int32_t e_lv = 0, e_av = 0;
   static int32_t e_lv_last = 0, e_av_last = 0;
   static int32_t e_lv_last2 = 0, e_av_last2 = 0;
   static float lpterm, literm, ldterm;
   static float apterm, aiterm, adterm;
   static int32_t u_lv = 0, u_av = 0;
-  static int32_t count = 0;
+  static int32_t angVelIndex;
+//  static int32_t count = 0;
   static float dt;
   static uint32_t ticks, lastTicks = 0;
-  //static int32_t y, y_prev = 0, lv_last = 0;;
+//  static int32_t y, y_prev = 0, lv_last = 0;;
   
   static int64_t e_sum = 0;
 
@@ -82,9 +86,13 @@ static void vControllerTask( void *pvParameters )
         lastTicks = ticks;
 		    
 		    // VELOCITY PID CONTROLLER
-		    lpterm = (float)kp_lv * (e_lv - e_lv_last);
-		    literm = (float)ki_lv * (e_lv + e_lv_last) / 2 * dt;
-		    ldterm = (float)kd_lv * (e_lv - 2 * e_lv_last + e_lv_last2) / dt;
+		    //lpterm = kp_lv * (e_lv - e_lv_last);
+		    //literm = ki_lv * (e_lv + e_lv_last) / 2 * dt;
+		    //ldterm = kd_lv * (e_lv - 2 * e_lv_last + e_lv_last2) / dt;
+		    
+		    lpterm = lin_pids[0] * (e_lv - e_lv_last);
+		    literm = lin_pids[1] * (e_lv + e_lv_last) / 2 * dt;
+		    ldterm = lin_pids[2] * (e_lv - 2 * e_lv_last + e_lv_last2) / dt;
 		    
 		    u_lv += (int32_t)(lpterm + literm + ldterm);
 		    
@@ -93,10 +101,20 @@ static void vControllerTask( void *pvParameters )
 		      		    
 		    if (u_lv < VELOCITY_PWM_MIN)
 		      u_lv = VELOCITY_PWM_MIN;
-		      
-		    apterm = (float)kp_av * (e_av - e_av_last);
-		    aiterm = (float)ki_av * (e_av + e_av_last) / 2 * dt;
-		    adterm = (float)kd_av * (e_av - 2 * e_av_last + e_av_last2) / dt;
+		    
+		    angVelIndex = 0;
+        while (abs(lv) > ang_pids[angVelIndex] && angVelIndex < ang_pid_cnt - 4)
+        { 
+          angVelIndex += 4; 
+		    }
+		    
+		    apterm = ang_pids[angVelIndex + 1] * (e_av - e_av_last);
+		    aiterm = ang_pids[angVelIndex + 2] * (e_av + e_av_last) / 2 * dt;
+		    adterm = ang_pids[angVelIndex + 3] * (e_av - 2 * e_av_last + e_av_last2) / dt;
+		    
+ 		    //apterm = kp_av * (e_av - e_av_last);
+		    //aiterm = ki_av * (e_av + e_av_last) / 2 * dt;
+		    //adterm = kd_av * (e_av - 2 * e_av_last + e_av_last2) / dt;
 		    
 		    u_av += (int32_t)(apterm + aiterm + adterm);
 		    
@@ -111,12 +129,12 @@ static void vControllerTask( void *pvParameters )
 	      PWMSetDuty(FRONT_SERVO_CHANNEL, DUTY_1_5 - u_av);
 	      PWMSetDuty(REAR_SERVO_CHANNEL, DUTY_1_5 + u_av);
 	    
-	      count++;
+	      /*count++;
 	      if (count > 5)
 	      {
-	        //ROSSendPidTerms(&data, (int32_t)lpterm, (int32_t)literm, (int32_t)ldterm, u_lv);
+	        ROSSendPidTerms(&data, (int32_t)lpterm, (int32_t)literm, (int32_t)ldterm, u_lv);
 	        count = 0;
-	      }
+	      }*/
 
 		    // Store last velocity errors
 		    e_lv_last2 = e_lv_last;
@@ -230,6 +248,58 @@ float ControllerGetPid(uint8_t gain)
     default:
       break;
   }
+}
+
+float ControllerGetLinPid(uint8_t gain)
+{ 
+  return lin_pids[gain];
+}
+
+float ControllerGetAngPid(uint8_t gain)
+{
+  uint8_t i = 0;
+  while (abs(lv) > ang_pids[i] && i < ang_pid_cnt - 4)
+    i += 4;
+    
+  return ang_pids[i + 1 + gain];
+}
+
+float ControllerGetAngPidAddr(uint8_t velIndex, int8_t gain)
+{
+  return ang_pids[velIndex * 4 + gain + 1];
+}
+
+// There are only three linear pid gains
+void ControllerSetLinPid(int32_t * linPids)
+{
+  uint8_t i;
+  portENTER_CRITICAL();
+  for (i = 0; i < 3; i++)
+  {
+    lin_pids[i] = (float)(*linPids) / 1000;
+    linPids++;
+  }
+  portEXIT_CRITICAL();
+}
+
+void ControllerSetAngPid(int32_t * angPids, uint8_t count)
+{
+  uint8_t i;
+  portENTER_CRITICAL();
+  ang_pid_cnt = count;
+  for (i = 0; i < count; i++)
+  {
+    if ((i == 0) || (i % 4 == 0))
+      ang_pids[i] = (float)(*angPids);
+    else
+      ang_pids[i] = (float)(*angPids) / 1000;
+    angPids++;
+  }
+  
+  for (i = count; i < ANG_PID_CNT_MAX; i++)
+    ang_pids[i] = 0.0;
+    
+  portEXIT_CRITICAL();
 }
 
 void ControllerToggleMode(void)

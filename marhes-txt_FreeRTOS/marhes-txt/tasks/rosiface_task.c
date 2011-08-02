@@ -48,7 +48,7 @@
 extern xComPortHandle rosPortHandle;
 
 ///< The message structure that stores incoming data for parsing.
-static msg_u data;                           
+static msg_u data, send;                           
 
 /**
  @brief Builds the ROS header for a message.
@@ -217,6 +217,21 @@ void ROSSendPidTerms(msg_u * pmsg, \
 	vSerialPutString( rosPortHandle, pmsg->bytes,  pmsg->var.header.var.length + HEADER_SIZE + CHKSUM_SIZE);
 }
 
+void ROSSendPidResponse(msg_u * pmsg, \
+                        uint8_t resp)
+{
+  uint16_t checksum;
+  ROSBuildHeader(pmsg, 1, CMD_PID);                 // Build header
+  
+  pmsg->var.data[0] = resp;
+  
+  checksum = ROSCalcChkSum(pmsg);
+  pmsg->var.data[1] = checksum >> 8;
+	pmsg->var.data[2] = checksum & 0xFF;
+	
+	vSerialPutString( rosPortHandle, pmsg->bytes,  pmsg->var.header.var.length + HEADER_SIZE + CHKSUM_SIZE);
+}
+
 /**
  @brief The task to parse received data.
  
@@ -328,7 +343,7 @@ int8_t ROSChecksum(void)
 */
 void ROSProcessData(void)
 {
-  static int32_t pidVals[6];
+  static int32_t pidVals[24];
   static int32_t temp;
   
   switch(data.var.header.var.command)
@@ -427,6 +442,35 @@ void ROSProcessData(void)
       temp = (data.var.data[4] << 24)  | (data.var.data[5] << 16) | \
 	           (data.var.data[6] << 8)   | data.var.data[7];
 	    PWMSetDuty(PWM5, DUTY_1_5 + temp);	
+      break;
+    case CMD_PID:
+      if (data.var.header.var.length > SIZE_PID_MAX)
+        break;
+      
+      uint8_t numAngPids;  
+      if ((data.var.header.var.length / 4 - 3) % 4 == 0)
+        numAngPids = (data.var.header.var.length / 4 - 3);
+      else
+        break;
+        
+      uint8_t i;
+      for (i = 0; i < 3; i++)
+      {
+        pidVals[i] = (data.var.data[0 + 4 * i] << 24) | (data.var.data[1 + 4 * i] << 16) | \
+                     (data.var.data[2 + 4 * i] << 8) | data.var.data[3 + 4 * i];
+      }
+      
+      ControllerSetLinPid(pidVals);
+      
+      for (i = 0; i < numAngPids; i++)
+      {
+        pidVals[i] = (data.var.data[12 + 4 * i] << 24) | (data.var.data[13 + 4 * i] << 16) | \
+                     (data.var.data[14 + 4 * i] << 8) | data.var.data[15 + 4 * i];
+      }
+      
+      ControllerSetAngPid(pidVals, numAngPids);
+      
+      ROSSendPidResponse(&send, RESP_OK);      
       break;
     default:
       break;   

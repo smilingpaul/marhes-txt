@@ -34,8 +34,8 @@
 #define DELTA_T               50
 
 // The maximum linear and angular velocities
-#define LIN_VEL_MAX					1000
-#define LIN_VEL_MIN					-1000
+#define LIN_VEL_MAX					1500
+#define LIN_VEL_MIN					-1500
 
 #define RADIUS_MIN          555  // In mm
 
@@ -44,6 +44,8 @@
 #define VELOCITY_PWM_MIN			(PWM_MIN - DUTY_1_5)
 #define ANGULAR_PWM_MAX				18000
 #define ANGULAR_PWM_MIN				-18000
+
+#define ANG_PID_CNT_MAX       24
 
 /**
  @brief Array indices for the pid gain matrix
@@ -63,6 +65,11 @@ void ControllerSetOdomCombined(int32_t linVel, int32_t angVel);
 void ControllerSetPid(int32_t lp, int32_t li, int32_t ld, \
 					  int32_t ap, int32_t ai, int32_t ad);
 float ControllerGetPid(uint8_t gain);
+float ControllerGetLinPid(uint8_t gain);
+float ControllerGetAngPid(uint8_t gain);
+float ControllerGetAngPidAddr(uint8_t velIndex, int8_t gain);
+void ControllerSetLinPid(int32_t * linPids);
+void ControllerSetAngPid(int32_t * angPids, uint8_t count);
 void ControllerToggleMode(void);
 int8_t ControllerGetMode(void);
 

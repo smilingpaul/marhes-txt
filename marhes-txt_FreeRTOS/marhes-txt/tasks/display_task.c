@@ -104,6 +104,9 @@ void DisplayUpdate(void)
 	    break;
     case DISPLAY_ENCODER:
     	DisplayEncoders();
+	    break;
+	  case DISPLAY_GAINS:
+	    DisplayGains();
 	    break;		    		    
     default:
 	    // Don't do anything
@@ -186,13 +189,13 @@ void DisplayStatus(void)
 	LcdPutStr(itoa(ControllerGetAngularVelocity()), 92, 60, SMALL, FCOLOR, BCOLOR);
 
 	LcdSetRect(104, 60, 112, SCREEN_MAX, FILL, BCOLOR);
-	LcdPutStr(itoa((int32_t)ControllerGetPid(0)), 104, 60, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr(itoa((int32_t)ControllerGetPid(1)), 104, 85, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr(itoa((int32_t)ControllerGetPid(2)), 104, 110, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetLinPid(0)), 104, 60, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetLinPid(1)), 104, 85, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetLinPid(2)), 104, 110, SMALL, FCOLOR, BCOLOR);
 	LcdSetRect(116, 60, 124, SCREEN_MAX, FILL, BCOLOR);
-	LcdPutStr(itoa((int32_t)ControllerGetPid(3)), 116, 60, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr(itoa((int32_t)ControllerGetPid(4)), 116, 85, SMALL, FCOLOR, BCOLOR);
-	LcdPutStr(itoa((int32_t)ControllerGetPid(5)), 116, 110, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetAngPid(0)), 116, 60, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetAngPid(1)), 116, 85, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetAngPid(2)), 116, 110, SMALL, FCOLOR, BCOLOR);
 }
 
 /**
@@ -260,4 +263,37 @@ void DisplayEncoders(void)
 	LcdPutStr(itoa(vels[VELS_LINEAR]), 44, 60, SMALL, FCOLOR, BCOLOR);
 	LcdSetRect(56, 60, 64, SCREEN_MAX, FILL, BCOLOR);
 	LcdPutStr(itoa(vels[VELS_ANGULAR]), 56, 60, SMALL, FCOLOR, BCOLOR);
+}
+
+/**
+ @brief Update the 4th display screen with the stored PID gains
+ */
+void DisplayGains(void)
+{
+  int i;
+  
+	if (SwitchedState)
+	{
+    LcdClearScreen(BCOLOR);
+		LcdPutStr("TXT1 PID GAINS", 0, 0, LARGE, FCOLOR, BCOLOR);
+    LcdPutStr("LIN GAINS:  ", 20, 0, SMALL, FCOLOR, BCOLOR);
+		LcdPutStr("ANG GAINS:  ", 32, 0, SMALL, FCOLOR, BCOLOR);
+		LcdPutStr("VEL  KP   KI   KD", 44, 0, SMALL, FCOLOR, BCOLOR);
+	  LcdSetLine(18, 0, 18, 131, FCOLOR);
+		SwitchedState = 0;
+  }
+  
+  LcdSetRect(20, 60, 28, SCREEN_MAX, FILL, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetLinPid(0)), 20, 60, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetLinPid(1)), 20, 85, SMALL, FCOLOR, BCOLOR);
+	LcdPutStr(itoa((int32_t)ControllerGetLinPid(2)), 20, 110, SMALL, FCOLOR, BCOLOR);
+	
+	for (i = 0; i < 6; i++)
+	{
+	  LcdSetRect(56 + i * 12, 0, 64 + i * 12, SCREEN_MAX, FILL, BCOLOR);
+	  LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(i, -1)), 56 + i * 12, 0, SMALL, FCOLOR, BCOLOR);
+	  LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(i, 0)), 56 + i * 12, 30, SMALL, FCOLOR, BCOLOR);
+	  LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(i, 1)), 56 + i * 12, 60, SMALL, FCOLOR, BCOLOR);
+    LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(i, 2)), 56 + i * 12, 90, SMALL, FCOLOR, BCOLOR);
+  }
 }
