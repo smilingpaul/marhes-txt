@@ -43,6 +43,7 @@ void DisplayDecreaseState(void);
 void DisplayIncreaseState(void);
 void DisplayUpdate(void);
 void DisplayBrightUpdate(void);
+void DisplayPidSelected(int8_t direction);
 void DisplayStatus(void);
 void DisplayPWM(void);
 void DisplayEncoders(void);

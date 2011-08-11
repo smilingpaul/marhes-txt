@@ -343,7 +343,7 @@ int8_t ROSChecksum(void)
 */
 void ROSProcessData(void)
 {
-  static int32_t pidVals[24];
+  static int32_t pidVals[ANG_PID_CNT_MAX];
   static int32_t temp;
   
   switch(data.var.header.var.command)

@@ -37,7 +37,7 @@
 #define LIN_VEL_MAX					1500
 #define LIN_VEL_MIN					-1500
 
-#define RADIUS_MIN          555  // In mm
+#define RADIUS_MIN          560  // In mm was 555
 
 // The maximum and minimum PWM values for the servos/motor controller
 #define VELOCITY_PWM_MAX			(PWM_MAX - DUTY_1_5)
@@ -45,7 +45,7 @@
 #define ANGULAR_PWM_MAX				18000
 #define ANGULAR_PWM_MIN				-18000
 
-#define ANG_PID_CNT_MAX       24
+#define ANG_PID_CNT_MAX       56 // 24
 
 /**
  @brief Array indices for the pid gain matrix

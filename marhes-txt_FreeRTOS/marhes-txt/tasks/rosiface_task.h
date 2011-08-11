@@ -53,7 +53,7 @@
 #define SIZE_PID_TERMS    16
 #define SIZE_SWITCH_PWR   2
 #define SIZE_PWM          8
-#define SIZE_PID_MAX      108
+#define SIZE_PID_MAX      236
 
 // Size of arrays
 #define SIZE_VEL_ARR      2
