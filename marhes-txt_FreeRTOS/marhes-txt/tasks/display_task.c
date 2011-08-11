@@ -25,13 +25,14 @@
 extern int32_t ticks[SIZE_ENCODER_TICKS_ARR];
 extern int32_t vels[SIZE_ENCODER_VEL_ARR];
 
-static int8_t DisplayState;           ///< The display type to show
-static int8_t SwitchedState;          ///< If the display has switch states
+static int8_t DisplayState;              ///< The display type to show
+static int8_t SwitchedState;             ///< If the display has switch states
+static uint8_t SelectedPIDDisplayIndex;  ///< The selected PID display index
 
 /**
  @brief The display task first initializes the display, then updates it and the
         brightness of the backlight.
- @param[in] pvParameters The parameters from the task create call
+ @param[in] pvParameters The parameteDisplayPidSelectedrs from the task create call
  @todo Allow the delay to be variable 
 */
 static void vDisplayTask( void *pvParameters )
@@ -63,7 +64,8 @@ void vDisplayTaskStart(void)
 void DisplayInit(void)
 {
     DisplayState = DISPLAY_STATUS;
-    SwitchedState = 1;    
+    SwitchedState = 1;   
+    SelectedPIDDisplayIndex = 0; 
     LcdClearScreen(BCOLOR);
 }
 
@@ -121,6 +123,14 @@ void DisplayBrightUpdate(void)
 {
   int16_t val = ADCGetChannel(5);
   PWMSetDuty(6, (val * 1407));
+}
+
+void DisplayPidSelected(int8_t direction)
+{
+  if (direction == -1 && SelectedPIDDisplayIndex > 0)
+    SelectedPIDDisplayIndex--;
+  if (direction == 1 && SelectedPIDDisplayIndex < ANG_PID_CNT_MAX / 4 - 6)
+    SelectedPIDDisplayIndex++;
 }
 
 /**
@@ -291,9 +301,13 @@ void DisplayGains(void)
 	for (i = 0; i < 6; i++)
 	{
 	  LcdSetRect(56 + i * 12, 0, 64 + i * 12, SCREEN_MAX, FILL, BCOLOR);
-	  LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(i, -1)), 56 + i * 12, 0, SMALL, FCOLOR, BCOLOR);
-	  LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(i, 0)), 56 + i * 12, 30, SMALL, FCOLOR, BCOLOR);
-	  LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(i, 1)), 56 + i * 12, 60, SMALL, FCOLOR, BCOLOR);
-    LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(i, 2)), 56 + i * 12, 90, SMALL, FCOLOR, BCOLOR);
+	  LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(SelectedPIDDisplayIndex + i,
+	                 -1)), 56 + i * 12, 0, SMALL, FCOLOR, BCOLOR);
+	  LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(SelectedPIDDisplayIndex + i,
+	                  0)), 56 + i * 12, 30, SMALL, FCOLOR, BCOLOR);
+	  LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(SelectedPIDDisplayIndex + i,
+	                  1)), 56 + i * 12, 60, SMALL, FCOLOR, BCOLOR);
+    LcdPutStr(itoa((int32_t)ControllerGetAngPidAddr(SelectedPIDDisplayIndex + i, 
+                    2)), 56 + i * 12, 90, SMALL, FCOLOR, BCOLOR);
   }
 }
