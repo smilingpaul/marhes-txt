@@ -168,27 +168,27 @@ void vControllerTaskStart(void)
   xTaskCreate( vControllerTask, "ControllerTask", configMINIMAL_STACK_SIZE * 4, NULL, 4, NULL );
 }
 
-void ControllerSetVelocity(int16_t lv, int16_t av) 
+void ControllerSetVelocity(int16_t set_lv, int16_t set_av) 
 {
   float maxAV;
   portENTER_CRITICAL();
   
-  if (lv > LIN_VEL_MAX)
+  if (set_lv > LIN_VEL_MAX)
     linVelocity = LIN_VEL_MAX;
-  else if (lv < LIN_VEL_MIN)
+  else if (set_lv < LIN_VEL_MIN)
     linVelocity = LIN_VEL_MIN;
   else
-    linVelocity = lv;
+    linVelocity = set_lv;
     
   maxAV = 1000 * absValue(linVelocity) / RADIUS_MIN;
   
-  if (absValue(av) > maxAV)
+  if (absValue(set_av) > maxAV)
   {
-    angVelocity = signValue(av) * maxAV;
+    angVelocity = signValue(set_av) * maxAV;
   }
   else
   {
-    angVelocity = av;
+    angVelocity = set_av;
   }
 		
   portEXIT_CRITICAL();
