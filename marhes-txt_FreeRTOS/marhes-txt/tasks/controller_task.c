@@ -126,9 +126,17 @@ static void vControllerTask( void *pvParameters )
 
 		    // Set the PWM duty cycles for the motor and the steering servos
 		    PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + u_lv);
-	      PWMSetDuty(FRONT_SERVO_CHANNEL, DUTY_1_5 - u_av);
-	      PWMSetDuty(REAR_SERVO_CHANNEL, DUTY_1_5 + u_av);
-	    
+		    
+		    if (linVelocity >= 0)
+		    {
+	        PWMSetDuty(FRONT_SERVO_CHANNEL, DUTY_1_5 - u_av);
+	        PWMSetDuty(REAR_SERVO_CHANNEL, DUTY_1_5 + u_av);
+	      }
+	      else
+	      {
+	        PWMSetDuty(FRONT_SERVO_CHANNEL, DUTY_1_5 + u_av);
+	        PWMSetDuty(REAR_SERVO_CHANNEL, DUTY_1_5 - u_av);
+	      }
 	      /*count++;
 	      if (count > 5)
 	      {
