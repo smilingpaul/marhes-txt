@@ -93,6 +93,9 @@ uint16_t ROSCalcChkSum(msg_u * pmsg)
   // low-order byte of the checksum.
   if (n>0) c = c ^ (uint32_t)*(buffer++);
   
+  // Flash the TX LED
+  FIO3PIN ^= (1<<7);
+  
   return((uint16_t)c);
 }
 
@@ -345,6 +348,9 @@ void ROSProcessData(void)
 {
   static int32_t pidVals[ANG_PID_CNT_MAX];
   static int32_t temp;
+  
+  // Flash the RX pin
+  FIO3PIN ^= (1<<6);
   
   switch(data.var.header.var.command)
   {

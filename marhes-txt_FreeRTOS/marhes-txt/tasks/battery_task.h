@@ -21,8 +21,8 @@
 #include "drivers/adc.h"
 #include "tasks/rosiface_task.h"
 
-#define BATTERY_1		1               ///< Battery 1 ADC input channel
-#define BATTERY_2		3               ///< Battery 1 ADC input channel
+#define BATTERY_1		3               ///< Battery 1 ADC input channel
+#define BATTERY_2		6               ///< Battery 1 ADC input channel
 
 #define BATTERY_GOOD		0           ///< Battery status good
 #define BATTERY_WARN		1           ///< Battery status warning
