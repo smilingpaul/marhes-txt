@@ -188,6 +188,7 @@
 
 // Configure the hardware as required
 static void prvSetupHardware( void );
+static void IOInit(void);
 
 /// ROS serial port handle
 xComPortHandle rosPortHandle;
@@ -290,8 +291,25 @@ static void prvSetupHardware( void )
 	PWMInit();
 	ADCInit();
 	LcdInit();
+	IOInit();
 	rosPortHandle = xSerialPortInit( serCOM1, ser57600, serNO_PARITY, serBITS_8,
 	                                  serSTOP_1, 250 );
 	debugPortHandle = xSerialPortInit( serCOM2, ser57600, serNO_PARITY, serBITS_8,
 	                                  serSTOP_1, 250 );
+}
+
+static void IOInit(void)
+{
+  // Set up the speaker and led outputs
+  FIO3DIR |= 0x000000E0;
+  FIO3PIN &= ~0x000000E0;
+  
+  // Set up the SD Card led output
+  FIO0DIR |= (1<<21);
+  FIO0PIN |= (1<<21);
+  
+  // Set up the Power Switches
+  FIO4DIR |= 0x00000003;
+  FIO4PIN |= 0x00000003;
+  
 }
