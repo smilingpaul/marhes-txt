@@ -28,8 +28,8 @@
 #define BATTERY_WARN		1           ///< Battery status warning
 #define BATTERY_BAD			2           ///< Battery status bad
 
-#define BATTERY_VWARN		900         ///< Battery status warning voltage
-#define BATTERY_VBAD		700         ///< Battery status bad voltage
+#define BATTERY_VWARN		9500        ///< Battery status warning voltage
+#define BATTERY_VBAD		9000        ///< Battery status bad voltage
 
 void vBatteryTaskStart(void);
 void BatteryUpdateVoltages(void);

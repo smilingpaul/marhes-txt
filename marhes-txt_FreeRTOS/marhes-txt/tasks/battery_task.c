@@ -40,7 +40,7 @@ static void vBatteryTask( void *pvParameters )
   {
     BatteryUpdateVoltages();
     BatteryUpdateStatus();
-//    ROSSendBattery(&data, batt1, batt2);
+    ROSSendBattery(&data, batt1, batt2);
   
     vTaskDelay( 1000 / portTICK_RATE_MS );
   }
@@ -60,8 +60,8 @@ void vBatteryTaskStart(void)
 */
 void BatteryUpdateVoltages(void)
 {
-	batt1 = ADCGetChannel(BATTERY_1);
-	batt2 = ADCGetChannel(BATTERY_2);
+	batt1 = (AD0DR3 & 0x3FF) * 19.41; //ADCGetChannel(BATTERY_1);// / 0.23;
+	batt2 = (AD0DR6 & 0x3FF) * 19.41; //ADCGetChannel(BATTERY_2);
 }
 
 /**
