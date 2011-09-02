@@ -175,7 +175,7 @@ void DisplayStatus(void)
 	else
 		LcdPutStr("BAD    ", 44, 60, SMALL, RED, BCOLOR);
 
-  temp = BatteryVoltage(BATTERY_1);
+  temp = BatteryVoltage(1);
 	LcdSetRect(56, 60, 64, SCREEN_MAX, FILL, BCOLOR);
 	if (temp > BATTERY_VWARN)
 		LcdPutStr(itoa(temp), 56, 60, SMALL, GREEN, BCOLOR);
@@ -184,7 +184,7 @@ void DisplayStatus(void)
 	else
 		LcdPutStr(itoa(temp), 56, 60, SMALL, RED, BCOLOR);
 
-  temp = BatteryVoltage(BATTERY_2);
+  temp = BatteryVoltage(2);
 	LcdSetRect(68, 60, 76, SCREEN_MAX, FILL, BCOLOR);
 	if (temp > BATTERY_VWARN)
 		LcdPutStr(itoa(temp), 68, 60, SMALL, GREEN, BCOLOR);

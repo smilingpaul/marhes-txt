@@ -176,34 +176,34 @@ void EncoderInit(void)
 {
   portENTER_CRITICAL();
   {
-	// 1. Power up timers 0, 1, and 3
-	PCONP |= PCONP_PCTIM0 | PCONP_PCTIM3;
+	  // 1. Power up timers 0, 1, and 3
+	  PCONP |= PCONP_PCTIM0 | PCONP_PCTIM3;
 
-	// 2. Make the peripheral clocks 72 MHz = divided by one
-	PCLKSEL0 |= PCLKSEL0_TIM0_DIV1;
-	PCLKSEL1 |= PCLKSEL1_TIM3_DIV1;
+	  // 2. Make the peripheral clocks 72 MHz = divided by one
+	  PCLKSEL0 |= PCLKSEL0_TIM0_DIV1;
+	  PCLKSEL1 |= PCLKSEL1_TIM3_DIV1;
 
-	// 3. Select pin functions.  Make P3.23 be CAP0 and P0.23 be CAP3.0.
-	PINSEL7 |= (PINSEL7_CAP00);
-	PINSEL1 |= (PINSEL1_CAP30);
+	  // 3. Select pin functions.  Make P3.23 be CAP0 and P0.23 be CAP3.0.
+	  PINSEL7 |= (PINSEL7_CAP00);
+	  PINSEL1 |= (PINSEL1_CAP30);
 
-	// 4. Setup timer counter
-	T0CTCR = CTCR_CM_RF | CTCR_CAP_SEL_0;  // Timer is counter mode on rise/fall
-										                     // Start the counting on channel 0
-	T0TCR = TCR_CR;						             // Reset timer0 counter
-	T0PR = 0;							                 // Increment TC after every rise/fall
+	  // 4. Setup timer counter
+	  T0CTCR = CTCR_CM_RF | CTCR_CAP_SEL_0;  // Timer is counter mode on rise/fall
+										                       // Start the counting on channel 0
+	  T0TCR = TCR_CR;						             // Reset timer0 counter
+	  T0PR = 0;							                 // Increment TC after every rise/fall
 
-	T3CTCR = CTCR_CM_RF | CTCR_CAP_SEL_0;  // Timer is counter mode on rise/fall
-										                     // Start the counting on channel 0
-	T3TCR = TCR_CR;						             // Reset timer3 counter
-	T3PR = 0;							                 // Increment TC after every rise/fall
+	  T3CTCR = CTCR_CM_RF | CTCR_CAP_SEL_0;  // Timer is counter mode on rise/fall
+										                       // Start the counting on channel 0
+	  T3TCR = TCR_CR;						             // Reset timer3 counter
+	  T3PR = 0;							                 // Increment TC after every rise/fall
 
-	// 5. Enable the Timer counters
-	T0TCR = TCR_CE;
-	T3TCR = TCR_CE;
+	  // 5. Enable the Timer counters
+	  T0TCR = TCR_CE;
+	  T3TCR = TCR_CE;
 
-	// 6. Setup direction inputs (input is 0)
-	FIO3DIR &= ~DIR_LEFT & ~DIR_RIGHT;
+	  // 6. Setup direction inputs (input is 0)
+	  FIO3DIR &= ~DIR_LEFT & ~DIR_RIGHT;
 	}
 	portEXIT_CRITICAL();
 }
@@ -220,7 +220,7 @@ int8_t EncoderGetDirection(uint8_t channel)
 		val = FIO3PIN & DIR_LEFT;
 
 	if (channel == TICKS_FR)
-		val = FIO3PIN & DIR_RIGHT;
+		val = ~FIO3PIN & DIR_RIGHT;
 
 	if (val > 0)
 		return -1;
@@ -234,9 +234,18 @@ int8_t EncoderGetDirection(uint8_t channel)
 */
 int32_t EncoderLinVel(void)
 {
+  ///*
+  int32_t temp;
+  portENTER_CRITICAL();
+  temp = vels[VELS_LINEAR];
+  portEXIT_CRITICAL();
+  return temp;
+  //*/
+  /*
   portENTER_CRITICAL();
   return vels[VELS_LINEAR];
   portEXIT_CRITICAL();
+  */
 }
 
 /**
@@ -245,9 +254,18 @@ int32_t EncoderLinVel(void)
 */
 int32_t EncoderAngVel(void)
 {
+  ///*
+  int32_t temp;
+  portENTER_CRITICAL();
+  temp = vels[VELS_ANGULAR];
+  portEXIT_CRITICAL();
+  return temp;
+  //*/
+  /*
   portENTER_CRITICAL();
   return vels[VELS_ANGULAR];
   portEXIT_CRITICAL();
+  */
 }
 
 /**
