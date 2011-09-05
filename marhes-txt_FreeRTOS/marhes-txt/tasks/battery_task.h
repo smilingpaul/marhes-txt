@@ -27,6 +27,7 @@
 #define BATTERY_GOOD		0           ///< Battery status good
 #define BATTERY_WARN		1           ///< Battery status warning
 #define BATTERY_BAD			2           ///< Battery status bad
+#define BATTERY_EXT     3           ///< External power connected
 
 #define BATTERY_VWARN		9500        ///< Battery status warning voltage
 #define BATTERY_VBAD		9000        ///< Battery status bad voltage

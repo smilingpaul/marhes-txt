@@ -26,6 +26,7 @@ extern xComPortHandle debugPortHandle, rosPortHandle;
 static unsigned portBASE_TYPE batt1;      ///< The voltage of battery 1. 
 static unsigned portBASE_TYPE batt2;      ///< The voltage of battery 2.
 static unsigned portBASE_TYPE status;     ///< The status of the batteries.
+static unsigned portBASE_TYPE cntSpkr;    ///< Speaker timing count
 static msg_u data;                        ///< The battery message to transmit
 
 /**
@@ -36,12 +37,15 @@ static msg_u data;                        ///< The battery message to transmit
 */
 static void vBatteryTask( void *pvParameters )
 {
+  cntSpkr = 0;
+
   for( ;; )
   {
     BatteryUpdateVoltages();
     BatteryUpdateStatus();
+    portENTER_CRITICAL();
     ROSSendBattery(&data, batt1, batt2);
-  
+    portEXIT_CRITICAL();  
     vTaskDelay( 1000 / portTICK_RATE_MS );
   }
 }
@@ -60,8 +64,8 @@ void vBatteryTaskStart(void)
 */
 void BatteryUpdateVoltages(void)
 {
-	batt1 = (AD0DR3 & 0x3FF) * 19.41; //ADCGetChannel(BATTERY_1);// / 0.23;
-	batt2 = (AD0DR6 & 0x3FF) * 19.41; //ADCGetChannel(BATTERY_2);
+	batt1 = ADCGetChannel(BATTERY_1) * 13.978;
+	batt2 = ADCGetChannel(BATTERY_2) * 13.978;
 }
 
 /**
@@ -69,19 +73,32 @@ void BatteryUpdateVoltages(void)
 */
 void BatteryUpdateStatus(void)
 {
-	if((batt1 > BATTERY_VWARN) && (batt2 > BATTERY_VWARN))
+  if(FIO3PIN & (1<<4))
+  {
+    status = BATTERY_EXT;
+  }
+	else if((batt1 > BATTERY_VWARN) || (batt2 > BATTERY_VWARN))
 	{
 		status = BATTERY_GOOD;
+		FIO3PIN &= ~(1<<5);
 //		vSerialPutString( debugPortHandle, "BATTERY_GOOD\r\n", 14 );
 	}
-	else if ((batt1 > BATTERY_VBAD) && (batt2 > BATTERY_VBAD))
+	else if ((batt1 > BATTERY_VBAD) || (batt2 > BATTERY_VBAD))
 	{
 		status = BATTERY_WARN;
+		cntSpkr++;
+		if (cntSpkr < 3)
+		  FIO3PIN |= (1<<5);
+		else if (cntSpkr == 4)
+		  cntSpkr = 0;
+		else
+		  FIO3PIN &= ~(1<<5);
 //		vSerialPutString( debugPortHandle, "BATTERY_WARN\r\n", 14 );
 	}
 	else
 	{
 		status = BATTERY_BAD;
+		FIO3PIN ^= (1<<5);
 //		vSerialPutString( debugPortHandle, "BATTERY_BAD\r\n", 13 );
   }
 }

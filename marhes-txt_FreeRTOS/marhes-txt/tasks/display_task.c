@@ -122,6 +122,7 @@ void DisplayUpdate(void)
 void DisplayBrightUpdate(void)
 {
   int16_t val = ADCGetChannel(5);
+  uint32_t temp = AD0DR5;
   PWMSetDuty(6, (val * 1407));
 }
 
@@ -169,11 +170,13 @@ void DisplayStatus(void)
 
   temp = BatteryStatus();
 	if (temp == BATTERY_GOOD)
-		LcdPutStr("GOOD   ", 44, 60, SMALL, GREEN, BCOLOR);
+		LcdPutStr("GOOD          ", 44, 60, SMALL, GREEN, BCOLOR);
 	else if (temp == BATTERY_WARN)
-		LcdPutStr("WARNING", 44, 60, SMALL, YELLOW, BCOLOR);
-	else
-		LcdPutStr("BAD    ", 44, 60, SMALL, RED, BCOLOR);
+		LcdPutStr("WARNING       ", 44, 60, SMALL, YELLOW, BCOLOR);
+	else if (temp == BATTERY_BAD)
+		LcdPutStr("BAD           ", 44, 60, SMALL, RED, BCOLOR);
+  else
+    LcdPutStr("EXTERNAL POWER", 44, 60, SMALL, GREEN, BCOLOR);
 
   temp = BatteryVoltage(1);
 	LcdSetRect(56, 60, 64, SCREEN_MAX, FILL, BCOLOR);

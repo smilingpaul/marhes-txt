@@ -149,9 +149,10 @@ static void vEncoderSendTask( void *pvParameters )
 
   for ( ;; )
   {
-    // Send encoder message
-	  //ROSSendOdomEnc(&data, (int32_t)pos[0], (int32_t)pos[1], (int32_t)pos[2], vels[0], vels[1]);
-	  vTaskDelayUntil( &xLastWakeTime, ( 100 / portTICK_RATE_MS ) );	
+    portENTER_CRITICAL();
+    ROSSendOdomEnc(&data, (int32_t)pos[0], (int32_t)pos[1], (int32_t)pos[2], vels[0], vels[1]);
+    portEXIT_CRITICAL();
+    vTaskDelayUntil( &xLastWakeTime, ( 50 / portTICK_RATE_MS ) );	
 	}
 }
 

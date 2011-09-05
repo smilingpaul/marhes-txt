@@ -48,6 +48,8 @@ static unsigned portBASE_TYPE StopLostConn = pdTRUE;
 */
 static void vModeTask( void *pvParameters )
 {
+  static unsigned portBASE_TYPE cnt = 0;
+  
   /* As per most tasks, this task is implemented in an infinite loop. */
   for( ;; )
   {
@@ -72,6 +74,13 @@ static void vModeTask( void *pvParameters )
 		else
 		{
 			StopLostConn = pdTRUE;
+			cnt++;
+  		if (cnt == 1)
+	  	  FIO3PIN |= (1<<5);
+		  else if (cnt == 4)
+		    cnt = 0;
+		  else
+		    FIO3PIN &= ~(1<<5);
 //			vSerialPutString( debugPortHandle, "LINK_ERROR\r\n", 12 );
 		}
 
@@ -123,4 +132,3 @@ unsigned portBASE_TYPE ModeStopLostConn(void)
 {
   return StopLostConn;
 }
-
