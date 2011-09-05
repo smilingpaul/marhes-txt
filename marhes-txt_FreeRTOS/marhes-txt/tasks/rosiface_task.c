@@ -452,7 +452,7 @@ void ROSProcessData(void)
     case CMD_PID:
       if (data.var.header.var.length > SIZE_PID_MAX)
         break;
-      
+      portENTER_CRITICAL();
       uint8_t numAngPids;  
       if ((data.var.header.var.length / 4 - 3) % 4 == 0)
         numAngPids = (data.var.header.var.length / 4 - 3);
@@ -476,7 +476,8 @@ void ROSProcessData(void)
       
       ControllerSetAngPid(pidVals, numAngPids);
       
-      ROSSendPidResponse(&send, RESP_OK);      
+      ROSSendPidResponse(&send, RESP_OK);   
+      portEXIT_CRITICAL();  
       break;
     default:
       break;   

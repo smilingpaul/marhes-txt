@@ -36,6 +36,7 @@
 #define AD0CR_SEL6          (1<<6)
 #define AD0CR_SEL7          (1<<7)
 #define AD0CR_CLKDIV9       (8<<8)
+#define AD0CR_CLKDIV60      (59<<8)
 #define AD0CR_BURST         (1<<16)
 #define AD0CR_CLKS11        (0<<17)
 #define AD0CR_CLKS10        (1<<17)

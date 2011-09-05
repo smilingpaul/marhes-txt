@@ -20,6 +20,7 @@
 #include "app_types.h"
 #include "drivers/timer.h"
 #include "tasks/rosiface_task.h"
+#include "tasks/mode_task.h"
 
 // Encoder channels
 #define TICKS_FR                0      //!< Front right encoder channel
