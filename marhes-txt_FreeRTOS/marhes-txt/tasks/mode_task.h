@@ -18,6 +18,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "serial.h"
+#include "tasks/battery_task.h"
 
 void vModeTaskStart(void);
 void vOdomCombRx(void);

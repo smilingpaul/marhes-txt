@@ -64,7 +64,7 @@ void vBatteryTaskStart(void)
 */
 void BatteryUpdateVoltages(void)
 {
-        double alpha = 0.9;
+  double alpha = 0.6;
 	batt1 = batt1 * alpha + (ADCGetChannel(BATTERY_1) * 13.978) * (1 - alpha);
 	batt2 = batt2 * alpha + (ADCGetChannel(BATTERY_2) * 13.978) * (1 - alpha);
 }
@@ -90,7 +90,7 @@ void BatteryUpdateStatus(void)
 		cntSpkr++;
 		if (cntSpkr < 3)
 		  FIO3PIN |= (1<<5);
-		else if (cntSpkr == 4)
+		else if (cntSpkr > 3)
 		  cntSpkr = 0;
 		else
 		  FIO3PIN &= ~(1<<5);

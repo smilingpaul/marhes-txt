@@ -69,18 +69,23 @@ static void vModeTask( void *pvParameters )
   	if (CmdVelRxCount > CMD_VEL_LIMIT)
 		{
 			StopLostConn = pdFALSE;
+			if (BatteryStatus() == BATTERY_GOOD || BatteryStatus() == BATTERY_EXT)
+			  FIO3PIN &= ~(1<<5);
 //			vSerialPutString( debugPortHandle, "LINK_ACTIVE\r\n", 13 );
 	  }
 		else
 		{
 			StopLostConn = pdTRUE;
-			cnt++;
-  		if (cnt == 1)
-	  	  FIO3PIN |= (1<<5);
-		  else if (cnt == 4)
-		    cnt = 0;
-		  else
-		    FIO3PIN &= ~(1<<5);
+			if (BatteryStatus() == BATTERY_GOOD || BatteryStatus() == BATTERY_EXT)
+			{
+			  cnt++;
+    		if (cnt < 2)
+	    	  FIO3PIN |= (1<<5);
+		    else if (cnt > 3)
+		      cnt = 0;
+		    else
+		      FIO3PIN &= ~(1<<5);
+		  }
 //			vSerialPutString( debugPortHandle, "LINK_ERROR\r\n", 12 );
 		}
 
