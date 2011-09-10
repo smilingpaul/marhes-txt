@@ -64,8 +64,9 @@ void vBatteryTaskStart(void)
 */
 void BatteryUpdateVoltages(void)
 {
-	batt1 = ADCGetChannel(BATTERY_1) * 13.978;
-	batt2 = ADCGetChannel(BATTERY_2) * 13.978;
+        double alpha = 0.9;
+	batt1 = batt1 * alpha + (ADCGetChannel(BATTERY_1) * 13.978) * (1 - alpha);
+	batt2 = batt2 * alpha + (ADCGetChannel(BATTERY_2) * 13.978) * (1 - alpha);
 }
 
 /**
