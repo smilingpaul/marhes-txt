@@ -76,7 +76,16 @@ static void vControllerTask( void *pvParameters )
         
         // Get the error signals and process signals
 		    e_lv = linVelocity - lv;
-		    e_av = angVelocity - av;
+		    
+		    if (lv >= 0)
+		    {
+		      e_av = angVelocity - av;
+		    }
+		    else
+		    {
+		      e_av = av - angVelocity;
+		      //lv = -lv;
+		    }
         
         ticks = xTaskGetTickCount();
         if (ticks > lastTicks)
@@ -84,11 +93,6 @@ static void vControllerTask( void *pvParameters )
         else
           dt = (float)(0xFFFFFFFF - lastTicks + ticks + 1) / configTICK_RATE_HZ;
         lastTicks = ticks;
-		    
-		    // VELOCITY PID CONTROLLER
-		    //lpterm = kp_lv * (e_lv - e_lv_last);
-		    //literm = ki_lv * (e_lv + e_lv_last) / 2 * dt;
-		    //ldterm = kd_lv * (e_lv - 2 * e_lv_last + e_lv_last2) / dt;
 		    
 		    lpterm = lin_pids[0] * (e_lv - e_lv_last);
 		    literm = lin_pids[1] * (e_lv + e_lv_last) / 2 * dt;
@@ -102,19 +106,22 @@ static void vControllerTask( void *pvParameters )
 		    if (u_lv < VELOCITY_PWM_MIN)
 		      u_lv = VELOCITY_PWM_MIN;
 		    
-		    angVelIndex = 0;
-        while (abs(lv) > ang_pids[angVelIndex] && angVelIndex < ang_pid_cnt - 4)
+		    //angVelIndex = 0;        
+        //while (lv > ang_pids[angVelIndex] && angVelIndex < ang_pid_cnt - 4)
+        //{ 
+        //  angVelIndex += 4; 
+		    //}
+		    
+		    angVelIndex = 0;        
+        while (lv > ang_pids[angVelIndex] && 
+               angVelIndex < ang_pid_cnt - 4)
         { 
           angVelIndex += 4; 
-		    }
+        }
 		    
 		    apterm = ang_pids[angVelIndex + 1] * (e_av - e_av_last);
 		    aiterm = ang_pids[angVelIndex + 2] * (e_av + e_av_last) / 2 * dt;
 		    adterm = ang_pids[angVelIndex + 3] * (e_av - 2 * e_av_last + e_av_last2) / dt;
-		    
- 		    //apterm = kp_av * (e_av - e_av_last);
-		    //aiterm = ki_av * (e_av + e_av_last) / 2 * dt;
-		    //adterm = kd_av * (e_av - 2 * e_av_last + e_av_last2) / dt;
 		    
 		    u_av += (int32_t)(apterm + aiterm + adterm);
 		    
@@ -127,16 +134,16 @@ static void vControllerTask( void *pvParameters )
 		    // Set the PWM duty cycles for the motor and the steering servos
 		    PWMSetDuty(MOTOR_CHANNEL, DUTY_1_5 + u_lv);
 		    
-		    if (linVelocity >= 0)
-		    {
+		    //if (linVelocity >= 0)
+		    //{
 	        PWMSetDuty(FRONT_SERVO_CHANNEL, DUTY_1_5 - u_av);
 	        PWMSetDuty(REAR_SERVO_CHANNEL, DUTY_1_5 + u_av);
-	      }
-	      else
-	      {
-	        PWMSetDuty(FRONT_SERVO_CHANNEL, DUTY_1_5 + u_av);
-	        PWMSetDuty(REAR_SERVO_CHANNEL, DUTY_1_5 - u_av);
-	      }
+	      //}
+	      //else
+	      //{
+	      //  PWMSetDuty(FRONT_SERVO_CHANNEL, DUTY_1_5 + u_av);
+	      //  PWMSetDuty(REAR_SERVO_CHANNEL, DUTY_1_5 - u_av);
+	      //}
 	      /*count++;
 	      if (count > 5)
 	      {
