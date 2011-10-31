@@ -192,6 +192,8 @@ void ControllerSetVelocity(int16_t set_lv, int16_t set_av)
     linVelocity = LIN_VEL_MAX;
   else if (set_lv < LIN_VEL_MIN)
     linVelocity = LIN_VEL_MIN;
+  else if (set_lv < 0.15 && set_lv > -0.15)
+    linVelocity = 0;
   else
     linVelocity = set_lv;
     
