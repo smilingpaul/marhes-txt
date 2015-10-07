@@ -1,0 +1,3 @@
+The project is to create a set of robots using the Tamiya TXT-1 truck chassis. We are using the LPC2378 development board from Sparkfun for the lower level control and the Mac Mini for the higher level control. Version control for the lower level control is maintained on this site.  The Eclipse, CodeSourcery, and OpenOCD tools are used for the LPC2378.  ROS on Ubuntu is used for the Mac Mini.  The ROS TXT1 Drivers can be found on the [marhes-ros-pkg](http://code.google.com/p/marhes-ros-pkg/) repository.
+
+In order to setup a development system for the LPC2378 board look at the [Setup](Setup.md) page.
